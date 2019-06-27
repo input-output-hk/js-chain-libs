@@ -1,0 +1,3 @@
+[submodule "chain-libs"]
+	path = chain-libs
+	url = https://github.com/input-output-hk/chain-libs.git
