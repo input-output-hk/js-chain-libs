@@ -459,9 +459,12 @@ pub struct Value(value::Value);
 
 #[wasm_bindgen]
 impl Value {
-    //It probably would be better to derive deserialize?
     pub fn from_u64(number: u64) -> Self {
         Value(value::Value(number))
+    }
+
+    pub fn to_number(&self) -> u64 {
+        self.0.as_ref().clone()
     }
 }
 
