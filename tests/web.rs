@@ -95,3 +95,12 @@ fn transaction_finalizer() {
     assert!(finalizer.set_witness(0, witness).is_ok());
     assert!(finalizer.build().is_ok())
 }
+
+#[wasm_bindgen_test]
+fn stake_delegation_certificate() {
+    let stake_pool_id = StakePoolId::from_hex("541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d41").unwrap();
+    let public_key = PublicKey::from_bech32("ed25519_pk1ycaqtzewdqtmevzcu9e5mgup4x27xv6u8c2sm5kkyxeuzdj402ns0uny5a").unwrap();
+    let certificate = Certificate::stake_delegation(stake_pool_id, public_key);
+    let mut txbuilder = mock_builder(30, 20);
+    assert!(txbuilder.set_certificate(certificate).is_ok());
+} 

@@ -30,7 +30,16 @@ impl PrivateKey {
 }
 
 #[wasm_bindgen]
-pub struct PublicKey(crypto::Ed25519);
+pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>); 
+
+#[wasm_bindgen]
+impl PublicKey {
+    pub fn from_bech32(bech32_str: &str) -> Result<PublicKey, JsValue> {
+        crypto::PublicKey::try_from_bech32_str(&bech32_str)
+        .map(PublicKey)
+        .map_err(|_| JsValue::from_str("Malformed public key"))
+    }
+}
 
 //-----------------------------//
 //----------Address------------//
@@ -137,7 +146,7 @@ impl TransactionBuilder {
     }
 
     #[wasm_bindgen]
-    pub fn set_sertificate(&mut self, certificate: Certificate) -> Result<(), JsValue> {
+    pub fn set_certificate(&mut self, certificate: Certificate) -> Result<(), JsValue> {
         let builder = match &self.0 {
             EitherTransactionBuilder::TransactionBuilderNoExtra(ref builder) => {
                 builder.clone().set_certificate(certificate.0)
@@ -443,9 +452,51 @@ impl From<value::Value> for Value {
 #[wasm_bindgen]
 pub struct Certificate(certificate::Certificate);
 
+#[wasm_bindgen]
+impl Certificate {
+    pub fn stake_delegation(pool_id: StakePoolId, account: PublicKey) -> Certificate {
+        let content = certificate::StakeDelegation {
+            stake_key_id: tx::AccountIdentifier::from_single_account(account.0.into()),
+            pool_id: pool_id.0,
+        };
+        certificate::Certificate {
+            content: certificate::CertificateContent::StakeDelegation(content),
+            signatures: vec![],
+        }
+        .into()
+    }
+
+    pub fn sign(&mut self, private_key: PrivateKey) {
+        let signature = match &self.0.content {
+            certificate::CertificateContent::StakeDelegation(s) => {
+                s.make_certificate(&private_key.0)
+            }
+            certificate::CertificateContent::StakePoolRegistration(s) => {
+                s.make_certificate(&private_key.0)
+            }
+            certificate::CertificateContent::StakePoolRetirement(s) => {
+                s.make_certificate(&private_key.0)
+            }
+        };
+        &mut self.0.signatures.push(signature);
+    }
+}
+
 impl From<certificate::Certificate> for Certificate {
     fn from(certificate: certificate::Certificate) -> Certificate {
         Certificate(certificate)
+    }
+}
+
+#[wasm_bindgen]
+pub struct StakePoolId(chain::stake::StakePoolId);
+
+#[wasm_bindgen]
+impl StakePoolId {
+    pub fn from_hex(hex_string: &str) -> Result<StakePoolId, JsValue> {
+        key::Hash::from_str(hex_string)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+            .map(|hash| StakePoolId(hash.into()))
     }
 }
 
