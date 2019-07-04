@@ -30,14 +30,14 @@ impl PrivateKey {
 }
 
 #[wasm_bindgen]
-pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>); 
+pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
 
 #[wasm_bindgen]
 impl PublicKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PublicKey, JsValue> {
         crypto::PublicKey::try_from_bech32_str(&bech32_str)
-        .map(PublicKey)
-        .map_err(|_| JsValue::from_str("Malformed public key"))
+            .map(PublicKey)
+            .map_err(|_| JsValue::from_str("Malformed public key"))
     }
 }
 
@@ -596,6 +596,24 @@ impl SpendingCounter {
 
     pub fn from_u32(counter: u32) -> Self {
         account::SpendingCounter::from(counter).into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct Message(chain::message::Message);
+
+#[wasm_bindgen]
+impl Message {
+    pub fn from_generated_transaction(tx: GeneratedTransaction) -> Message {
+        let msg = match tx.0 {
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => {
+                chain::message::Message::Transaction(auth)
+            }
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => {
+                chain::message::Message::Certificate(auth)
+            }
+        };
+        Message(msg)
     }
 }
 
