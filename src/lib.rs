@@ -1,10 +1,11 @@
 mod utils;
 
+use bech32::{Bech32, FromBase32 as _, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
+use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
-use crypto::bech32::Bech32;
-use serde::{Deserialize, Serialize};
+use crypto::bech32::Bech32 as _;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
@@ -507,6 +508,12 @@ impl Certificate {
             .serialize_as_vec()
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
+
+    pub fn to_bech32(&self) -> Result<String, JsValue> {
+        Bech32::new("cert".to_string(), self.as_bytes()?.to_base32())
+            .map(|bech32| bech32.to_string())
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
 }
 
 impl From<certificate::Certificate> for Certificate {
@@ -619,6 +626,17 @@ impl Witness {
             &account_spending_counter.0,
             &secret_key.0,
         ))
+    }
+
+    pub fn to_bech32(&self) -> Result<String, JsValue> {
+        let bytes = self
+            .0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))?;
+
+        Bech32::new("witness".to_string(), bytes.to_base32())
+            .map(|bech32| bech32.to_string())
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
 }
 
