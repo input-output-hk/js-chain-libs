@@ -288,7 +288,9 @@ impl From<txbuilder::TransactionFinalizer> for TransactionFinalizer {
     }
 }
 
+#[wasm_bindgen]
 impl TransactionFinalizer {
+    #[wasm_bindgen(constructor)]
     pub fn new(transaction: Transaction) -> Self {
         TransactionFinalizer(match transaction.0 {
             EitherTransaction::TransactionWithCertificate(tx) => {
@@ -310,9 +312,10 @@ impl TransactionFinalizer {
         self.0.get_txid().into()
     }
 
-    pub fn build(self) -> Result<txbuilder::GeneratedTransaction, JsValue> {
+    pub fn build(self) -> Result<GeneratedTransaction, JsValue> {
         self.0
             .build()
+            .map(GeneratedTransaction)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 }
@@ -323,6 +326,20 @@ pub struct GeneratedTransaction(txbuilder::GeneratedTransaction);
 impl From<txbuilder::GeneratedTransaction> for GeneratedTransaction {
     fn from(generated_transaction: txbuilder::GeneratedTransaction) -> GeneratedTransaction {
         GeneratedTransaction(generated_transaction)
+    }
+}
+
+#[wasm_bindgen]
+impl GeneratedTransaction {
+    pub fn id(&self) -> TransactionId {
+        match &self.0 {
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => {
+                auth.transaction.hash()
+            }
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => {
+                auth.transaction.hash()
+            }
+        }.into()
     }
 }
 
@@ -339,6 +356,10 @@ impl TransactionId {
         tx::TransactionId::from_str(input)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
             .map(TransactionId)
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
     }
 }
 
@@ -379,8 +400,8 @@ impl Input {
         Input(tx::Input::from_utxo(utxo_pointer.0.clone()))
     }
 
-    pub fn from_account(account: &Account, v: u64) -> Self {
-        Input(tx::Input::from_account(account.0.clone(), value::Value(v)))
+    pub fn from_account(account: &Account, v: Value) -> Self {
+        Input(tx::Input::from_account(account.0.clone(), v.0))
     }
 }
 
@@ -480,6 +501,12 @@ impl Certificate {
         };
         &mut self.0.signatures.push(signature);
     }
+
+    pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
+        self.0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
 }
 
 impl From<certificate::Certificate> for Certificate {
@@ -532,6 +559,8 @@ impl Balance {
 #[wasm_bindgen]
 pub struct Fee(FeeVariant);
 
+use fee::FeeAlgorithm;
+
 #[wasm_bindgen]
 impl Fee {
     pub fn linear_fee(constant: u64, coefficient: u64, certificate: u64) -> Fee {
@@ -540,6 +569,20 @@ impl Fee {
             coefficient,
             certificate,
         )))
+    }
+
+    pub fn calculate(&self, tx: Transaction) -> Option<Value> {
+        use EitherTransaction::TransactionWithCertificate;
+        use EitherTransaction::TransactionWithoutCertificate;
+        match (&self.0, tx.0) {
+            (FeeVariant::Linear(algorithm), TransactionWithCertificate(ref tx)) => {
+                algorithm.calculate(tx)
+            }
+            (FeeVariant::Linear(algorithm), TransactionWithoutCertificate(ref tx)) => {
+                algorithm.calculate(tx)
+            }
+        }
+        .map(Value)
     }
 }
 
@@ -614,6 +657,13 @@ impl Message {
             }
         };
         Message(msg)
+    }
+
+    pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
+        //It may be safe to just unwrap this
+        self.0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
 }
 
