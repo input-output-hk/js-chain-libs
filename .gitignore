@@ -1,5 +1,7 @@
 /target
 **/*.rs.bk
+**/node_modules
+package-lock.json
 Cargo.lock
 bin/
 pkg/
