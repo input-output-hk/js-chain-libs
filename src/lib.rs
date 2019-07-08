@@ -1,10 +1,11 @@
 mod utils;
 
+use bech32::{Bech32, FromBase32 as _, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
+use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
-use crypto::bech32::Bech32;
-use serde::{Deserialize, Serialize};
+use crypto::bech32::Bech32 as _;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
@@ -30,7 +31,16 @@ impl PrivateKey {
 }
 
 #[wasm_bindgen]
-pub struct PublicKey(crypto::Ed25519);
+pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
+
+#[wasm_bindgen]
+impl PublicKey {
+    pub fn from_bech32(bech32_str: &str) -> Result<PublicKey, JsValue> {
+        crypto::PublicKey::try_from_bech32_str(&bech32_str)
+            .map(PublicKey)
+            .map_err(|_| JsValue::from_str("Malformed public key"))
+    }
+}
 
 //-----------------------------//
 //----------Address------------//
@@ -137,7 +147,7 @@ impl TransactionBuilder {
     }
 
     #[wasm_bindgen]
-    pub fn set_sertificate(&mut self, certificate: Certificate) -> Result<(), JsValue> {
+    pub fn set_certificate(&mut self, certificate: Certificate) -> Result<(), JsValue> {
         let builder = match &self.0 {
             EitherTransactionBuilder::TransactionBuilderNoExtra(ref builder) => {
                 builder.clone().set_certificate(certificate.0)
@@ -279,7 +289,9 @@ impl From<txbuilder::TransactionFinalizer> for TransactionFinalizer {
     }
 }
 
+#[wasm_bindgen]
 impl TransactionFinalizer {
+    #[wasm_bindgen(constructor)]
     pub fn new(transaction: Transaction) -> Self {
         TransactionFinalizer(match transaction.0 {
             EitherTransaction::TransactionWithCertificate(tx) => {
@@ -301,9 +313,10 @@ impl TransactionFinalizer {
         self.0.get_txid().into()
     }
 
-    pub fn build(self) -> Result<txbuilder::GeneratedTransaction, JsValue> {
+    pub fn build(self) -> Result<GeneratedTransaction, JsValue> {
         self.0
             .build()
+            .map(GeneratedTransaction)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 }
@@ -314,6 +327,20 @@ pub struct GeneratedTransaction(txbuilder::GeneratedTransaction);
 impl From<txbuilder::GeneratedTransaction> for GeneratedTransaction {
     fn from(generated_transaction: txbuilder::GeneratedTransaction) -> GeneratedTransaction {
         GeneratedTransaction(generated_transaction)
+    }
+}
+
+#[wasm_bindgen]
+impl GeneratedTransaction {
+    pub fn id(&self) -> TransactionId {
+        match &self.0 {
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => {
+                auth.transaction.hash()
+            }
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => {
+                auth.transaction.hash()
+            }
+        }.into()
     }
 }
 
@@ -330,6 +357,10 @@ impl TransactionId {
         tx::TransactionId::from_str(input)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
             .map(TransactionId)
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
     }
 }
 
@@ -370,8 +401,8 @@ impl Input {
         Input(tx::Input::from_utxo(utxo_pointer.0.clone()))
     }
 
-    pub fn from_account(account: &Account, v: u64) -> Self {
-        Input(tx::Input::from_account(account.0.clone(), value::Value(v)))
+    pub fn from_account(account: &Account, v: Value) -> Self {
+        Input(tx::Input::from_account(account.0.clone(), v.0))
     }
 }
 
@@ -443,9 +474,63 @@ impl From<value::Value> for Value {
 #[wasm_bindgen]
 pub struct Certificate(certificate::Certificate);
 
+#[wasm_bindgen]
+impl Certificate {
+    pub fn stake_delegation(pool_id: StakePoolId, account: PublicKey) -> Certificate {
+        let content = certificate::StakeDelegation {
+            stake_key_id: tx::AccountIdentifier::from_single_account(account.0.into()),
+            pool_id: pool_id.0,
+        };
+        certificate::Certificate {
+            content: certificate::CertificateContent::StakeDelegation(content),
+            signatures: vec![],
+        }
+        .into()
+    }
+
+    pub fn sign(&mut self, private_key: PrivateKey) {
+        let signature = match &self.0.content {
+            certificate::CertificateContent::StakeDelegation(s) => {
+                s.make_certificate(&private_key.0)
+            }
+            certificate::CertificateContent::StakePoolRegistration(s) => {
+                s.make_certificate(&private_key.0)
+            }
+            certificate::CertificateContent::StakePoolRetirement(s) => {
+                s.make_certificate(&private_key.0)
+            }
+        };
+        &mut self.0.signatures.push(signature);
+    }
+
+    pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
+        self.0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
+
+    pub fn to_bech32(&self) -> Result<String, JsValue> {
+        Bech32::new("cert".to_string(), self.as_bytes()?.to_base32())
+            .map(|bech32| bech32.to_string())
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
+}
+
 impl From<certificate::Certificate> for Certificate {
     fn from(certificate: certificate::Certificate) -> Certificate {
         Certificate(certificate)
+    }
+}
+
+#[wasm_bindgen]
+pub struct StakePoolId(chain::stake::StakePoolId);
+
+#[wasm_bindgen]
+impl StakePoolId {
+    pub fn from_hex(hex_string: &str) -> Result<StakePoolId, JsValue> {
+        key::Hash::from_str(hex_string)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+            .map(|hash| StakePoolId(hash.into()))
     }
 }
 
@@ -481,6 +566,8 @@ impl Balance {
 #[wasm_bindgen]
 pub struct Fee(FeeVariant);
 
+use fee::FeeAlgorithm;
+
 #[wasm_bindgen]
 impl Fee {
     pub fn linear_fee(constant: u64, coefficient: u64, certificate: u64) -> Fee {
@@ -489,6 +576,20 @@ impl Fee {
             coefficient,
             certificate,
         )))
+    }
+
+    pub fn calculate(&self, tx: Transaction) -> Option<Value> {
+        use EitherTransaction::TransactionWithCertificate;
+        use EitherTransaction::TransactionWithoutCertificate;
+        match (&self.0, tx.0) {
+            (FeeVariant::Linear(algorithm), TransactionWithCertificate(ref tx)) => {
+                algorithm.calculate(tx)
+            }
+            (FeeVariant::Linear(algorithm), TransactionWithoutCertificate(ref tx)) => {
+                algorithm.calculate(tx)
+            }
+        }
+        .map(Value)
     }
 }
 
@@ -526,6 +627,17 @@ impl Witness {
             &secret_key.0,
         ))
     }
+
+    pub fn to_bech32(&self) -> Result<String, JsValue> {
+        let bytes = self
+            .0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))?;
+
+        Bech32::new("witness".to_string(), bytes.to_base32())
+            .map(|bech32| bech32.to_string())
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
 }
 
 #[wasm_bindgen]
@@ -545,6 +657,31 @@ impl SpendingCounter {
 
     pub fn from_u32(counter: u32) -> Self {
         account::SpendingCounter::from(counter).into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct Message(chain::message::Message);
+
+#[wasm_bindgen]
+impl Message {
+    pub fn from_generated_transaction(tx: GeneratedTransaction) -> Message {
+        let msg = match tx.0 {
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => {
+                chain::message::Message::Transaction(auth)
+            }
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => {
+                chain::message::Message::Certificate(auth)
+            }
+        };
+        Message(msg)
+    }
+
+    pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
+        //It may be safe to just unwrap this
+        self.0
+            .serialize_as_vec()
+            .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
 }
 
