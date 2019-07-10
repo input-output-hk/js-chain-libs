@@ -19,11 +19,14 @@ async function makeTransaction(args) {
     PrivateKey,
     Witness,
     SpendingCounter,
-    Hash
+    Hash,
+    Account,
+    uint8array_to_hex
   } = await rust;
   const txbuilder = new TransactionBuilder();
 
-  const account = Address.from_string(inputAccount.address);
+  const accountAddress = Address.from_string(inputAccount.address);
+  const account = Account.from_address(accountAddress);
 
   const input = Input.from_account(
     account,
@@ -42,11 +45,7 @@ async function makeTransaction(args) {
     PublicKey.from_bech32(delegation.stakeKey)
   );
 
-  console.log(`Certificate: ${certificate.to_bech32()}`);
-
   certificate.sign(PrivateKey.from_bech32(delegation.privateKey));
-
-  console.log(`Signed Certificate: ${certificate.to_bech32()}`);
 
   txbuilder.set_certificate(certificate);
 
@@ -54,35 +53,29 @@ async function makeTransaction(args) {
 
   const finalizedTx = txbuilder.finalize(
     feeAlgorithm,
-    OutputPolicy.one(account)
+    OutputPolicy.one(accountAddress)
   );
 
   const finalizer = new TransactionFinalizer(finalizedTx);
 
   const witness = Witness.for_account(
-    Hash.from_bytes(genesisHash),
+    Hash.from_hex(genesisHash),
     finalizer.get_txid(),
     PrivateKey.from_bech32(inputAccount.privateKey),
     SpendingCounter.zero()
   );
 
-  console.log(`Witness: ${witness.to_bech32()}`);
-
   finalizer.set_witness(0, witness);
 
   const signedTx = finalizer.build();
 
-  console.log(`tx id: ${toHexString(signedTx.id().as_bytes())}`);
-
   const message = Message.from_generated_transaction(signedTx);
 
-  console.log(toHexString(message.as_bytes()));
 }
 
 makeTransaction({
-  genesisHash: hexStringToBytes(
-    '6a702a181151b772ca0acbdc4d2870ed80c09b626b29fffc2e47abf2330ad0cd'
-  ),
+  genesisHash:
+    '6a702a181151b772ca0acbdc4d2870ed80c09b626b29fffc2e47abf2330ad0cd',
   inputAccount: {
     address: 'ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344',
     value: 1000,
@@ -101,16 +94,3 @@ makeTransaction({
     poolId: '541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d41'
   }
 });
-
-function hexStringToBytes(string) {
-  const bytes = [];
-  for (let c = 0; c < string.length; c += 2)
-    bytes.push(parseInt(string.substr(c, 2), 16));
-  return Uint8Array.from(bytes);
-}
-
-function toHexString(byteArray) {
-  return Array.from(byteArray, function(byte) {
-    return `0${(byte & 0xff).toString(16)}`.slice(-2);
-  }).join('');
-}
