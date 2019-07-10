@@ -1,5 +1,7 @@
 /* eslint-disable promise/always-return */
 /* global BigInt */
+import { expect } from 'chai';
+
 const rust = import('../pkg/js_chain_libs');
 
 async function makeTransaction(args) {
@@ -71,6 +73,9 @@ async function makeTransaction(args) {
 
   const message = Message.from_generated_transaction(signedTx);
 
+  expect(uint8array_to_hex(message.as_bytes())).to.eql(
+    '0143030102ff00000000000003e8cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21905263a058b2e6817bcb058e1734da381a995e3335c3e150dd2d621b3c136557aa700000000000001f405cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21900000000000001c701cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e219541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d41010040faef2a78b53511b598b9484108fff109d1a098558e037c6c04246a7b78557eccfb7f38a774dcf584bb68c99db205f6e95ffde4c42696a8b0d730030aaacad70402c8414c567e866f73a5b89ae434c5f38cb6dc4dca2a9c2f18026aa0123eaa0220aa0ece26a1373cbb8a3568755580835e47ffc33d38a906c359a2c038b15cd709'
+  );
 }
 
 makeTransaction({

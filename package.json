@@ -10,5 +10,7 @@
         "webpack-dev-server": "^3.1.0",
         "text-encoder": "0.0.4"
     },
-    "dependencies": {}
+    "dependencies": {
+        "chai": "^4.2.0"
+    }
 }
