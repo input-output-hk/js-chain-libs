@@ -2,18 +2,17 @@ mod utils;
 
 use bech32::{Bech32, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
+use chain_core::property::Block as _;
+use chain_core::property::Deserialize as _;
+use chain_core::property::HasMessages as _;
 use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
+use js_sys::Uint8Array;
+use std::convert::TryFrom;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
-use std::convert::TryFrom;
-use js_sys::Uint8Array;
-use chain_core::property::Deserialize as _;
-use chain_core::property::Block as _;
-use chain_core::property::HasMessages as _;
-
 
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
@@ -66,7 +65,10 @@ impl Address {
     }
 
     pub fn to_string(&self, prefix: &str) -> String {
-        format!("{}", chain_addr::AddressReadable::from_address(prefix, &self.0))
+        format!(
+            "{}",
+            chain_addr::AddressReadable::from_address(prefix, &self.0)
+        )
     }
 }
 
@@ -90,6 +92,36 @@ enum EitherTransaction {
     TransactionWithCertificate(tx::Transaction<chain_addr::Address, certificate::Certificate>),
 }
 
+impl EitherTransaction {
+    fn id(&self) -> TransactionSignDataHash {
+        match &self {
+            EitherTransaction::TransactionWithoutCertificate(tx) => tx.hash(),
+            EitherTransaction::TransactionWithCertificate(tx) => tx.hash(),
+        }
+        .into()
+    }
+
+    fn inputs(&self) -> Vec<tx::Input> {
+        match &self {
+            EitherTransaction::TransactionWithoutCertificate(tx) => tx.inputs.clone(),
+            EitherTransaction::TransactionWithCertificate(tx) => tx.inputs.clone(),
+        }
+        .iter()
+        .map(|input| input.clone())
+        .collect()
+    }
+
+    fn outputs(&self) -> Vec<tx::Output<chain_addr::Address>> {
+        match &self {
+            EitherTransaction::TransactionWithoutCertificate(ref tx) => tx.outputs.clone(),
+            EitherTransaction::TransactionWithCertificate(ref tx) => tx.outputs.clone(),
+        }
+        .iter()
+        .map(|output| output.clone())
+        .collect()
+    }
+}
+
 impl From<tx::Transaction<chain_addr::Address, tx::NoExtra>> for Transaction {
     fn from(tx: tx::Transaction<chain_addr::Address, tx::NoExtra>) -> Self {
         Transaction(EitherTransaction::TransactionWithoutCertificate(tx))
@@ -103,13 +135,57 @@ impl From<tx::Transaction<chain_addr::Address, certificate::Certificate>> for Tr
 }
 
 #[wasm_bindgen]
+pub struct Inputs(Vec<Input>);
+
+#[wasm_bindgen]
+impl Inputs {
+    pub fn size(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn get(&self, index: usize) -> Input {
+        self.0[index].clone()
+    }
+}
+
+#[wasm_bindgen]
+pub struct Outputs(Vec<Output>);
+
+#[wasm_bindgen]
+impl Outputs {
+    pub fn size(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn get(&self, index: usize) -> Output {
+        self.0[index].clone()
+    }
+}
+
+#[wasm_bindgen]
 impl Transaction {
     pub fn id(&self) -> TransactionSignDataHash {
-        match &self.0 {
-            EitherTransaction::TransactionWithoutCertificate(tx) => tx.hash(),
-            EitherTransaction::TransactionWithCertificate(tx) => tx.hash(),
-        }
-        .into()
+        self.0.id()
+    }
+
+    pub fn inputs(&self) -> Inputs {
+        Inputs(
+            self.0
+                .inputs()
+                .iter()
+                .map(|input| Input(input.clone()))
+                .collect(),
+        )
+    }
+
+    pub fn outputs(&self) -> Outputs {
+        Outputs(
+            self.0
+                .outputs()
+                .iter()
+                .map(|output| Output(output.clone()))
+                .collect(),
+        )
     }
 }
 
@@ -357,6 +433,13 @@ impl GeneratedTransaction {
         }
         .into()
     }
+
+    pub fn transaction(&self) -> Transaction {
+        match &self.0 {
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => auth.transaction.clone().into(),
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => auth.transaction.clone().into(),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -366,8 +449,8 @@ pub struct TransactionSignDataHash(tx::TransactionSignDataHash);
 impl TransactionSignDataHash {
     pub fn from_bytes(bytes: &[u8]) -> Result<TransactionSignDataHash, JsValue> {
         tx::TransactionSignDataHash::try_from(bytes)
-        .map_err(|e| JsValue::from_str(&format!("{}", e)))
-        .map(|digest| digest.into())
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(|digest| digest.into())
     }
 
     pub fn from_hex(input: &str) -> Result<TransactionSignDataHash, JsValue> {
@@ -407,9 +490,14 @@ impl Hash {
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
             .map(Hash)
     }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
+    }
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct Input(tx::Input);
 
 impl From<tx::Input> for Input {
@@ -427,11 +515,42 @@ impl Input {
     pub fn from_account(account: &Account, v: Value) -> Self {
         Input(tx::Input::from_account(account.0.clone(), v.0))
     }
+
+    pub fn get_type(&self) -> String {
+        match self.0.get_type() {
+            tx::InputType::Account => "Account".to_string(),
+            tx::InputType::Utxo => "Utxo".to_string(),
+        }
+    }
+
+    pub fn value(&self) -> Value {
+        self.0.value.into()
+    }
+
+    pub fn get_utxo_pointer(&self) -> Result<UtxoPointer, JsValue> {
+        match self.0.to_enum() {
+            tx::InputEnum::UtxoInput(utxo_pointer) => Ok(utxo_pointer.into()),
+            _ => Err(JsValue::from_str("Input is not from utxo")),
+        }
+    }
+
+    pub fn get_account(&self) -> Result<Account, JsValue> {
+        match self.0.to_enum() {
+            tx::InputEnum::AccountInput(account, _) => Ok(account.into()),
+            _ => Err(JsValue::from_str("Input is not from account")),
+        }
+    }
 }
 
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct UtxoPointer(tx::UtxoPointer);
+
+impl From<tx::UtxoPointer> for UtxoPointer {
+    fn from(ptr: tx::UtxoPointer) -> UtxoPointer {
+        UtxoPointer(ptr)
+    }
+}
 
 #[wasm_bindgen]
 impl UtxoPointer {
@@ -465,14 +584,35 @@ impl Account {
             Err(JsValue::from_str("Address is not account"))
         }
     }
+
+    pub fn to_address(&self) -> Address {
+        let kind = match self.0.to_single_account() {
+            Some(key) => chain_addr::Kind::Account(key.into()),
+            None => panic!(),
+        };
+        let discriminant = chain_addr::Discrimination::Production;
+        chain_addr::Address(discriminant, kind).into()
+    }
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct Output(tx::Output<chain_addr::Address>);
 
 impl From<tx::Output<chain_addr::Address>> for Output {
     fn from(output: tx::Output<chain_addr::Address>) -> Output {
         Output(output)
+    }
+}
+
+#[wasm_bindgen]
+impl Output {
+    pub fn address(&self) -> Address {
+        self.0.address.clone().into()
+    }
+
+    pub fn value(&self) -> Value {
+        self.0.value.into()
     }
 }
 
@@ -687,11 +827,12 @@ impl SpendingCounter {
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct Fragment(chain::fragment::Fragment);
 
-impl From<chain::message::Message> for Message {
-    fn from(msg: chain::message::Message) -> Message {
-        Message(msg)
+impl From<chain::fragment::Fragment> for Fragment {
+    fn from(msg: chain::fragment::Fragment) -> Fragment {
+        Fragment(msg)
     }
 }
 
@@ -711,7 +852,7 @@ impl Fragment {
 
     pub fn get_transaction(self) -> Result<GeneratedTransaction, JsValue> {
         match self.0 {
-            chain::message::Message::Transaction(auth) => {
+            chain::fragment::Fragment::Transaction(auth) => {
                 Ok(txbuilder::GeneratedTransaction::Type1(auth).into())
             }
             _ => Err(JsValue::from_str("Invalid message type")),
@@ -726,42 +867,42 @@ impl Fragment {
 
     pub fn is_initial(&self) -> bool {
         match self.0 {
-            chain::message::Message::Initial(_) => true,
+            chain::fragment::Fragment::Initial(_) => true,
             _ => false,
         }
     }
-    
+
     pub fn is_transaction(&self) -> bool {
         match self.0 {
-            chain::message::Message::Transaction(_) => true,
+            chain::fragment::Fragment::Transaction(_) => true,
             _ => false,
         }
     }
 
     pub fn is_certificate(&self) -> bool {
         match self.0 {
-            chain::message::Message::Certificate(_) => true,
+            chain::fragment::Fragment::Certificate(_) => true,
             _ => false,
         }
     }
-    
+
     pub fn is_old_utxo_declaration(&self) -> bool {
         match self.0 {
-            chain::message::Message::OldUtxoDeclaration(_) => true,
+            chain::fragment::Fragment::OldUtxoDeclaration(_) => true,
             _ => false,
         }
     }
-    
+
     pub fn is_update_proposal(&self) -> bool {
         match self.0 {
-            chain::message::Message::UpdateProposal(_) => true,
+            chain::fragment::Fragment::UpdateProposal(_) => true,
             _ => false,
         }
     }
 
     pub fn is_update_vote(&self) -> bool {
         match self.0 {
-            chain::message::Message::UpdateVote(_) => true,
+            chain::fragment::Fragment::UpdateVote(_) => true,
             _ => false,
         }
     }
@@ -779,7 +920,7 @@ impl From<chain::block::Block> for Block {
 #[wasm_bindgen]
 impl Block {
     pub fn from_bytes(bytes: Uint8Array) -> Result<Block, JsValue> {
-        let mut slice : Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice(); 
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
         bytes.copy_to(&mut *slice);
         chain::block::Block::deserialize(&*slice)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
@@ -794,30 +935,34 @@ impl Block {
         self.0.parent_id().into()
     }
 
-    pub fn messages(&self) -> Messages {
+    ///This involves copying all the messages
+    pub fn fragments(&self) -> Fragments {
         self.0
             .messages()
-            .map(|m| Message::from(m.clone())).collect::<Vec<Message>>().into()
+            .map(|m| Fragment::from(m.clone()))
+            .collect::<Vec<Fragment>>()
+            .into()
     }
 }
 
 #[wasm_bindgen]
-pub struct Messages(Vec<Message>);
+pub struct Fragments(Vec<Fragment>);
 
-impl From<Vec<Message>> for Messages {
-    fn from(messages: Vec<Message>) -> Messages {
-        Messages(messages)
+impl From<Vec<Fragment>> for Fragments {
+    fn from(fragments: Vec<Fragment>) -> Fragments {
+        Fragments(fragments)
     }
 }
 
 #[wasm_bindgen]
-impl Messages {
-    pub fn get_by_index(&self, index: usize) -> Message {
+impl Fragments {
+    ///This performs a copy of the message, returning a pointer may be unsafe
+    pub fn get_by_index(&self, index: usize) -> Fragment {
         self.0[index].clone()
     }
 
     pub fn size(&self) -> usize {
-       self.0.len() 
+        self.0.len()
     }
 }
 
