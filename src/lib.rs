@@ -1,6 +1,6 @@
 mod utils;
 
-use bech32::{Bech32, FromBase32 as _, ToBase32 as _};
+use bech32::{Bech32, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
 use chain_core::property::Serialize;
 use chain_crypto as crypto;
@@ -9,6 +9,11 @@ use crypto::bech32::Bech32 as _;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 use std::convert::TryFrom;
+use js_sys::Uint8Array;
+use chain_core::property::Deserialize as _;
+use chain_core::property::Block as _;
+use chain_core::property::HasMessages as _;
+
 
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
@@ -684,6 +689,12 @@ impl SpendingCounter {
 #[wasm_bindgen]
 pub struct Fragment(chain::fragment::Fragment);
 
+impl From<chain::message::Message> for Message {
+    fn from(msg: chain::message::Message) -> Message {
+        Message(msg)
+    }
+}
+
 #[wasm_bindgen]
 impl Fragment {
     pub fn from_generated_transaction(tx: GeneratedTransaction) -> Fragment {
@@ -698,11 +709,131 @@ impl Fragment {
         Fragment(msg)
     }
 
+    pub fn get_transaction(self) -> Result<GeneratedTransaction, JsValue> {
+        match self.0 {
+            chain::message::Message::Transaction(auth) => {
+                Ok(txbuilder::GeneratedTransaction::Type1(auth).into())
+            }
+            _ => Err(JsValue::from_str("Invalid message type")),
+        }
+    }
+
     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
-        //It may be safe to just unwrap this
         self.0
             .serialize_as_vec()
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
+
+    pub fn is_initial(&self) -> bool {
+        match self.0 {
+            chain::message::Message::Initial(_) => true,
+            _ => false,
+        }
+    }
+    
+    pub fn is_transaction(&self) -> bool {
+        match self.0 {
+            chain::message::Message::Transaction(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_certificate(&self) -> bool {
+        match self.0 {
+            chain::message::Message::Certificate(_) => true,
+            _ => false,
+        }
+    }
+    
+    pub fn is_old_utxo_declaration(&self) -> bool {
+        match self.0 {
+            chain::message::Message::OldUtxoDeclaration(_) => true,
+            _ => false,
+        }
+    }
+    
+    pub fn is_update_proposal(&self) -> bool {
+        match self.0 {
+            chain::message::Message::UpdateProposal(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_update_vote(&self) -> bool {
+        match self.0 {
+            chain::message::Message::UpdateVote(_) => true,
+            _ => false,
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub struct Block(chain::block::Block);
+
+impl From<chain::block::Block> for Block {
+    fn from(block: chain::block::Block) -> Block {
+        Block(block)
+    }
+}
+
+#[wasm_bindgen]
+impl Block {
+    pub fn from_bytes(bytes: Uint8Array) -> Result<Block, JsValue> {
+        let mut slice : Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice(); 
+        bytes.copy_to(&mut *slice);
+        chain::block::Block::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(Block)
+    }
+
+    pub fn id(&self) -> BlockId {
+        self.0.id().into()
+    }
+
+    pub fn parent_id(&self) -> BlockId {
+        self.0.parent_id().into()
+    }
+
+    pub fn messages(&self) -> Messages {
+        self.0
+            .messages()
+            .map(|m| Message::from(m.clone())).collect::<Vec<Message>>().into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct Messages(Vec<Message>);
+
+impl From<Vec<Message>> for Messages {
+    fn from(messages: Vec<Message>) -> Messages {
+        Messages(messages)
+    }
+}
+
+#[wasm_bindgen]
+impl Messages {
+    pub fn get_by_index(&self, index: usize) -> Message {
+        self.0[index].clone()
+    }
+
+    pub fn size(&self) -> usize {
+       self.0.len() 
+    }
+}
+
+#[wasm_bindgen]
+pub struct BlockId(chain::block::BlockId);
+
+impl From<chain::block::BlockId> for BlockId {
+    fn from(block_id: chain::block::BlockId) -> BlockId {
+        BlockId(block_id)
+    }
+}
+
+#[wasm_bindgen]
+impl BlockId {
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
     }
 }
 
