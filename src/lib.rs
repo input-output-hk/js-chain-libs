@@ -8,6 +8,7 @@ use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
+use std::convert::TryFrom;
 
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
@@ -98,7 +99,7 @@ impl From<tx::Transaction<chain_addr::Address, certificate::Certificate>> for Tr
 
 #[wasm_bindgen]
 impl Transaction {
-    pub fn id(&self) -> TransactionId {
+    pub fn id(&self) -> TransactionSignDataHash {
         match &self.0 {
             EitherTransaction::TransactionWithoutCertificate(tx) => tx.hash(),
             EitherTransaction::TransactionWithCertificate(tx) => tx.hash(),
@@ -309,7 +310,7 @@ impl TransactionFinalizer {
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
-    pub fn get_txid(&self) -> TransactionId {
+    pub fn get_txid(&self) -> TransactionSignDataHash {
         self.0.get_txid().into()
     }
 
@@ -332,7 +333,7 @@ impl From<txbuilder::GeneratedTransaction> for GeneratedTransaction {
 
 #[wasm_bindgen]
 impl GeneratedTransaction {
-    pub fn id(&self) -> TransactionId {
+    pub fn id(&self) -> TransactionSignDataHash {
         match &self.0 {
             chain::txbuilder::GeneratedTransaction::Type1(auth) => {
                 auth.transaction.hash()
@@ -345,28 +346,30 @@ impl GeneratedTransaction {
 }
 
 #[wasm_bindgen]
-pub struct TransactionId(tx::TransactionId);
+pub struct TransactionSignDataHash(tx::TransactionSignDataHash);
 
 #[wasm_bindgen]
-impl TransactionId {
-    pub fn from_bytes(bytes: &[u8]) -> TransactionId {
-        tx::TransactionId::hash_bytes(bytes).into()
+impl TransactionSignDataHash {
+    pub fn from_bytes(bytes: &[u8]) -> Result<TransactionSignDataHash, JsValue> {
+        tx::TransactionSignDataHash::try_from(bytes)
+        .map_err(|e| JsValue::from_str(&format!("{}", e)))
+        .map(|digest| digest.into())
     }
 
-    pub fn from_hex(input: &str) -> Result<TransactionId, JsValue> {
-        tx::TransactionId::from_str(input)
+    pub fn from_hex(input: &str) -> Result<TransactionSignDataHash, JsValue> {
+        tx::TransactionSignDataHash::from_str(input)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
-            .map(TransactionId)
+            .map(TransactionSignDataHash)
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
-        self.0.serialize_as_vec().unwrap()
+        self.0.as_ref().to_vec()
     }
 }
 
-impl From<tx::TransactionId> for TransactionId {
-    fn from(txid: tx::TransactionId) -> TransactionId {
-        TransactionId(txid)
+impl From<tx::TransactionSignDataHash> for TransactionSignDataHash {
+    fn from(txid: tx::TransactionSignDataHash) -> TransactionSignDataHash {
+        TransactionSignDataHash(txid)
     }
 }
 
@@ -412,9 +415,9 @@ pub struct UtxoPointer(tx::UtxoPointer);
 
 #[wasm_bindgen]
 impl UtxoPointer {
-    pub fn new(tx_id: TransactionId, output_index: u8, value: u64) -> UtxoPointer {
+    pub fn new(fragment_id: FragmentId, output_index: u8, value: u64) -> UtxoPointer {
         UtxoPointer(tx::UtxoPointer {
-            transaction_id: tx_id.0,
+            transaction_id: fragment_id.0,
             output_index,
             value: value::Value(value),
         })
@@ -607,7 +610,7 @@ pub struct Witness(tx::Witness);
 impl Witness {
     pub fn for_utxo(
         genesis_hash: Hash,
-        transaction_id: TransactionId,
+        transaction_id: TransactionSignDataHash,
         secret_key: PrivateKey,
     ) -> Witness {
         Witness(tx::Witness::new_utxo(
@@ -619,7 +622,7 @@ impl Witness {
 
     pub fn for_account(
         genesis_hash: Hash,
-        transaction_id: TransactionId,
+        transaction_id: TransactionSignDataHash,
         secret_key: PrivateKey,
         account_spending_counter: SpendingCounter,
     ) -> Witness {
@@ -664,20 +667,20 @@ impl SpendingCounter {
 }
 
 #[wasm_bindgen]
-pub struct Message(chain::message::Message);
+pub struct Fragment(chain::fragment::Fragment);
 
 #[wasm_bindgen]
-impl Message {
-    pub fn from_generated_transaction(tx: GeneratedTransaction) -> Message {
+impl Fragment {
+    pub fn from_generated_transaction(tx: GeneratedTransaction) -> Fragment {
         let msg = match tx.0 {
             chain::txbuilder::GeneratedTransaction::Type1(auth) => {
-                chain::message::Message::Transaction(auth)
+                chain::fragment::Fragment::Transaction(auth)
             }
             chain::txbuilder::GeneratedTransaction::Type2(auth) => {
-                chain::message::Message::Certificate(auth)
+                chain::fragment::Fragment::Certificate(auth)
             }
         };
-        Message(msg)
+        Fragment(msg)
     }
 
     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
@@ -685,6 +688,15 @@ impl Message {
         self.0
             .serialize_as_vec()
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
+    }
+}
+
+#[wasm_bindgen]
+pub struct FragmentId(chain::fragment::FragmentId);
+
+impl From<chain::fragment::FragmentId> for FragmentId {
+    fn from(fragment_id: chain::fragment::FragmentId) -> FragmentId {
+        FragmentId(fragment_id)
     }
 }
 
