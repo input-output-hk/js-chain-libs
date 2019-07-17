@@ -70,11 +70,52 @@ impl Address {
             chain_addr::AddressReadable::from_address(prefix, &self.0)
         )
     }
+
+    pub fn single_from_public_key(
+        key: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0)).into()
+    }
+
+    pub fn delegation_from_public_key(
+        key: PublicKey,
+        delegation: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Group(key.0, delegation.0),
+        )
+        .into()
+    }
+
+    pub fn account_from_public_key(
+        key: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0)).into()
+    }
 }
 
 impl From<chain_addr::Address> for Address {
     fn from(address: chain_addr::Address) -> Address {
         Address(address)
+    }
+}
+
+#[wasm_bindgen]
+pub enum AddressDiscrimination {
+    Production,
+    Test,
+}
+
+impl Into<chain_addr::Discrimination> for AddressDiscrimination {
+    fn into(self) -> chain_addr::Discrimination {
+        match self {
+            AddressDiscrimination::Production => chain_addr::Discrimination::Production,
+            AddressDiscrimination::Test => chain_addr::Discrimination::Test,
+        }
     }
 }
 
@@ -592,6 +633,10 @@ impl Account {
         };
         let discriminant = chain_addr::Discrimination::Production;
         chain_addr::Address(discriminant, kind).into()
+    }
+
+    pub fn from_public_key(key: PublicKey) -> Account {
+        Account(tx::AccountIdentifier::from_single_account(key.0.into()))
     }
 }
 
