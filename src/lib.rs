@@ -54,13 +54,13 @@ pub struct Address(chain_addr::Address);
 impl Address {
     //XXX: Maybe this should be from_bech32?
     pub fn from_string(s: &str) -> Result<Address, JsValue> {
-        chain_addr::AddressReadable::from_string_anyprefix(s)
+        chain_addr::AddressReadable::from_string(s)
             .map(|address_readable| Address(address_readable.to_address()))
             .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
     }
 
-    pub fn to_string(&self, prefix: &str) -> String {
-        format!("{}", chain_addr::AddressReadable::from_address(prefix, &self.0))
+    pub fn to_string(&self) -> String {
+        format!("{}", chain_addr::AddressReadable::from_address(&self.0))
     }
 }
 
