@@ -258,6 +258,18 @@ impl TransactionBuilder {
         }
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
+
+    #[wasm_bindgen]
+    pub fn get_txid(&self) -> TransactionId {
+        match &self.0 {
+            EitherTransactionBuilder::TransactionBuilderNoExtra(builder) => {
+                builder.tx.hash().into()
+            }
+            EitherTransactionBuilder::TransactionBuilderCertificate(builder) => {
+                builder.tx.hash().into()
+            }
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -334,13 +346,10 @@ impl From<txbuilder::GeneratedTransaction> for GeneratedTransaction {
 impl GeneratedTransaction {
     pub fn id(&self) -> TransactionId {
         match &self.0 {
-            chain::txbuilder::GeneratedTransaction::Type1(auth) => {
-                auth.transaction.hash()
-            }
-            chain::txbuilder::GeneratedTransaction::Type2(auth) => {
-                auth.transaction.hash()
-            }
-        }.into()
+            chain::txbuilder::GeneratedTransaction::Type1(auth) => auth.transaction.hash(),
+            chain::txbuilder::GeneratedTransaction::Type2(auth) => auth.transaction.hash(),
+        }
+        .into()
     }
 }
 
@@ -383,6 +392,12 @@ impl From<key::Hash> for Hash {
 impl Hash {
     pub fn from_bytes(bytes: &[u8]) -> Hash {
         key::Hash::hash_bytes(bytes).into()
+    }
+
+    pub fn from_hex(hex_string: &str) -> Result<Hash, JsValue> {
+        key::Hash::from_str(hex_string)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(Hash)
     }
 }
 
@@ -686,6 +701,27 @@ impl Message {
             .serialize_as_vec()
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
+}
+
+//this is useful for debugging, I'm not sure it is a good idea to have it here
+//also, the 'hex' module in chain_crypto is private, so I cannot use that
+
+#[wasm_bindgen]
+pub fn uint8array_to_hex(input: JsValue) -> Result<String, JsValue> {
+    //For some reason JSON.stringify serializes Uint8Array as objects instead of arrays
+    let input_array: std::collections::BTreeMap<usize, u8> = input
+        .into_serde()
+        .map_err(|e| JsValue::from_str(&format!("{}", e)))?;
+
+    let mut v = Vec::with_capacity(input_array.len() * 2);
+
+    const ALPHABET: &'static [u8] = b"0123456789abcdef";
+    for &byte in input_array.values() {
+        v.push(ALPHABET[(byte >> 4) as usize]);
+        v.push(ALPHABET[(byte & 0xf) as usize]);
+    }
+
+    String::from_utf8(v).map_err(|e| JsValue::from_str(&format!("{}", e)))
 }
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
