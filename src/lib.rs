@@ -27,16 +27,26 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
 impl PrivateKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
-            .map(|key| key::EitherEd25519SecretKey::Extended(key))
-            .or(crypto::SecretKey::try_from_bech32_str(&bech32_str)
-                .map(|key| key::EitherEd25519SecretKey::Normal(key)))
-            .map(|secret_key| PrivateKey(secret_key))
+            .map(key::EitherEd25519SecretKey::Extended)
+            .or_else(|_| crypto::SecretKey::try_from_bech32_str(&bech32_str)
+                .map(key::EitherEd25519SecretKey::Normal))
+            .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid secret key"))
+    }
+
+    pub fn to_public(&self) -> PublicKey {
+        self.0.to_public().into()
     }
 }
 
 #[wasm_bindgen]
 pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
+
+impl From<crypto::PublicKey<crypto::Ed25519>> for PublicKey {
+    fn from(key: crypto::PublicKey<crypto::Ed25519>) -> PublicKey {
+        PublicKey(key)
+    }
+}
 
 #[wasm_bindgen]
 impl PublicKey {
