@@ -4,7 +4,7 @@ use bech32::{Bech32, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
 use chain_core::property::Block as _;
 use chain_core::property::Deserialize as _;
-use chain_core::property::HasMessages as _;
+use chain_core::property::HasFragments as _;
 use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
@@ -1207,7 +1207,7 @@ impl Block {
     ///This involves copying all the messages
     pub fn fragments(&self) -> Fragments {
         self.0
-            .messages()
+            .fragments()
             .map(|m| Fragment::from(m.clone()))
             .collect::<Vec<Fragment>>()
             .into()
