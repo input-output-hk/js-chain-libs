@@ -36,7 +36,7 @@ fn parse_bech32_normal_secret_key() {
 
 fn mock_builder(input: u64, output: u64) -> TransactionBuilder {
     let mut txbuilder = TransactionBuilder::new();
-    let txid = TransactionId::from_bytes(&[0]);
+    let txid = FragmentId::from_bytes(&[0]);
     let utxopointer = UtxoPointer::new(txid, 0, input);
     let input = Input::from_utxo(&utxopointer);
 

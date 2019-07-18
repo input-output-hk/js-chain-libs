@@ -1046,6 +1046,13 @@ impl From<chain::fragment::FragmentId> for FragmentId {
     }
 }
 
+#[wasm_bindgen]
+impl FragmentId {
+    pub fn from_bytes(bytes: &[u8]) -> FragmentId {
+        chain::fragment::FragmentId::hash_bytes(bytes).into()
+    }
+}
+
 //this is useful for debugging, I'm not sure it is a good idea to have it here
 //also, the 'hex' module in chain_crypto is private, so I cannot use that
 
