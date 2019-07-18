@@ -109,3 +109,49 @@ fn stake_delegation_certificate() {
     let mut txbuilder = mock_builder(30, 20);
     assert!(txbuilder.set_certificate(certificate).is_ok());
 }
+
+#[wasm_bindgen_test]
+fn account_address_from_public_key() {
+    let public_key = PublicKey::from_bech32(
+        "ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8",
+    )
+    .unwrap();
+    let discriminant = AddressDiscrimination::Test;
+    let address = Address::account_from_public_key(public_key, discriminant);
+    assert_eq!(
+        address.to_string("ta"),
+        "ta1sk6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgjm9vc4c"
+    );
+}
+
+#[wasm_bindgen_test]
+fn single_address_from_public_key() {
+    let public_key = PublicKey::from_bech32(
+        "ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8",
+    )
+    .unwrap();
+    let discriminant = AddressDiscrimination::Test;
+    let address = Address::single_from_public_key(public_key, discriminant);
+    assert_eq!(
+        address.to_string("ta"),
+        "ta1sw6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgj44fgl3"
+    );
+}
+
+#[wasm_bindgen_test]
+fn delegation_address_from_public_key() {
+    let public_key = PublicKey::from_bech32(
+        "ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8",
+    )
+    .unwrap();
+    let account_key = PublicKey::from_bech32(
+        "ed25519_pk1e0rueku628h2fex8pzp48sdpjqku76zlwwgefhyl4lexkl6zugvs0uuy0w",
+    )
+    .unwrap();
+    let discriminant = AddressDiscrimination::Test;
+    let address = Address::delegation_from_public_key(public_key, account_key, discriminant);
+    assert_eq!(
+        address.to_string("ta"),
+        "ta1sj6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgnj78ende550w5njvwzyr20q6rypdea597uu3jnwfltljddl59cseaq7yn9"
+    );
+}
