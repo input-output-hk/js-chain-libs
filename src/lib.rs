@@ -27,16 +27,26 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
 impl PrivateKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
-            .map(|key| key::EitherEd25519SecretKey::Extended(key))
-            .or(crypto::SecretKey::try_from_bech32_str(&bech32_str)
-                .map(|key| key::EitherEd25519SecretKey::Normal(key)))
-            .map(|secret_key| PrivateKey(secret_key))
+            .map(key::EitherEd25519SecretKey::Extended)
+            .or_else(|_| crypto::SecretKey::try_from_bech32_str(&bech32_str)
+                .map(key::EitherEd25519SecretKey::Normal))
+            .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid secret key"))
+    }
+
+    pub fn to_public(&self) -> PublicKey {
+        self.0.to_public().into()
     }
 }
 
 #[wasm_bindgen]
 pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
+
+impl From<crypto::PublicKey<crypto::Ed25519>> for PublicKey {
+    fn from(key: crypto::PublicKey<crypto::Ed25519>) -> PublicKey {
+        PublicKey(key)
+    }
+}
 
 #[wasm_bindgen]
 impl PublicKey {
@@ -70,11 +80,52 @@ impl Address {
             chain_addr::AddressReadable::from_address(prefix, &self.0)
         )
     }
+
+    pub fn single_from_public_key(
+        key: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0)).into()
+    }
+
+    pub fn delegation_from_public_key(
+        key: PublicKey,
+        delegation: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Group(key.0, delegation.0),
+        )
+        .into()
+    }
+
+    pub fn account_from_public_key(
+        key: PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0)).into()
+    }
 }
 
 impl From<chain_addr::Address> for Address {
     fn from(address: chain_addr::Address) -> Address {
         Address(address)
+    }
+}
+
+#[wasm_bindgen]
+pub enum AddressDiscrimination {
+    Production,
+    Test,
+}
+
+impl Into<chain_addr::Discrimination> for AddressDiscrimination {
+    fn into(self) -> chain_addr::Discrimination {
+        match self {
+            AddressDiscrimination::Production => chain_addr::Discrimination::Production,
+            AddressDiscrimination::Test => chain_addr::Discrimination::Test,
+        }
     }
 }
 
@@ -593,6 +644,10 @@ impl Account {
         let discriminant = chain_addr::Discrimination::Production;
         chain_addr::Address(discriminant, kind).into()
     }
+
+    pub fn from_public_key(key: PublicKey) -> Account {
+        Account(tx::AccountIdentifier::from_single_account(key.0.into()))
+    }
 }
 
 #[wasm_bindgen]
@@ -988,6 +1043,13 @@ pub struct FragmentId(chain::fragment::FragmentId);
 impl From<chain::fragment::FragmentId> for FragmentId {
     fn from(fragment_id: chain::fragment::FragmentId) -> FragmentId {
         FragmentId(fragment_id)
+    }
+}
+
+#[wasm_bindgen]
+impl FragmentId {
+    pub fn from_bytes(bytes: &[u8]) -> FragmentId {
+        chain::fragment::FragmentId::hash_bytes(bytes).into()
     }
 }
 
