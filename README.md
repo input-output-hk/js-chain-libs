@@ -195,3 +195,7 @@ npm run serve
 ```
 
 Go to `http://127.0.0.1:8080/` to see the results.
+
+# Documentation
+
+Run `npm run doc` on this repository to generate the [jsdoc](https://jsdoc.app/) documentation from the build,the actual files are generated in the `docs` directory.
