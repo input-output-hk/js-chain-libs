@@ -14,6 +14,7 @@ use std::convert::TryFrom;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
+/// ED25519 signing key, either normal or extended 
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
 
@@ -25,6 +26,14 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
 
 #[wasm_bindgen]
 impl PrivateKey {
+    /// Get private key from its bech32 representation
+    /// ```javascript 
+    /// PrivateKey.from_bech32(&#39;ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0&#39;); 
+    /// ```
+    /// For an extended 25519 key
+    /// ```javascript
+    /// PrivateKey.from_bech32(&#39;ed25519e_sk1gqwl4szuwwh6d0yk3nsqcc6xxc3fpvjlevgwvt60df59v8zd8f8prazt8ln3lmz096ux3xvhhvm3ca9wj2yctdh3pnw0szrma07rt5gl748fp&#39;); 
+    /// ```
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
             .map(key::EitherEd25519SecretKey::Extended)
@@ -39,6 +48,7 @@ impl PrivateKey {
     }
 }
 
+/// ED25519 key used as public key
 #[wasm_bindgen]
 pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
 
@@ -50,6 +60,11 @@ impl From<crypto::PublicKey<crypto::Ed25519>> for PublicKey {
 
 #[wasm_bindgen]
 impl PublicKey {
+    /// Get private key from its bech32 representation
+    /// Example:
+    /// ```javascript 
+    /// const pkey = PublicKey.from_bech32(&#39;ed25519_pk1dgaagyh470y66p899txcl3r0jaeaxu6yd7z2dxyk55qcycdml8gszkxze2&#39;); 
+    /// ```
     pub fn from_bech32(bech32_str: &str) -> Result<PublicKey, JsValue> {
         crypto::PublicKey::try_from_bech32_str(&bech32_str)
             .map(PublicKey)
@@ -61,6 +76,10 @@ impl PublicKey {
 //----------Address------------//
 //-----------------------------//
 
+/// An address of any type, this can be one of
+/// * A utxo-based address without delegation (single)
+/// * A utxo-based address with delegation (group)
+/// * An address for an account
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Address(chain_addr::Address);
@@ -68,12 +87,27 @@ pub struct Address(chain_addr::Address);
 #[wasm_bindgen]
 impl Address {
     //XXX: Maybe this should be from_bech32?
+    /// Construct Address from its bech32 representation 
+    /// Example
+    /// ```javascript
+    /// const address = Address.from_string(&#39;ca1q09u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pjyknplu&#39;);
+    /// ```
     pub fn from_string(s: &str) -> Result<Address, JsValue> {
         chain_addr::AddressReadable::from_string_anyprefix(s)
             .map(|address_readable| Address(address_readable.to_address()))
             .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
     }
 
+    /// Get Address bech32 (string) representation with a given prefix
+    /// ```javascript
+    /// let public_key = PublicKey.from_bech32(
+    ///     &#39;ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8&#39;
+    /// );
+    /// let discriminant = AddressDiscrimination.Test;
+    /// let address = Address.single_from_public_key(public_key, discriminant);
+    /// address.to_string(&#39;ta&#39;)
+    /// // ta1sj6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgnj78ende550w5njvwzyr20q6rypdea597uu3jnwfltljddl59cseaq7yn9
+    /// ```
     pub fn to_string(&self, prefix: &str) -> String {
         format!(
             "{}",
@@ -81,6 +115,13 @@ impl Address {
         )
     }
 
+    /// Construct a single non-account address from a public key 
+    /// ```javascript
+    /// let public_key = PublicKey.from_bech32(
+    ///     &#39;ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8&#39;
+    /// );
+    /// let address = Address.single_from_public_key(public_key, AddressDiscrimination.Test);
+    /// ```
     pub fn single_from_public_key(
         key: PublicKey,
         discrimination: AddressDiscrimination,
@@ -88,6 +129,7 @@ impl Address {
         chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0)).into()
     }
 
+    /// Construct a non-account address from a pair of public keys, delegating founds from the first to the second
     pub fn delegation_from_public_key(
         key: PublicKey,
         delegation: PublicKey,
@@ -100,6 +142,7 @@ impl Address {
         .into()
     }
 
+    /// Construct address of account type from a public key
     pub fn account_from_public_key(
         key: PublicKey,
         discrimination: AddressDiscrimination,
@@ -114,6 +157,14 @@ impl From<chain_addr::Address> for Address {
     }
 }
 
+/// Allow to differentiate between address in
+/// production and testing setting, so that
+/// one type of address is not used in another setting.
+/// Example
+/// ```javascript
+/// let discriminant = AddressDiscrimination.Test;
+/// let address = Address::single_from_public_key(public_key, discriminant);
+/// ```
 #[wasm_bindgen]
 pub enum AddressDiscrimination {
     Production,
@@ -133,8 +184,7 @@ impl Into<chain_addr::Discrimination> for AddressDiscrimination {
 //-------- Transaction --------------//
 //-----------------------------------//
 
-// the wrapper is because non C-enums cannot be directly exposed
-// and the enum is because parametrized types cannot be exposed either
+/// Type representing a unsigned transaction
 #[wasm_bindgen]
 pub struct Transaction(EitherTransaction);
 
@@ -185,15 +235,18 @@ impl From<tx::Transaction<chain_addr::Address, certificate::Certificate>> for Tr
     }
 }
 
+/// Type representing a collection of Transaction Inputs
 #[wasm_bindgen]
 pub struct Inputs(Vec<Input>);
 
 #[wasm_bindgen]
 impl Inputs {
+    /// Get the size of the collection
     pub fn size(&self) -> usize {
         self.0.len()
     }
 
+    /// Get the ith input, in the range [0, size)
     pub fn get(&self, index: usize) -> Input {
         self.0[index].clone()
     }
@@ -204,10 +257,12 @@ pub struct Outputs(Vec<Output>);
 
 #[wasm_bindgen]
 impl Outputs {
+    /// Get the size of the collection
     pub fn size(&self) -> usize {
         self.0.len()
     }
 
+    /// Get the ith output, in the range [0, size)
     pub fn get(&self, index: usize) -> Output {
         self.0[index].clone()
     }
@@ -215,10 +270,12 @@ impl Outputs {
 
 #[wasm_bindgen]
 impl Transaction {
+    /// Get the transaction id, needed to compute its signature
     pub fn id(&self) -> TransactionSignDataHash {
         self.0.id()
     }
 
+    /// Get collection of the inputs in the transaction (this allocates new copies of all the values)
     pub fn inputs(&self) -> Inputs {
         Inputs(
             self.0
@@ -229,6 +286,7 @@ impl Transaction {
         )
     }
 
+    /// Get collection of the outputs in the transaction (this allocates new copies of all the values)
     pub fn outputs(&self) -> Outputs {
         Outputs(
             self.0
@@ -244,6 +302,39 @@ impl Transaction {
 //--------TransactionBuilder---------//
 //-----------------------------------//
 
+/// Builder pattern implementation for making a Transaction
+/// 
+/// Example
+/// 
+/// ```javascript
+/// const txbuilder = new TransactionBuilder();
+///
+/// const account = Account.from_address(Address.from_string(
+///   &#39;ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344&#39;
+/// ));
+///
+/// const input = Input.from_account(account, Value.from_u64(BigInt(1000)));
+///
+/// txbuilder.add_input(input);
+///
+/// txbuilder.add_output(
+///   Address.from_string(
+///     &#39;ca1q5nr5pvt9e5p009strshxndrsx5etcentslp2rwj6csm8sfk24a2w3swacn&#39;
+///   ),
+///   Value.from_u64(BigInt(500))
+/// );
+///
+/// const feeAlgorithm = Fee.linear_fee(
+///   BigInt(20),
+///   BigInt(5),
+///   BigInt(0)
+/// );
+///
+/// const finalizedTx = txbuilder.finalize(
+///   feeAlgorithm,
+///   OutputPolicy.one(accountInputAddress)
+/// );
+/// ```
 #[wasm_bindgen]
 pub struct TransactionBuilder(EitherTransactionBuilder);
 
@@ -279,6 +370,19 @@ impl TransactionBuilder {
         txbuilder::TransactionBuilder::new().into()
     }
 
+    /// Add certificate to the transaction if there isn't one already
+    /// Example
+    /// ```javascript
+    /// const certificate = Certificate.stake_delegation(
+    ///     StakePoolId.from_hex(poolId),
+    ///     PublicKey.from_bech32(stakeKey)
+    /// );
+    ///
+    /// certificate.sign(PrivateKey.from_bech32(privateKey));
+    ///
+    /// const txbuilder = new TransactionBuilder();
+    /// txbuilder.set_certificate(certificate);
+    /// ```
     #[wasm_bindgen]
     pub fn set_certificate(&mut self, certificate: Certificate) -> Result<(), JsValue> {
         let builder = match &self.0 {
@@ -295,6 +399,7 @@ impl TransactionBuilder {
         Ok(())
     }
 
+    /// Add input to the transaction
     #[wasm_bindgen]
     pub fn add_input(&mut self, input: Input) {
         match &mut self.0 {
@@ -307,6 +412,7 @@ impl TransactionBuilder {
         }
     }
 
+    /// Add output to the transaction
     #[wasm_bindgen]
     pub fn add_output(&mut self, address: Address, value: Value) {
         match &mut self.0 {
@@ -319,6 +425,7 @@ impl TransactionBuilder {
         }
     }
 
+    /// Estimate fee with the currently added inputs, outputs and certificate based on the given algorithm
     #[wasm_bindgen]
     pub fn estimate_fee(&self, fee: &Fee) -> Result<Value, JsValue> {
         let fee_algorithm = match fee.0 {
@@ -367,6 +474,7 @@ impl TransactionBuilder {
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
+    /// Get the Transaction with the current inputs and outputs without computing the fees nor adding a change address 
     #[wasm_bindgen]
     pub fn unchecked_finalize(self) -> Transaction {
         match self.0 {
@@ -375,6 +483,19 @@ impl TransactionBuilder {
         }
     }
 
+    /// Finalize the transaction by adding the change Address output
+    /// leaving enough for paying the minimum fee computed by the given algorithm
+    /// see the unchecked_finalize for the non-assisted version
+    /// 
+    /// Example
+    /// ```javascript
+    /// const feeAlgorithm = Fee.linear_fee(BigInt(20), BigInt(5), BigInt(10));
+    ///
+    /// const finalizedTx = txbuilder.finalize(
+    ///   Fee.linear_fee(BigInt(20), BigInt(5), BigInt(10)),
+    ///   OutputPolicy.one(changeAddress)
+    /// );
+    /// ```
     #[wasm_bindgen]
     pub fn finalize(self, fee: &Fee, output_policy: OutputPolicy) -> Result<Transaction, JsValue> {
         let fee_algorithm = match fee.0 {
@@ -392,6 +513,7 @@ impl TransactionBuilder {
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
+    /// Get the current Transaction id, this will change when adding input, outputs and certificates
     #[wasm_bindgen]
     pub fn get_txid(&self) -> TransactionSignDataHash {
         match &self.0 {
@@ -405,6 +527,9 @@ impl TransactionBuilder {
     }
 }
 
+/// Helper to add change addresses when finalizing a transaction, there are currently two options
+/// * forget: use all the excess money as fee
+/// * one: send all the excess money to the given address 
 #[wasm_bindgen]
 pub struct OutputPolicy(txbuilder::OutputPolicy);
 
@@ -416,15 +541,35 @@ impl From<txbuilder::OutputPolicy> for OutputPolicy {
 
 #[wasm_bindgen]
 impl OutputPolicy {
+    /// don't do anything with the excess money in transaction
     pub fn forget() -> OutputPolicy {
         txbuilder::OutputPolicy::Forget.into()
     }
 
+    /// use the given address as the only change address
     pub fn one(address: Address) -> OutputPolicy {
         txbuilder::OutputPolicy::One(address.0).into()
     }
 }
 
+/// Builder pattern implementation for signing a Transaction (adding witnesses)
+/// Example (for an account as input)
+/// 
+/// ```javascript
+/// //finalizedTx could be the result of the finalize method on a TransactionBuilder object
+/// const finalizer = new TransactionFinalizer(finalizedTx);
+///
+/// const witness = Witness.for_account(
+///   Hash.from_hex(genesisHashString),
+///   finalizer.get_txid(),
+///   inputAccountPrivateKey,
+///   SpendingCounter.zero()
+/// );
+///
+/// finalizer.set_witness(0, witness);
+///
+/// const signedTx = finalizer.build();
+/// ```
 #[wasm_bindgen]
 pub struct TransactionFinalizer(txbuilder::TransactionFinalizer);
 
@@ -448,6 +593,7 @@ impl TransactionFinalizer {
         })
     }
 
+    /// Set the witness for the corresponding index, the index corresponds to the order in which the inputs were added to the transaction
     pub fn set_witness(&mut self, index: usize, witness: Witness) -> Result<(), JsValue> {
         self.0
             .set_witness(index, witness.0)
@@ -466,6 +612,7 @@ impl TransactionFinalizer {
     }
 }
 
+/// Type for representing a Transaction with Witnesses (signatures)
 #[wasm_bindgen]
 pub struct GeneratedTransaction(txbuilder::GeneratedTransaction);
 
@@ -485,6 +632,7 @@ impl GeneratedTransaction {
         .into()
     }
 
+    /// Get a copy of the inner Transaction, discarding the signatures
     pub fn transaction(&self) -> Transaction {
         match &self.0 {
             chain::txbuilder::GeneratedTransaction::Type1(auth) => auth.transaction.clone().into(),
@@ -493,6 +641,7 @@ impl GeneratedTransaction {
     }
 }
 
+/// Type for representing the hash of a Transaction, necessary for signing it
 #[wasm_bindgen]
 pub struct TransactionSignDataHash(tx::TransactionSignDataHash);
 
@@ -521,6 +670,7 @@ impl From<tx::TransactionSignDataHash> for TransactionSignDataHash {
     }
 }
 
+/// Type for representing a generic Hash
 #[wasm_bindgen]
 pub struct Hash(key::Hash);
 
@@ -557,16 +707,21 @@ impl From<tx::Input> for Input {
     }
 }
 
+/// Generalized input which have a specific input value, and
+/// either contains an account reference or a TransactionSignDataHash+index
+///
+/// This uniquely refer to a specific source of value.
 #[wasm_bindgen]
 impl Input {
     pub fn from_utxo(utxo_pointer: &UtxoPointer) -> Self {
-        Input(tx::Input::from_utxo(utxo_pointer.0.clone()))
+        Input(tx::Input::from_utxo(utxo_pointer.0))
     }
 
     pub fn from_account(account: &Account, v: Value) -> Self {
         Input(tx::Input::from_account(account.0.clone(), v.0))
     }
 
+    /// Get the kind of Input, this can be either "Account" or "Utxo"
     pub fn get_type(&self) -> String {
         match self.0.get_type() {
             tx::InputType::Account => "Account".to_string(),
@@ -578,6 +733,7 @@ impl Input {
         self.0.value.into()
     }
 
+    /// Get the inner UtxoPointer if the Input type is Utxo
     pub fn get_utxo_pointer(&self) -> Result<UtxoPointer, JsValue> {
         match self.0.to_enum() {
             tx::InputEnum::UtxoInput(utxo_pointer) => Ok(utxo_pointer.into()),
@@ -585,6 +741,7 @@ impl Input {
         }
     }
 
+    /// Get the source Account if the Input type is Account
     pub fn get_account(&self) -> Result<Account, JsValue> {
         match self.0.to_enum() {
             tx::InputEnum::AccountInput(account, _) => Ok(account.into()),
@@ -593,6 +750,11 @@ impl Input {
     }
 }
 
+/// Unspent transaction pointer. This is composed of:
+/// * the transaction identifier where the unspent output is (a FragmentId)
+/// * the output index within the pointed transaction's outputs
+/// * the value we expect to read from this output, this setting is added in order to protect undesired withdrawal
+/// and to set the actual fee in the transaction.
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct UtxoPointer(tx::UtxoPointer);
@@ -614,6 +776,7 @@ impl UtxoPointer {
     }
 }
 
+/// This is either an single account or a multisig account depending on the witness type
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct Account(tx::AccountIdentifier);
@@ -650,6 +813,7 @@ impl Account {
     }
 }
 
+/// Type for representing a Transaction Output, composed of an Address and a Value
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct Output(tx::Output<chain_addr::Address>);
@@ -682,7 +846,7 @@ impl Value {
     }
 
     pub fn to_number(&self) -> u64 {
-        self.0.as_ref().clone()
+        *self.0.as_ref()
     }
 }
 
@@ -697,6 +861,7 @@ pub struct Certificate(certificate::Certificate);
 
 #[wasm_bindgen]
 impl Certificate {
+    /// Create a stake delegation certificate from account (stake key) to pool_id
     pub fn stake_delegation(pool_id: StakePoolId, account: PublicKey) -> Certificate {
         let content = certificate::StakeDelegation {
             stake_key_id: tx::AccountIdentifier::from_single_account(account.0.into()),
@@ -709,6 +874,7 @@ impl Certificate {
         .into()
     }
 
+    /// Add signature to certificate
     pub fn sign(&mut self, private_key: PrivateKey) {
         let signature = match &self.0.content {
             certificate::CertificateContent::StakeDelegation(s) => {
@@ -721,7 +887,7 @@ impl Certificate {
                 s.make_certificate(&private_key.0)
             }
         };
-        &mut self.0.signatures.push(signature);
+        self.0.signatures.push(signature);
     }
 
     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
@@ -755,6 +921,7 @@ impl StakePoolId {
     }
 }
 
+/// Amount of the balance in the transaction.
 #[wasm_bindgen]
 pub struct Balance(tx::Balance);
 
@@ -775,6 +942,7 @@ impl Balance {
         })
     }
 
+    /// Get value without taking into account if the balance is positive or negative
     pub fn get_value(&self) -> Value {
         match self.0 {
             tx::Balance::Positive(v) => Value(v),
@@ -784,6 +952,8 @@ impl Balance {
     }
 }
 
+/// Algorithm used to compute transaction fees
+/// Currently the only implementation if the Linear one
 #[wasm_bindgen]
 pub struct Fee(FeeVariant);
 
@@ -791,6 +961,7 @@ use fee::FeeAlgorithm;
 
 #[wasm_bindgen]
 impl Fee {
+    /// Linear algorithm, this is formed by: `coefficient * (#inputs + #outputs) + constant + certificate * #certificate
     pub fn linear_fee(constant: u64, coefficient: u64, certificate: u64) -> Fee {
         Fee(FeeVariant::Linear(fee::LinearFee::new(
             constant,
@@ -799,6 +970,7 @@ impl Fee {
         )))
     }
 
+    /// Compute the fee if possible (it can fail in case the values are out of range)
     pub fn calculate(&self, tx: Transaction) -> Option<Value> {
         use EitherTransaction::TransactionWithCertificate;
         use EitherTransaction::TransactionWithoutCertificate;
@@ -818,11 +990,18 @@ pub enum FeeVariant {
     Linear(fee::LinearFee),
 }
 
+/// Structure that proofs that certain user agrees with
+/// some data. This structure is used to sign `Transaction`
+/// and get `SignedTransaction` out.
+///
+/// It's important that witness works with opaque structures
+/// and may not know the contents of the internal transaction.
 #[wasm_bindgen]
 pub struct Witness(tx::Witness);
 
 #[wasm_bindgen]
 impl Witness {
+    /// Generate Witness for an utxo-based transaction Input
     pub fn for_utxo(
         genesis_hash: Hash,
         transaction_id: TransactionSignDataHash,
@@ -835,6 +1014,8 @@ impl Witness {
         ))
     }
 
+    /// Generate Witness for an account based transaction Input
+    /// the account-spending-counter should be incremented on each transaction from this account
     pub fn for_account(
         genesis_hash: Hash,
         transaction_id: TransactionSignDataHash,
@@ -849,6 +1030,7 @@ impl Witness {
         ))
     }
 
+    /// Get string representation
     pub fn to_bech32(&self) -> Result<String, JsValue> {
         let bytes = self
             .0
@@ -870,6 +1052,12 @@ impl From<account::SpendingCounter> for SpendingCounter {
     }
 }
 
+/// Spending counter associated to an account.
+///
+/// every time the owner is spending from an account,
+/// the counter is incremented. A matching counter
+/// needs to be used in the spending phase to make
+/// sure we have non-replayability of a transaction.
 #[wasm_bindgen]
 impl SpendingCounter {
     pub fn zero() -> Self {
@@ -881,6 +1069,7 @@ impl SpendingCounter {
     }
 }
 
+/// All possible messages recordable in the Block content
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct Fragment(chain::fragment::Fragment);
@@ -905,6 +1094,7 @@ impl Fragment {
         Fragment(msg)
     }
 
+    /// Get a Transaction if the Fragment represents one
     pub fn get_transaction(self) -> Result<GeneratedTransaction, JsValue> {
         match self.0 {
             chain::fragment::Fragment::Transaction(auth) => {
@@ -963,6 +1153,9 @@ impl Fragment {
     }
 }
 
+/// `Block` is an element of the blockchain it contains multiple
+/// transaction and a reference to the parent block. Alongside
+/// with the position of that block in the chain.
 #[wasm_bindgen]
 pub struct Block(chain::block::Block);
 
@@ -974,6 +1167,7 @@ impl From<chain::block::Block> for Block {
 
 #[wasm_bindgen]
 impl Block {
+    /// Deserialize a block from a byte array
     pub fn from_bytes(bytes: Uint8Array) -> Result<Block, JsValue> {
         let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
         bytes.copy_to(&mut *slice);
