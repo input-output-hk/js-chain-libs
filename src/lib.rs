@@ -28,8 +28,10 @@ impl PrivateKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
             .map(key::EitherEd25519SecretKey::Extended)
-            .or_else(|_| crypto::SecretKey::try_from_bech32_str(&bech32_str)
-                .map(key::EitherEd25519SecretKey::Normal))
+            .or_else(|_| {
+                crypto::SecretKey::try_from_bech32_str(&bech32_str)
+                    .map(key::EitherEd25519SecretKey::Normal)
+            })
             .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid secret key"))
     }
@@ -40,6 +42,7 @@ impl PrivateKey {
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct PublicKey(crypto::PublicKey<crypto::Ed25519>);
 
 impl From<crypto::PublicKey<crypto::Ed25519>> for PublicKey {
@@ -54,6 +57,29 @@ impl PublicKey {
         crypto::PublicKey::try_from_bech32_str(&bech32_str)
             .map(PublicKey)
             .map_err(|_| JsValue::from_str("Malformed public key"))
+    }
+}
+
+#[wasm_bindgen]
+pub struct PublicKeys(Vec<PublicKey>);
+
+#[wasm_bindgen]
+impl PublicKeys {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> PublicKeys {
+        PublicKeys(vec![])
+    }
+
+    pub fn size(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn get(&self, index: usize) -> PublicKey {
+        self.0[index].clone()
+    }
+
+    pub fn add(&mut self, key: PublicKey) {
+        self.0.push(key);
     }
 }
 
@@ -693,6 +719,44 @@ impl From<value::Value> for Value {
 }
 
 #[wasm_bindgen]
+pub struct U128(u128);
+
+impl From<u128> for U128 {
+    fn from(number: u128) -> U128 {
+        U128(number)
+    }
+}
+
+#[wasm_bindgen]
+impl U128 {
+    pub fn from_be_bytes(bytes: Uint8Array) -> Result<U128, JsValue> {
+        if bytes.length() == std::mem::size_of::<u128>() as u32 {
+            let mut slice = [0u8; 16];
+            bytes.copy_to(&mut slice);
+            Ok(u128::from_be_bytes(slice).into())
+        } else {
+            Err(JsValue::from_str(&format!(
+                "Invalid array length. Found {}, expected: 16",
+                bytes.length()
+            )))
+        }
+    }
+
+    pub fn from_le_bytes(bytes: Uint8Array) -> Result<U128, JsValue> {
+        if bytes.length() == std::mem::size_of::<u128>() as u32 {
+            let mut slice = [0u8; 16];
+            bytes.copy_to(&mut slice);
+            Ok(u128::from_le_bytes(slice).into())
+        } else {
+            Err(JsValue::from_str(&format!(
+                "Invalid array length. Found {}, expected: 16",
+                bytes.length()
+            )))
+        }
+    }
+}
+
+#[wasm_bindgen]
 pub struct Certificate(certificate::Certificate);
 
 #[wasm_bindgen]
@@ -704,6 +768,14 @@ impl Certificate {
         };
         certificate::Certificate {
             content: certificate::CertificateContent::StakeDelegation(content),
+            signatures: vec![],
+        }
+        .into()
+    }
+
+    pub fn stake_pool_registration(pool_info: StakePoolInfo) -> Certificate {
+        certificate::Certificate {
+            content: certificate::CertificateContent::StakePoolRegistration(pool_info.0),
             signatures: vec![],
         }
         .into()
@@ -744,7 +816,51 @@ impl From<certificate::Certificate> for Certificate {
 }
 
 #[wasm_bindgen]
+pub struct StakePoolInfo(chain::stake::StakePoolInfo);
+
+impl From<chain::stake::StakePoolInfo> for StakePoolInfo {
+    fn from(info: chain::stake::StakePoolInfo) -> StakePoolInfo {
+        StakePoolInfo(info)
+    }
+}
+
+#[wasm_bindgen]
+impl StakePoolInfo {
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        serial: U128,
+        owners: PublicKeys,
+        kes_public_key: KesPublicKey,
+        vrf_public_key: VrfPublicKey,
+    ) -> StakePoolInfo {
+        chain::stake::StakePoolInfo {
+            serial: serial.0,
+            owners: owners
+                .0
+                .into_iter()
+                .map(|key| account::Identifier::from(key.0))
+                .collect(),
+            initial_key: chain::leadership::genesis::GenesisPraosLeader {
+                kes_public_key: kes_public_key.0,
+                vrf_public_key: vrf_public_key.0,
+            },
+        }
+        .into()
+    }
+
+    pub fn id(&self) -> StakePoolId {
+        self.0.to_id().into()
+    }
+}
+
+#[wasm_bindgen]
 pub struct StakePoolId(chain::stake::StakePoolId);
+
+impl From<chain::stake::StakePoolId> for StakePoolId {
+    fn from(pool_id: chain::stake::StakePoolId) -> StakePoolId {
+        StakePoolId(pool_id)
+    }
+}
 
 #[wasm_bindgen]
 impl StakePoolId {
@@ -752,6 +868,46 @@ impl StakePoolId {
         key::Hash::from_str(hex_string)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
             .map(|hash| StakePoolId(hash.into()))
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{}", self.0).to_string()
+    }
+}
+
+#[wasm_bindgen]
+pub struct KesPublicKey(crypto::PublicKey<crypto::SumEd25519_12>);
+
+impl From<crypto::PublicKey<crypto::SumEd25519_12>> for KesPublicKey {
+    fn from(kes: crypto::PublicKey<crypto::SumEd25519_12>) -> KesPublicKey {
+        KesPublicKey(kes)
+    }
+}
+
+#[wasm_bindgen]
+impl KesPublicKey {
+    pub fn from_bech32(bech32_str: &str) -> Result<KesPublicKey, JsValue> {
+        crypto::PublicKey::try_from_bech32_str(&bech32_str)
+            .map(KesPublicKey)
+            .map_err(|_| JsValue::from_str("Malformed kes public key"))
+    }
+}
+
+#[wasm_bindgen]
+pub struct VrfPublicKey(crypto::PublicKey<crypto::Curve25519_2HashDH>);
+
+impl From<crypto::PublicKey<crypto::Curve25519_2HashDH>> for VrfPublicKey {
+    fn from(vrf: crypto::PublicKey<crypto::Curve25519_2HashDH>) -> VrfPublicKey {
+        VrfPublicKey(vrf)
+    }
+}
+
+#[wasm_bindgen]
+impl VrfPublicKey {
+    pub fn from_bech32(bech32_str: &str) -> Result<VrfPublicKey, JsValue> {
+        crypto::PublicKey::try_from_bech32_str(&bech32_str)
+            .map(VrfPublicKey)
+            .map_err(|_| JsValue::from_str("Malformed vrf public key"))
     }
 }
 
