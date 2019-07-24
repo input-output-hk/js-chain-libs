@@ -155,3 +155,13 @@ fn delegation_address_from_public_key() {
         "ta1sj6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgnj78ende550w5njvwzyr20q6rypdea597uu3jnwfltljddl59cseaq7yn9"
     );
 }
+
+#[wasm_bindgen_test]
+fn generate_private_key_ed25519_normal() {
+    assert!(PrivateKey::generate_ed25519().is_ok());
+}
+
+#[wasm_bindgen_test]
+fn generate_private_key_ed25519_extended() {
+    assert!(PrivateKey::generate_ed25519extended().is_ok());
+}
