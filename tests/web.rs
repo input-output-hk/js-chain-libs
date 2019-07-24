@@ -158,10 +158,12 @@ fn delegation_address_from_public_key() {
 
 #[wasm_bindgen_test]
 fn generate_private_key_ed25519_normal() {
-    assert!(PrivateKey::generate_ed25519().is_ok());
+    let key = PrivateKey::generate_ed25519().unwrap();
+    assert!(key.to_bech32().starts_with("ed25519_"));
 }
 
 #[wasm_bindgen_test]
 fn generate_private_key_ed25519_extended() {
-    assert!(PrivateKey::generate_ed25519extended().is_ok());
+    let key = PrivateKey::generate_ed25519extended().unwrap();
+    assert!(key.to_bech32().starts_with("ed25519e_"));
 }

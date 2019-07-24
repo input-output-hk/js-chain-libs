@@ -61,6 +61,13 @@ impl PrivateKey {
             .map(PrivateKey)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
+
+    pub fn to_bech32(&self) -> String {
+        match self.0 {
+            key::EitherEd25519SecretKey::Normal(ref secret) => secret.to_bech32_str(),
+            key::EitherEd25519SecretKey::Extended(ref secret) => secret.to_bech32_str(),
+        }
+    }
 }
 
 #[wasm_bindgen]
