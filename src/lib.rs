@@ -1265,6 +1265,10 @@ impl FragmentId {
     pub fn from_bytes(bytes: &[u8]) -> FragmentId {
         chain::fragment::FragmentId::hash_bytes(bytes).into()
     }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
+    }
 }
 
 //this is useful for debugging, I'm not sure it is a good idea to have it here
