@@ -185,33 +185,33 @@ impl From<tx::Transaction<chain_addr::Address, certificate::Certificate>> for Tr
     }
 }
 
-#[wasm_bindgen]
-pub struct Inputs(Vec<Input>);
+macro_rules! impl_collection {
+    ($collection:ident, $type:ty) => {
+        #[wasm_bindgen]
+        pub struct $collection(Vec<$type>);
 
-#[wasm_bindgen]
-impl Inputs {
-    pub fn size(&self) -> usize {
-        self.0.len()
-    }
+        #[wasm_bindgen]
+        impl $collection {
+            pub fn size(&self) -> usize {
+                self.0.len()
+            }
 
-    pub fn get(&self, index: usize) -> Input {
-        self.0[index].clone()
-    }
+            pub fn get(&self, index: usize) -> $type {
+                self.0[index].clone()
+            }
+        }
+
+        impl From<Vec<$type>> for $collection {
+            fn from(vec: Vec<$type>) -> $collection {
+                $collection(vec)
+            }
+        }
+    };
 }
 
-#[wasm_bindgen]
-pub struct Outputs(Vec<Output>);
-
-#[wasm_bindgen]
-impl Outputs {
-    pub fn size(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn get(&self, index: usize) -> Output {
-        self.0[index].clone()
-    }
-}
+impl_collection!(Outputs, Output);
+impl_collection!(Inputs, Input);
+impl_collection!(Fragments, Fragment);
 
 #[wasm_bindgen]
 impl Transaction {
@@ -220,23 +220,21 @@ impl Transaction {
     }
 
     pub fn inputs(&self) -> Inputs {
-        Inputs(
-            self.0
-                .inputs()
-                .iter()
-                .map(|input| Input(input.clone()))
-                .collect(),
-        )
+        self.0
+            .inputs()
+            .iter()
+            .map(|input| Input(input.clone()))
+            .collect::<Vec<Input>>()
+            .into()
     }
 
     pub fn outputs(&self) -> Outputs {
-        Outputs(
-            self.0
-                .outputs()
-                .iter()
-                .map(|output| Output(output.clone()))
-                .collect(),
-        )
+        self.0
+            .outputs()
+            .iter()
+            .map(|output| Output(output.clone()))
+            .collect::<Vec<Output>>()
+            .into()
     }
 }
 
@@ -997,27 +995,6 @@ impl Block {
             .map(|m| Fragment::from(m.clone()))
             .collect::<Vec<Fragment>>()
             .into()
-    }
-}
-
-#[wasm_bindgen]
-pub struct Fragments(Vec<Fragment>);
-
-impl From<Vec<Fragment>> for Fragments {
-    fn from(fragments: Vec<Fragment>) -> Fragments {
-        Fragments(fragments)
-    }
-}
-
-#[wasm_bindgen]
-impl Fragments {
-    ///This performs a copy of the message, returning a pointer may be unsafe
-    pub fn get_by_index(&self, index: usize) -> Fragment {
-        self.0[index].clone()
-    }
-
-    pub fn size(&self) -> usize {
-        self.0.len()
     }
 }
 
