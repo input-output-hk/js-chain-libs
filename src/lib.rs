@@ -10,6 +10,7 @@ use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
 use js_sys::Uint8Array;
+use rand_os::OsRng;
 use std::convert::TryFrom;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
@@ -22,10 +23,6 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
         PrivateKey(secret_key)
     }
 }
-
-use rand::rngs::OsRng;
-use rand_chacha::ChaChaRng;
-use rand_core::SeedableRng;
 
 #[wasm_bindgen]
 impl PrivateKey {
@@ -46,7 +43,6 @@ impl PrivateKey {
 
     pub fn generate_ed25519() -> Result<PrivateKey, JsValue> {
         OsRng::new()
-            .and_then(ChaChaRng::from_rng)
             .map(crypto::SecretKey::<crypto::Ed25519>::generate)
             .map(key::EitherEd25519SecretKey::Normal)
             .map(PrivateKey)
@@ -55,7 +51,6 @@ impl PrivateKey {
 
     pub fn generate_ed25519extended() -> Result<PrivateKey, JsValue> {
         OsRng::new()
-            .and_then(ChaChaRng::from_rng)
             .map(crypto::SecretKey::<crypto::Ed25519Extended>::generate)
             .map(key::EitherEd25519SecretKey::Extended)
             .map(PrivateKey)

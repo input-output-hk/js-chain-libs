@@ -19,9 +19,7 @@ chain-core = { path = "./chain-libs/chain-core" }
 serde = { version = "1.0.93", features = ["derive"] }
 bech32 = "0.6"
 js-sys = "0.3.24"
-rand = { version = "0.6", features = ["wasm-bindgen"] }
-rand_chacha = "0.1"
-rand_core = "0.3"
+rand_os = { version = "0.1", features = ["wasm-bindgen"] }
 
 # The default can't be compiled to wasm, so it's necessary to use either the 'nightly'
 # feature or this one
