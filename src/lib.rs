@@ -23,6 +23,10 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
     }
 }
 
+use rand::rngs::OsRng;
+use rand_chacha::ChaChaRng;
+use rand_core::SeedableRng;
+
 #[wasm_bindgen]
 impl PrivateKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
@@ -38,6 +42,31 @@ impl PrivateKey {
 
     pub fn to_public(&self) -> PublicKey {
         self.0.to_public().into()
+    }
+
+    pub fn generate_ed25519() -> Result<PrivateKey, JsValue> {
+        OsRng::new()
+            .and_then(ChaChaRng::from_rng)
+            .map(crypto::SecretKey::<crypto::Ed25519>::generate)
+            .map(key::EitherEd25519SecretKey::Normal)
+            .map(PrivateKey)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    }
+
+    pub fn generate_ed25519extended() -> Result<PrivateKey, JsValue> {
+        OsRng::new()
+            .and_then(ChaChaRng::from_rng)
+            .map(crypto::SecretKey::<crypto::Ed25519Extended>::generate)
+            .map(key::EitherEd25519SecretKey::Extended)
+            .map(PrivateKey)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    }
+
+    pub fn to_bech32(&self) -> String {
+        match self.0 {
+            key::EitherEd25519SecretKey::Normal(ref secret) => secret.to_bech32_str(),
+            key::EitherEd25519SecretKey::Extended(ref secret) => secret.to_bech32_str(),
+        }
     }
 }
 
