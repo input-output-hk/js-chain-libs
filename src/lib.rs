@@ -10,6 +10,7 @@ use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
 use js_sys::Uint8Array;
+use rand_os::OsRng;
 use std::convert::TryFrom;
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
@@ -37,14 +38,39 @@ impl PrivateKey {
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
             .map(key::EitherEd25519SecretKey::Extended)
-            .or_else(|_| crypto::SecretKey::try_from_bech32_str(&bech32_str)
-                .map(key::EitherEd25519SecretKey::Normal))
+            .or_else(|_| {
+                crypto::SecretKey::try_from_bech32_str(&bech32_str)
+                    .map(key::EitherEd25519SecretKey::Normal)
+            })
             .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid secret key"))
     }
 
     pub fn to_public(&self) -> PublicKey {
         self.0.to_public().into()
+    }
+
+    pub fn generate_ed25519() -> Result<PrivateKey, JsValue> {
+        OsRng::new()
+            .map(crypto::SecretKey::<crypto::Ed25519>::generate)
+            .map(key::EitherEd25519SecretKey::Normal)
+            .map(PrivateKey)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    }
+
+    pub fn generate_ed25519extended() -> Result<PrivateKey, JsValue> {
+        OsRng::new()
+            .map(crypto::SecretKey::<crypto::Ed25519Extended>::generate)
+            .map(key::EitherEd25519SecretKey::Extended)
+            .map(PrivateKey)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    }
+
+    pub fn to_bech32(&self) -> String {
+        match self.0 {
+            key::EitherEd25519SecretKey::Normal(ref secret) => secret.to_bech32_str(),
+            key::EitherEd25519SecretKey::Extended(ref secret) => secret.to_bech32_str(),
+        }
     }
 }
 
