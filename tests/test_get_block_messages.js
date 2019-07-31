@@ -17,13 +17,13 @@ it('get block messages', async () => {
   expect(
     block
       .fragments()
-      .get_by_index(0)
+      .get(0)
       .is_transaction()
   ).to.eql(true);
 
   const transaction = block
     .fragments()
-    .get_by_index(0)
+    .get(0)
     .get_transaction()
     .transaction();
 
