@@ -156,20 +156,14 @@ impl EitherTransaction {
         match &self {
             EitherTransaction::TransactionWithoutCertificate(tx) => tx.inputs.clone(),
             EitherTransaction::TransactionWithCertificate(tx) => tx.inputs.clone(),
-        }
-        .iter()
-        .map(|input| input.clone())
-        .collect()
+        }.to_vec()
     }
 
     fn outputs(&self) -> Vec<tx::Output<chain_addr::Address>> {
         match &self {
             EitherTransaction::TransactionWithoutCertificate(ref tx) => tx.outputs.clone(),
             EitherTransaction::TransactionWithCertificate(ref tx) => tx.outputs.clone(),
-        }
-        .iter()
-        .map(|output| output.clone())
-        .collect()
+        }.to_vec()
     }
 }
 

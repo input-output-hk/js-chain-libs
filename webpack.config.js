@@ -21,7 +21,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /test*\.js$/,
+        test: /test.*\.js$/,
         use: 'mocha-loader',
         exclude: /node_modules/
       }
