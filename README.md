@@ -1,6 +1,9 @@
-# Js chain libs
+# js chain libs
 
-WebAssembly library with Javascript bindings to the new chain libraries 
+WebAssembly library with Javascript bindings to the new chain libraries.
+
+This library can be used to do things like: create addresses, transactions and certificates, an encode them to be able to post to a node. It can also be used to parse the data fetched from a node (such as blocks).
+A possible use-case is for building explorers and wallets in javascript, either in the browser or in nodejs, making possible to build engaging blockchain apps with good user interfaces with the same low level primitives already used in the rust node.
 
 ## Building 
 
