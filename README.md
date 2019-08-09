@@ -35,7 +35,7 @@ wasm-pack pack
 
 ### Create transaction
 
-The following example uses Webpack to bundle the library and run the code in the browser.
+The following example sets up an example project using Webpack to bundle the library and run the code in the browser.
 
 Try it yourself.
 
@@ -44,9 +44,7 @@ Try it yourself.
 wasm-pack pack
 ```
 2. Copy the `pkg/js-chain-libs-0.1.0.tgz` file to a new directory. e.g: `make-transaction`
-3. Create the following files in that directory.
-4. run `npm install` and `npm install js-chain-libs-0.1.0.tgz` in that directory.
-5. run `npm run serve` and open a browser in `http://localhost:8080/`. The generated transaction should be logged in the console.
+3. Go to that new directory and create the following files.
 
 #### package.json
 
@@ -182,6 +180,11 @@ rust.then(mod => {
   console.log(uint8array_to_hex(readyToSendTx.as_bytes()));
 });
 ```
+
+Now, in that directory, run the two following commands
+
+4. run `npm install` and `npm install js-chain-libs-0.1.0.tgz`.
+5. run `npm run serve` and open a browser in `http://localhost:8080/`. The generated transaction should be logged in the console.
 
 ## Testing
 
