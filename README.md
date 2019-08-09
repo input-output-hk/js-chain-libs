@@ -9,9 +9,9 @@ A possible use-case is for building explorers and wallets in javascript, either 
 
 ### Requirements
 
-Install [rustup](https://rustup.rs/)
-Run rustup install stable
-Install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+- Install [rustup](https://rustup.rs/)
+- Run rustup install stable
+- Install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
 
 Make sure to update the submodule:
 
