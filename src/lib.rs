@@ -97,6 +97,10 @@ impl PublicKey {
             .map(PublicKey)
             .map_err(|_| JsValue::from_str("Malformed public key"))
     }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
+    }
 }
 
 #[wasm_bindgen]
