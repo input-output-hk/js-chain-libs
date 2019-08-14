@@ -12,10 +12,11 @@ use crypto::bech32::Bech32 as _;
 use js_sys::Uint8Array;
 use rand_os::OsRng;
 use std::convert::TryFrom;
+use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
-/// ED25519 signing key, either normal or extended 
+/// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
 
@@ -28,12 +29,12 @@ impl From<key::EitherEd25519SecretKey> for PrivateKey {
 #[wasm_bindgen]
 impl PrivateKey {
     /// Get private key from its bech32 representation
-    /// ```javascript 
-    /// PrivateKey.from_bech32(&#39;ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0&#39;); 
+    /// ```javascript
+    /// PrivateKey.from_bech32(&#39;ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0&#39;);
     /// ```
     /// For an extended 25519 key
     /// ```javascript
-    /// PrivateKey.from_bech32(&#39;ed25519e_sk1gqwl4szuwwh6d0yk3nsqcc6xxc3fpvjlevgwvt60df59v8zd8f8prazt8ln3lmz096ux3xvhhvm3ca9wj2yctdh3pnw0szrma07rt5gl748fp&#39;); 
+    /// PrivateKey.from_bech32(&#39;ed25519e_sk1gqwl4szuwwh6d0yk3nsqcc6xxc3fpvjlevgwvt60df59v8zd8f8prazt8ln3lmz096ux3xvhhvm3ca9wj2yctdh3pnw0szrma07rt5gl748fp&#39;);
     /// ```
     pub fn from_bech32(bech32_str: &str) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::try_from_bech32_str(&bech32_str)
@@ -89,8 +90,8 @@ impl From<crypto::PublicKey<crypto::Ed25519>> for PublicKey {
 impl PublicKey {
     /// Get private key from its bech32 representation
     /// Example:
-    /// ```javascript 
-    /// const pkey = PublicKey.from_bech32(&#39;ed25519_pk1dgaagyh470y66p899txcl3r0jaeaxu6yd7z2dxyk55qcycdml8gszkxze2&#39;); 
+    /// ```javascript
+    /// const pkey = PublicKey.from_bech32(&#39;ed25519_pk1dgaagyh470y66p899txcl3r0jaeaxu6yd7z2dxyk55qcycdml8gszkxze2&#39;);
     /// ```
     pub fn from_bech32(bech32_str: &str) -> Result<PublicKey, JsValue> {
         crypto::PublicKey::try_from_bech32_str(&bech32_str)
@@ -141,7 +142,7 @@ pub struct Address(chain_addr::Address);
 #[wasm_bindgen]
 impl Address {
     //XXX: Maybe this should be from_bech32?
-    /// Construct Address from its bech32 representation 
+    /// Construct Address from its bech32 representation
     /// Example
     /// ```javascript
     /// const address = Address.from_string(&#39;ca1q09u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pjyknplu&#39;);
@@ -169,7 +170,7 @@ impl Address {
         )
     }
 
-    /// Construct a single non-account address from a public key 
+    /// Construct a single non-account address from a public key
     /// ```javascript
     /// let public_key = PublicKey.from_bech32(
     ///     &#39;ed25519_pk1kj8yvfrh5tg7n62kdcw3kw6zvtcafgckz4z9s6vc608pzt7exzys4s9gs8&#39;
@@ -260,14 +261,16 @@ impl EitherTransaction {
         match &self {
             EitherTransaction::TransactionWithoutCertificate(tx) => tx.inputs.clone(),
             EitherTransaction::TransactionWithCertificate(tx) => tx.inputs.clone(),
-        }.to_vec()
+        }
+        .to_vec()
     }
 
     fn outputs(&self) -> Vec<tx::Output<chain_addr::Address>> {
         match &self {
             EitherTransaction::TransactionWithoutCertificate(ref tx) => tx.outputs.clone(),
             EitherTransaction::TransactionWithCertificate(ref tx) => tx.outputs.clone(),
-        }.to_vec()
+        }
+        .to_vec()
     }
 }
 
@@ -344,9 +347,9 @@ impl Transaction {
 //-----------------------------------//
 
 /// Builder pattern implementation for making a Transaction
-/// 
+///
 /// Example
-/// 
+///
 /// ```javascript
 /// const txbuilder = new TransactionBuilder();
 ///
@@ -354,7 +357,7 @@ impl Transaction {
 ///   &#39;ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344&#39;
 /// ));
 ///
-/// const input = Input.from_account(account, Value.from_u64(BigInt(1000)));
+/// const input = Input.from_account(account, Value.from_str('1000'));
 ///
 /// txbuilder.add_input(input);
 ///
@@ -362,13 +365,13 @@ impl Transaction {
 ///   Address.from_string(
 ///     &#39;ca1q5nr5pvt9e5p009strshxndrsx5etcentslp2rwj6csm8sfk24a2w3swacn&#39;
 ///   ),
-///   Value.from_u64(BigInt(500))
+///   Value.from_str('500')
 /// );
 ///
 /// const feeAlgorithm = Fee.linear_fee(
-///   BigInt(20),
-///   BigInt(5),
-///   BigInt(0)
+///   Value.from_str('20'),
+///   Value.from_str('5'),
+///   Value.from_str('0')
 /// );
 ///
 /// const finalizedTx = txbuilder.finalize(
@@ -515,7 +518,7 @@ impl TransactionBuilder {
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
-    /// Get the Transaction with the current inputs and outputs without computing the fees nor adding a change address 
+    /// Get the Transaction with the current inputs and outputs without computing the fees nor adding a change address
     #[wasm_bindgen]
     pub fn unchecked_finalize(self) -> Transaction {
         match self.0 {
@@ -527,13 +530,16 @@ impl TransactionBuilder {
     /// Finalize the transaction by adding the change Address output
     /// leaving enough for paying the minimum fee computed by the given algorithm
     /// see the unchecked_finalize for the non-assisted version
-    /// 
+    ///
     /// Example
+    /// 
     /// ```javascript
-    /// const feeAlgorithm = Fee.linear_fee(BigInt(20), BigInt(5), BigInt(10));
+    /// const feeAlgorithm = Fee.linear_fee(
+    ///     Value.from_str('20'), Value.from_str('5'), Value.from_str('10')
+    /// );
     ///
     /// const finalizedTx = txbuilder.finalize(
-    ///   Fee.linear_fee(BigInt(20), BigInt(5), BigInt(10)),
+    ///   feeAlgorithm,
     ///   OutputPolicy.one(changeAddress)
     /// );
     /// ```
@@ -570,7 +576,7 @@ impl TransactionBuilder {
 
 /// Helper to add change addresses when finalizing a transaction, there are currently two options
 /// * forget: use all the excess money as fee
-/// * one: send all the excess money to the given address 
+/// * one: send all the excess money to the given address
 #[wasm_bindgen]
 pub struct OutputPolicy(txbuilder::OutputPolicy);
 
@@ -595,7 +601,7 @@ impl OutputPolicy {
 
 /// Builder pattern implementation for signing a Transaction (adding witnesses)
 /// Example (for an account as input)
-/// 
+///
 /// ```javascript
 /// //finalizedTx could be the result of the finalize method on a TransactionBuilder object
 /// const finalizer = new TransactionFinalizer(finalizedTx);
@@ -808,11 +814,11 @@ impl From<tx::UtxoPointer> for UtxoPointer {
 
 #[wasm_bindgen]
 impl UtxoPointer {
-    pub fn new(fragment_id: FragmentId, output_index: u8, value: u64) -> UtxoPointer {
+    pub fn new(fragment_id: FragmentId, output_index: u8, value: Value) -> UtxoPointer {
         UtxoPointer(tx::UtxoPointer {
             transaction_id: fragment_id.0,
             output_index,
-            value: value::Value(value),
+            value: value.0,
         })
     }
 }
@@ -880,14 +886,42 @@ impl Output {
 #[derive(Debug, Eq, PartialEq)]
 pub struct Value(value::Value);
 
+impl AsRef<u64> for Value {
+    fn as_ref(&self) -> &u64 {
+        &self.0.as_ref()
+    }
+}
+
+impl From<u64> for Value {
+    fn from(number: u64) -> Value {
+        value::Value(number).into()
+    }
+}
+
 #[wasm_bindgen]
 impl Value {
-    pub fn from_u64(number: u64) -> Self {
-        Value(value::Value(number))
+    pub fn from_str(s: &str) -> Result<Value, JsValue> {
+        s.parse::<u64>()
+            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+            .map(|number| number.into())
     }
 
-    pub fn to_number(&self) -> u64 {
-        *self.0.as_ref()
+    pub fn to_str(&self) -> String {
+        format!("{}", self.0)
+    }
+
+    pub fn checked_add(&self, other: &Value) -> Result<Value, JsValue> {
+        self.0
+            .add(other.0)
+            .map_err(|e| JsValue::from_str(&format!("{}", &format!("{}", e))))
+            .map(Value)
+    }
+
+    pub fn checked_sub(&self, other: &Value) -> Result<Value, JsValue> {
+        self.0
+            .sub(other.0)
+            .map_err(|e| JsValue::from_str(&format!("{}", &format!("{}", e))))
+            .map(Value)
     }
 }
 
@@ -932,6 +966,16 @@ impl U128 {
                 bytes.length()
             )))
         }
+    }
+
+    pub fn from_str(s: &str) -> Result<U128, JsValue> {
+        s.parse::<u128>()
+            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+            .map(U128)
+    }
+
+    pub fn to_str(&self) -> String {
+        format!("{}", self.0)
     }
 }
 
@@ -1133,11 +1177,11 @@ use fee::FeeAlgorithm;
 #[wasm_bindgen]
 impl Fee {
     /// Linear algorithm, this is formed by: `coefficient * (#inputs + #outputs) + constant + certificate * #certificate
-    pub fn linear_fee(constant: u64, coefficient: u64, certificate: u64) -> Fee {
+    pub fn linear_fee(constant: Value, coefficient: Value, certificate: Value) -> Fee {
         Fee(FeeVariant::Linear(fee::LinearFee::new(
-            constant,
-            coefficient,
-            certificate,
+            *constant.0.as_ref(),
+            *coefficient.0.as_ref(),
+            *certificate.0.as_ref(),
         )))
     }
 
