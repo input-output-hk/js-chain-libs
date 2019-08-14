@@ -37,7 +37,7 @@ fn parse_bech32_normal_secret_key() {
 fn mock_builder(input: u64, output: u64) -> TransactionBuilder {
     let mut txbuilder = TransactionBuilder::new();
     let txid = FragmentId::from_bytes(&[0]);
-    let utxopointer = UtxoPointer::new(txid, 0, input);
+    let utxopointer = UtxoPointer::new(txid, 0, input.into());
     let input = Input::from_utxo(&utxopointer);
 
     txbuilder.add_input(input);
@@ -45,25 +45,24 @@ fn mock_builder(input: u64, output: u64) -> TransactionBuilder {
     let output_address =
         Address::from_string("ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344")
             .unwrap();
-    let value = Value::from_u64(output);
-    txbuilder.add_output(output_address, value);
+    txbuilder.add_output(output_address, output.into());
     txbuilder
 }
 
 #[wasm_bindgen_test]
 fn transaction_builder_balance() {
     let txbuilder = mock_builder(32, 20);
-    let fee_algorithm = Fee::linear_fee(2, 0, 0);
+    let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
     let balance = txbuilder.get_balance(&fee_algorithm).unwrap();
 
     assert_eq!(balance.get_sign(), "positive");
-    assert_eq!(balance.get_value(), Value::from_u64(32 - 20 - 2));
+    assert_eq!(balance.get_value(), (32u64 - 20 - 2).into());
 }
 
 #[wasm_bindgen_test]
 fn transaction_builder_finalize_good_case() {
     let txbuilder = mock_builder(32, 20);
-    let fee_algorithm = Fee::linear_fee(2, 0, 0);
+    let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
     let output_policy = OutputPolicy::forget();
 
     let transaction = txbuilder.finalize(&fee_algorithm, output_policy);
@@ -74,7 +73,7 @@ fn transaction_builder_finalize_good_case() {
 fn transaction_builder_finalize_not_enough_input() {
     let txbuilder = mock_builder(30, 31);
 
-    let fee_algorithm = Fee::linear_fee(2, 0, 0);
+    let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
     let output_policy = OutputPolicy::forget();
 
     let transaction = txbuilder.finalize(&fee_algorithm, output_policy);

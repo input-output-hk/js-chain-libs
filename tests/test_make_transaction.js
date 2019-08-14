@@ -1,19 +1,18 @@
 import { expect } from 'chai';
 
-/* global BigInt */
 const rust = import('../pkg/js_chain_libs');
 
 const genesisHash =
   '6a702a181151b772ca0acbdc4d2870ed80c09b626b29fffc2e47abf2330ad0cd';
 const inputAccount = {
   address: 'ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344',
-  value: 1000,
+  value: '1000',
   privateKey:
     'ed25519e_sk1gz0ff4w444nwejap5shxrllypz5euswq6wn04fffzes02atw99xkd4jn838v3vrfg9eqt7f4sxjlsy0tdcmj0d2dqvwc8ztwgyfnwyszvjg32'
 };
 const outputAccount = {
   address: 'ca1q5nr5pvt9e5p009strshxndrsx5etcentslp2rwj6csm8sfk24a2w3swacn',
-  value: 500
+  value: '500'
 };
 const delegation = {
   stakeKey:
@@ -49,16 +48,13 @@ it('create transaction', async () => {
   const accountAddress = Address.from_string(inputAccount.address);
   const account = Account.from_address(accountAddress);
 
-  const input = Input.from_account(
-    account,
-    Value.from_u64(BigInt(inputAccount.value))
-  );
+  const input = Input.from_account(account, Value.from_str(inputAccount.value));
 
   txbuilder.add_input(input);
 
   txbuilder.add_output(
     Address.from_string(outputAccount.address),
-    Value.from_u64(BigInt(outputAccount.value))
+    Value.from_str(outputAccount.value)
   );
 
   const certificate = Certificate.stake_delegation(
@@ -70,7 +66,11 @@ it('create transaction', async () => {
 
   txbuilder.set_certificate(certificate);
 
-  const feeAlgorithm = Fee.linear_fee(BigInt(20), BigInt(5), BigInt(10));
+  const feeAlgorithm = Fee.linear_fee(
+    Value.from_str('20'),
+    Value.from_str('5'),
+    Value.from_str('10')
+  );
 
   const finalizedTx = txbuilder.finalize(
     feeAlgorithm,
