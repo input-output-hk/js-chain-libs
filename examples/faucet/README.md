@@ -17,7 +17,7 @@ cd ../../ && wasm-pack build --target nodejs --out-dir ./examples/faucet/js-chai
 
 ### Configuration
 
-The following variables can be set in file named `.env` (you should create it) to configure the behaviour.
+The following variables can be set in file named `.env` (you should create it) to configure the behaviour. Note that the SECRET_KEY variable *should* always be set, as there is no way to sign transactions without it, and the server won't start without it.
 
 - JORMUNGANDR_API: The url where a jormungandr instance is listening for the rest api.
 - SECRET_KEY: The secret key of the faucet account.
