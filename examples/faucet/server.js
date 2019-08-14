@@ -1,5 +1,4 @@
 // Require the framework and instantiate it
-/* global BigInt */
 const fastify = require('fastify')({ logger: true });
 const fastifyEnv = require('fastify-env');
 const chainLibs = require('./js-chain-libs/js_chain_libs');
@@ -73,22 +72,24 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
     // #inputs = 1; #outputs = 2; #certificates = 0
     const computedFee =
       (1 + 1) * nodeSettings.fees.coefficient + nodeSettings.fees.constant;
+
+    const inputAmount = fastify.config.LOVELACES_TO_GIVE + computedFee;
     const input = Input.from_account(
       faucetAccount,
-      Value.from_u64(BigInt(fastify.config.LOVELACES_TO_GIVE + computedFee))
+      Value.from_str(inputAmount.toString())
     );
 
     txbuilder.add_input(input);
 
     txbuilder.add_output(
       Address.from_string(request.params.destinationAddress),
-      Value.from_u64(BigInt(fastify.config.LOVELACES_TO_GIVE))
+      Value.from_str(fastify.config.LOVELACES_TO_GIVE.toString())
     );
 
     const feeAlgorithm = Fee.linear_fee(
-      BigInt(nodeSettings.fees.constant),
-      BigInt(nodeSettings.fees.coefficient),
-      BigInt(nodeSettings.fees.certificate)
+      Value.from_str(nodeSettings.fees.constant.toString()),
+      Value.from_str(nodeSettings.fees.coefficient.toString()),
+      Value.from_str(nodeSettings.fees.certificate.toString())
     );
 
     // The amount is exact, that's why we use `forget()`
@@ -121,15 +122,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       message.as_bytes()
     );
 
-    // Return the encoded signed transaction
-    reply.send(
-      uint8array_to_hex(
-        message
-          .get_transaction()
-          .id()
-          .as_bytes()
-      )
-    );
+    reply.code(200).send('success');
   } catch (err) {
     fastify.log.error(err);
   }
