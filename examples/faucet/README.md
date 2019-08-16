@@ -6,14 +6,15 @@ A minimal example of a faucet endpoint, using the sdk on nodejs, showcasing its 
 
 ### Install dependencies
 
-1. Build the sdk for nodejs target, in the root directory of this example run:
+1. Build the sdk for nodejs target, in the root directory of this repository run:
 
 ```sh
-cd ../../ && wasm-pack build --target nodejs --out-dir ./examples/faucet/js-chain-libs/
+wasm-pack build --target nodejs --out-dir ./examples/faucet/js-chain-libs/
 ```
 
-2. Install the other node dependencies: `npm install`
+2. Install the example node dependencies:
 
+In the root directory of the faucet example run: `npm install`
 
 ### Configuration
 
