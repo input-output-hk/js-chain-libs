@@ -882,6 +882,11 @@ impl Output {
     }
 }
 
+/// Type used for representing certain amount of lovelaces.
+/// It wraps an unsigned 64 bits number.
+/// Strings are used for passing to and from javascript,
+/// as the native javascript Number type can't hold the entire u64 range
+/// and BigInt is not yet implemented in all the browsers
 #[wasm_bindgen]
 #[derive(Debug, Eq, PartialEq)]
 pub struct Value(value::Value);
@@ -900,12 +905,14 @@ impl From<u64> for Value {
 
 #[wasm_bindgen]
 impl Value {
+    /// Parse the given string into a rust u64 numeric type.
     pub fn from_str(s: &str) -> Result<Value, JsValue> {
         s.parse::<u64>()
             .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
             .map(|number| number.into())
     }
 
+    /// Return the wrapped u64 formatted as a string.
     pub fn to_str(&self) -> String {
         format!("{}", self.0)
     }
