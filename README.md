@@ -128,7 +128,7 @@ rust.then(mod => {
   );
   const account = Account.from_address(accountInputAddress);
 
-  const input = Input.from_account(account, Value.from_u64(BigInt(1000)));
+  const input = Input.from_account(account, Value.from_str('1000'));
 
   txbuilder.add_input(input);
 
@@ -136,16 +136,16 @@ rust.then(mod => {
     Address.from_string(
       'ca1q5nr5pvt9e5p009strshxndrsx5etcentslp2rwj6csm8sfk24a2w3swacn'
     ),
-    Value.from_u64(BigInt(500))
+    Value.from_str('500')
   );
 
   const feeAlgorithm = Fee.linear_fee(
     // constant fee
-    BigInt(20),
+    Value.from_str('20'),
     // coefficient
-    BigInt(5),
+    Value.from_str('5'),
     // certificate cost
-    BigInt(0)
+    Value.from_str('0')
   );
 
   const finalizedTx = txbuilder.finalize(

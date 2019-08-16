@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 
-/* global BigInt */
 const rust = import('../pkg/js_chain_libs');
 
 const binaryBlock =
@@ -48,7 +47,7 @@ it('get block messages', async () => {
   expect(output.address().to_string('ca')).to.eql(
     'ca1sk6gu33yw73dr60f2ehp6xemgf30r49rzc25gkrfnrfuuyf0mycgjvef0dw'
   );
-  expect(output.value().to_number()).to.equal(BigInt(10000));
+  expect(output.value().to_str()).to.equal('10000');
 });
 
 function hexStringToBytes(string) {

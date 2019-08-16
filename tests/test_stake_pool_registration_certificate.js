@@ -1,17 +1,6 @@
 import { expect } from 'chai';
 
-/* global BigInt */
 const rust = import('../pkg/js_chain_libs');
-
-function bigIntToByteArray(bigInt) {
-  const bytes = [];
-  let x = bigInt;
-  for (let i = 0; i < 16; ++i) {
-    bytes.push(Number(BigInt.asUintN(8, x)));
-    x >>= BigInt(8);
-  }
-  return new Uint8Array(bytes);
-}
 
 it('generates certificate', async () => {
   const {
@@ -24,7 +13,7 @@ it('generates certificate', async () => {
     VrfPublicKey,
     PublicKeys
   } = await rust;
-  const serial = U128.from_le_bytes(bigIntToByteArray(BigInt(1010101010)));
+  const serial = U128.from_str('1010101010');
   const owners = new PublicKeys();
   owners.add(
     PublicKey.from_bech32(
