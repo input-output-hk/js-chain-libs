@@ -184,7 +184,7 @@ rust.then(mod => {
 Now, in that directory, run the two following commands
 
 4. run `npm install` and `npm install js-chain-libs-0.1.0.tgz`.
-5. run `npm run serve` and open a browser in `http://localhost:8080/`. The generated transaction should be logged in the console.
+5. run `npm run serve` and open a browser in `http://localhost:8080/`. The generated transaction should be logged in the console. This is the transaction in its binary format, encoded in hexadecimal. It could be posted as it is to the node via the rest api, for example.
 
 ## Testing
 
