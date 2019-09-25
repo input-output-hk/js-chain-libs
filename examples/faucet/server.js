@@ -93,7 +93,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
     );
 
     // The amount is exact, that's why we use `forget()`
-    const finalizedTx = txbuilder.finalize(feeAlgorithm, OutputPolicy.forget());
+    const finalizedTx = txbuilder.seal_with_output_policy(feeAlgorithm, OutputPolicy.forget());
 
     const finalizer = new TransactionFinalizer(finalizedTx);
 
@@ -105,16 +105,16 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
 
     const witness = Witness.for_account(
       Hash.from_hex(nodeSettings.block0Hash),
-      finalizer.get_txid(),
+      finalizer.get_tx_sign_data_hash(),
       secretKey,
       SpendingCounter.from_u32(accountStatus.counter)
     );
 
     finalizer.set_witness(0, witness);
 
-    const signedTx = finalizer.build();
+    const signedTx = finalizer.finalize();
 
-    const message = Fragment.from_generated_transaction(signedTx);
+    const message = Fragment.from_authenticated_transaction(signedTx);
 
     // Send the transaction
     await jormungandrApi.postMsg(
