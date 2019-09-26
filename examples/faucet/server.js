@@ -122,7 +122,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       message.as_bytes()
     );
 
-    reply.code(200).send('success');
+    reply.code(200).send(`transaction id: ${uint8array_to_hex(message.id().as_bytes())}`);
   } catch (err) {
     fastify.log.error(err);
   }
