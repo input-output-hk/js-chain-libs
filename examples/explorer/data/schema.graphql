@@ -1,0 +1,107 @@
+type Address {
+  """The base32 representation of an address"""
+  id: String!
+  delegation: StakePool!
+  transactions: [Transaction!]!
+}
+
+"""A Block"""
+type Block {
+  """The Block unique identifier"""
+  id: String!
+
+  """Date the Block was included in the blockchain"""
+  date: BlockDate!
+
+  """The transactions contained in the block"""
+  transactions: [Transaction!]!
+  previousBlock: Block!
+  chainLength: ChainLength!
+}
+
+scalar BlockCount
+
+"""Block's date, composed of an Epoch and a Slot"""
+type BlockDate {
+  epoch: Epoch!
+  slot: Slot!
+}
+
+scalar ChainLength
+
+type Epoch {
+  id: EpochNumber!
+
+  """Not yet implemented"""
+  stakeDistribution: StakeDistribution!
+
+  """Not yet implemented"""
+  blocks: [Block!]!
+  firstBlock: Block
+  lastBlock: Block
+  totalBlocks: BlockCount!
+}
+
+scalar EpochNumber
+
+type FeeSettings {
+  constant: Value!
+  coefficient: Value!
+  certificate: Value!
+}
+
+scalar PoolId
+
+type PoolStakeDistribution {
+  pool: StakePool!
+  delegatedStake: Value!
+}
+
+type Query {
+  block(id: String!): Block!
+  blockByChainLength(length: ChainLength!): Block
+  transaction(id: String!): Transaction!
+  epoch(id: EpochNumber!): Epoch!
+  address(bech32: String!): Address!
+  stakePool(id: PoolId!): StakePool!
+  status: Status!
+}
+
+scalar Slot
+
+type StakeDistribution {
+  pools: [PoolStakeDistribution!]!
+}
+
+type StakePool {
+  id: PoolId!
+}
+
+type Status {
+  currentEpoch: Epoch!
+  latestBlock: Block!
+  feeSettings: FeeSettings!
+}
+
+"""A transaction in the blockchain"""
+type Transaction {
+  """The hash that identifies the transaction"""
+  id: String!
+
+  """The block this transaction is in"""
+  block: Block!
+  inputs: [TransactionInput!]!
+  outputs: [TransactionOutput!]!
+}
+
+type TransactionInput {
+  amount: Value!
+  address: Address!
+}
+
+type TransactionOutput {
+  amount: Value!
+  address: Address!
+}
+
+scalar Value
