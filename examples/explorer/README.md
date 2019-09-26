@@ -1,3 +1,3 @@
-# Basic Example
+# Basic Explorer
 
-A simple [create-react-app](CRA-README.md) setup, showcasing one of the lastest React-Bootstrap components!
+A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with Jorgunmandr node.

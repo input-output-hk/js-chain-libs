@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import Table from "react-bootstrap/Table";
+import Table from 'react-bootstrap/Table';
 
-const BlockTable = ({blocks}) => (
+const BlockTable = ({ blocks }) => (
   <Table striped bordered hover>
     <thead>
       <tr>
@@ -32,6 +32,6 @@ const BlockTable = ({blocks}) => (
       </tr>
     </tbody>
   </Table>
-)
+);
 
 export default BlockTable;

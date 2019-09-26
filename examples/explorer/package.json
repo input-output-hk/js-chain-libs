@@ -1,5 +1,13 @@
 {
-  "name": "code-sandbox-examples",
+  "name": "cardano-explorer",
+  "keywords": [
+    "cardano",
+    "cryptocurrency",
+    "crypto",
+    "blockchain",
+    "explorer",
+    "react"
+  ],
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,16 +19,29 @@
     "react-relay": "6.0.0",
     "react-scripts": "3.1.1"
   },
-  "devDependencies" : {
+  "devDependencies": {
     "babel-plugin-relay": "6.0.0",
-    "relay-config": "6.0.0",
-    "relay-compiler": "6.0.0"
+    "eslint": "6.4.0",
+    "eslint-config-airbnb": "18.0.1",
+    "eslint-config-prettier": "6.3.0",
+    "eslint-plugin-css-modules": "^2.11.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-jsx-a11y": "6.2.3",
+    "eslint-plugin-prettier": "3.1.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "7.14.3",
+    "eslint-plugin-react-hooks": "1.7.0",
+    "prettier": "^1.18.2",
+    "relay-compiler": "6.0.0",
+    "relay-config": "6.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "eslint": "./node_modules/eslint/bin/eslint.js . --ext .jsx --ext .js",
+    "eslint-fix": "./node_modules/eslint/bin/eslint.js . --ext .jsx --ext .js --fix",
     "relay": "relay-compiler --src ./src --schema ./schema.graphql --extensions js jsx"
   },
   "eslintConfig": {

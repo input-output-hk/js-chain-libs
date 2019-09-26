@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import Table from "react-bootstrap/Table";
+import Table from 'react-bootstrap/Table';
 
-const TransactionTable = ({txs}) => (
+const TransactionTable = ({ txs }) => (
   <Table striped bordered hover>
     <thead>
       <tr>
@@ -32,6 +32,6 @@ const TransactionTable = ({txs}) => (
       </tr>
     </tbody>
   </Table>
-)
+);
 
 export default TransactionTable;
