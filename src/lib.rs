@@ -1091,32 +1091,55 @@ impl From<certificate::Certificate> for Certificate {
     }
 }
 
-/* #[wasm_bindgen]
-pub struct StakePoolInfo(chain::stake::StakePoolInfo);
+#[wasm_bindgen]
+pub struct PoolRegistration(chain::certificate::PoolRegistration);
 
-impl From<chain::stake::StakePoolInfo> for StakePoolInfo {
-    fn from(info: chain::stake::StakePoolInfo) -> StakePoolInfo {
-        StakePoolInfo(info)
+impl From<chain::certificate::PoolRegistration> for PoolRegistration {
+    fn from(info: chain::certificate::PoolRegistration) -> PoolRegistration {
+        PoolRegistration(info)
     }
 }
 
 #[wasm_bindgen]
-impl StakePoolInfo {
+pub struct TimeOffsetSeconds(chain_time::timeline::TimeOffsetSeconds);
+
+impl From<chain_time::timeline::TimeOffsetSeconds> for TimeOffsetSeconds {
+    fn from(inner: chain_time::timeline::TimeOffsetSeconds) -> TimeOffsetSeconds {
+        TimeOffsetSeconds(inner)
+    }
+}
+
+#[wasm_bindgen]
+impl TimeOffsetSeconds {
+    /// Parse the given string into a 64 bits unsigned number
+    pub fn from_string(number: &str) -> Result<TimeOffsetSeconds, JsValue> {
+        number
+            .parse::<u64>()
+            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+            .map(chain_time::DurationSeconds)
+            .map(|duration| chain_time::timeline::TimeOffsetSeconds::from(duration).into())
+    }
+}
+
+#[wasm_bindgen]
+impl PoolRegistration {
     #[wasm_bindgen(constructor)]
     pub fn new(
         serial: U128,
         owners: PublicKeys,
+        management_threshold: u16,
+        start_validity: TimeOffsetSeconds,
         kes_public_key: KesPublicKey,
         vrf_public_key: VrfPublicKey,
-    ) -> StakePoolInfo {
-        chain::stake::StakePoolInfo {
+    ) -> PoolRegistration {
+        chain::certificate::PoolRegistration {
             serial: serial.0,
-            owners: owners
-                .0
-                .into_iter()
-                .map(|key| account::Identifier::from(key.0))
-                .collect(),
-            initial_key: chain::leadership::genesis::GenesisPraosLeader {
+            owners: owners.0.into_iter().map(|key| key.0).collect(),
+            management_threshold,
+            start_validity: start_validity.0,
+            // TODO: Hardcoded parameter
+            rewards: chain::rewards::TaxType::zero(),
+            keys: chain::leadership::genesis::GenesisPraosLeader {
                 kes_public_key: kes_public_key.0,
                 vrf_public_key: vrf_public_key.0,
             },
@@ -1124,10 +1147,10 @@ impl StakePoolInfo {
         .into()
     }
 
-    pub fn id(&self) -> StakePoolId {
+    pub fn id(&self) -> PoolId {
         self.0.to_id().into()
     }
-} */
+}
 
 #[wasm_bindgen]
 pub struct PoolId(chain::certificate::PoolId);
