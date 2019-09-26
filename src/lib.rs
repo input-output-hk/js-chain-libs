@@ -1043,7 +1043,7 @@ pub struct Certificate(certificate::Certificate);
 #[wasm_bindgen]
 impl Certificate {
     /// Create a stake delegation certificate from account (stake key) to pool_id
-    pub fn stake_delegation(pool_id: StakePoolId, account: PublicKey) -> Certificate {
+    pub fn stake_delegation(pool_id: PoolId, account: PublicKey) -> Certificate {
         let content = certificate::StakeDelegation {
             account_id: tx::AccountIdentifier::from_single_account(account.0.into()),
             pool_id: pool_id.0,
@@ -1130,21 +1130,21 @@ impl StakePoolInfo {
 } */
 
 #[wasm_bindgen]
-pub struct StakePoolId(chain::certificate::PoolId);
+pub struct PoolId(chain::certificate::PoolId);
 
-impl From<chain::certificate::PoolId> for StakePoolId {
-    fn from(pool_id: chain::certificate::PoolId) -> StakePoolId {
-        StakePoolId(pool_id)
+impl From<chain::certificate::PoolId> for PoolId {
+    fn from(pool_id: chain::certificate::PoolId) -> PoolId {
+        PoolId(pool_id)
     }
 }
 
 #[wasm_bindgen]
-impl StakePoolId {
-    /*     pub fn from_hex(hex_string: &str) -> Result<StakePoolId, JsValue> {
-        key::Hash::from_str(hex_string)
+impl PoolId {
+    pub fn from_hex(hex_string: &str) -> Result<PoolId, JsValue> {
+        crypto::Blake2b256::from_str(hex_string)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
-            .map(|hash| StakePoolId(hash.into()))
-    } */
+            .map(|hash| PoolId(hash.into()))
+    }
 
     pub fn to_string(&self) -> String {
         format!("{}", self.0).to_string()
