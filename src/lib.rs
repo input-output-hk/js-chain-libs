@@ -4,6 +4,7 @@ use bech32::{Bech32, ToBase32 as _};
 use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value};
 use chain_core::property::Block as _;
 use chain_core::property::Deserialize as _;
+use chain_core::property::Fragment as _;
 use chain_core::property::HasFragments as _;
 use chain_core::property::Serialize;
 use chain_crypto as crypto;
@@ -15,7 +16,6 @@ use std::convert::TryFrom;
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
-use chain_core::property::Fragment as _;
 
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
@@ -254,23 +254,20 @@ impl EitherTransaction {
         match &self {
             EitherTransaction::TransactionWithoutCertificate(tx) => {
                 let finalizer_tx = tx::Transaction {
-                   inputs: tx.inputs.clone(),
-                   outputs: tx.outputs.clone(),
-                   extra: None, 
+                    inputs: tx.inputs.clone(),
+                    outputs: tx.outputs.clone(),
+                    extra: None,
                 };
                 chain::txbuilder::TransactionFinalizer::new(finalizer_tx).get_tx_sign_data_hash()
             }
-            ,
-            EitherTransaction::TransactionWithCertificate(tx) => 
-            {
+            EitherTransaction::TransactionWithCertificate(tx) => {
                 let finalizer_tx = tx::Transaction {
-                   inputs: tx.inputs.clone(),
-                   outputs: tx.outputs.clone(),
-                   extra: Some(tx.extra.clone()), 
+                    inputs: tx.inputs.clone(),
+                    outputs: tx.outputs.clone(),
+                    extra: Some(tx.extra.clone()),
                 };
                 chain::txbuilder::TransactionFinalizer::new(finalizer_tx).get_tx_sign_data_hash()
             }
-            ,
         }
         .into()
     }
@@ -402,9 +399,7 @@ pub struct TransactionBuilder(EitherTransactionBuilder);
 
 enum EitherTransactionBuilder {
     TransactionBuilderNoExtra(txbuilder::TransactionBuilder<tx::NoExtra>),
-    TransactionBuilderCertificate(
-        txbuilder::TransactionBuilder<certificate::Certificate>,
-    ),
+    TransactionBuilderCertificate(txbuilder::TransactionBuilder<certificate::Certificate>),
 }
 
 impl From<txbuilder::TransactionBuilder<tx::NoExtra>> for TransactionBuilder {
@@ -413,12 +408,8 @@ impl From<txbuilder::TransactionBuilder<tx::NoExtra>> for TransactionBuilder {
     }
 }
 
-impl From<txbuilder::TransactionBuilder<certificate::Certificate>>
-    for TransactionBuilder
-{
-    fn from(
-        builder: txbuilder::TransactionBuilder<certificate::Certificate>,
-    ) -> Self {
+impl From<txbuilder::TransactionBuilder<certificate::Certificate>> for TransactionBuilder {
+    fn from(builder: txbuilder::TransactionBuilder<certificate::Certificate>) -> Self {
         TransactionBuilder(EitherTransactionBuilder::TransactionBuilderCertificate(
             builder,
         ))
@@ -427,10 +418,18 @@ impl From<txbuilder::TransactionBuilder<certificate::Certificate>>
 
 #[wasm_bindgen]
 impl TransactionBuilder {
+    #[wasm_bindgen(constructor)]
+    /// Deprecated. Use `new_no_payload()` instead
+    pub fn new() -> Self {
+        Self::new_no_payload()
+    }
+
+    /// Create a TransactionBuilder for a transaction without certificate
     pub fn new_no_payload() -> Self {
         txbuilder::TransactionBuilder::no_payload().into()
     }
 
+    /// Create a TransactionBuilder for a transaction with certificate
     pub fn new_payload(cert: Certificate) -> Self {
         txbuilder::TransactionBuilder::new_payload(cert.0).into()
     }
@@ -524,7 +523,7 @@ impl TransactionBuilder {
     /// see the unchecked_finalize for the non-assisted version
     ///
     /// Example
-    /// 
+    ///
     /// ```javascript
     /// const feeAlgorithm = Fee.linear_fee(
     ///     Value.from_str('20'), Value.from_str('5'), Value.from_str('10')
@@ -536,7 +535,11 @@ impl TransactionBuilder {
     /// );
     /// ```
     #[wasm_bindgen]
-    pub fn seal_with_output_policy(self, fee: &Fee, output_policy: OutputPolicy) -> Result<Transaction, JsValue> {
+    pub fn seal_with_output_policy(
+        self,
+        fee: &Fee,
+        output_policy: OutputPolicy,
+    ) -> Result<Transaction, JsValue> {
         let fee_algorithm = match fee.0 {
             FeeVariant::Linear(fee_algorithm) => fee_algorithm,
         };
@@ -552,7 +555,12 @@ impl TransactionBuilder {
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
-/*     /// Get the current Transaction id, this will change when adding input, outputs and certificates
+    /// Deprecated: use `seal_with_output_policy` instead
+    pub fn finalize(self, fee: &Fee, output_policy: OutputPolicy) -> Result<Transaction, JsValue> {
+        self.seal_with_output_policy(fee, output_policy)
+    }
+
+    /*     /// Get the current Transaction id, this will change when adding input, outputs and certificates
     #[wasm_bindgen]
     pub fn get_txid(&self) -> TransactionSignDataHash {
         match &self.0 {
@@ -627,15 +635,17 @@ impl TransactionFinalizer {
                 txbuilder::TransactionFinalizer::new(tx::Transaction {
                     inputs: tx.inputs,
                     outputs: tx.outputs,
-                    extra: Some(tx.extra)
-                }).into()
+                    extra: Some(tx.extra),
+                })
+                .into()
             }
-            EitherTransaction::TransactionWithoutCertificate(tx) =>  {
+            EitherTransaction::TransactionWithoutCertificate(tx) => {
                 txbuilder::TransactionFinalizer::new(tx::Transaction {
                     inputs: tx.inputs,
                     outputs: tx.outputs,
-                    extra: None
-                }).into()
+                    extra: None,
+                })
+                .into()
             }
         }
     }
@@ -647,29 +657,35 @@ impl TransactionFinalizer {
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
+    /// Deprecated: Use `get_tx_sign_data_hash` instead"
+    pub fn get_txid(&self) -> TransactionSignDataHash {
+        self.get_tx_sign_data_hash()
+    }
+
     pub fn get_tx_sign_data_hash(&self) -> TransactionSignDataHash {
         self.0.get_tx_sign_data_hash().into()
+    }
+
+    /// Deprecated: Use `get_tx_sign_data_hash` instead"
+    pub fn build(self) -> Result<AuthenticatedTransaction, JsValue> {
+        self.finalize()
     }
 
     pub fn finalize(self) -> Result<AuthenticatedTransaction, JsValue> {
         self.0
             .finalize()
-            .map(|auth_tx| {
-                match auth_tx.transaction.extra.clone() {
-                    Some(extra) => {
-                        EitherAuthenticatedTransaction::Certificate(
-                        tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.replace_extra(extra.clone()),
-                            witnesses: auth_tx.witnesses
-                        })
-                    }
-                    None => {
-                        EitherAuthenticatedTransaction::NoCertificate(
-                        tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.replace_extra(tx::NoExtra),
-                            witnesses: auth_tx.witnesses
-                        })
-                    }
+            .map(|auth_tx| match auth_tx.transaction.extra.clone() {
+                Some(extra) => {
+                    EitherAuthenticatedTransaction::Certificate(tx::AuthenticatedTransaction {
+                        transaction: auth_tx.transaction.replace_extra(extra.clone()),
+                        witnesses: auth_tx.witnesses,
+                    })
+                }
+                None => {
+                    EitherAuthenticatedTransaction::NoCertificate(tx::AuthenticatedTransaction {
+                        transaction: auth_tx.transaction.replace_extra(tx::NoExtra),
+                        witnesses: auth_tx.witnesses,
+                    })
                 }
             })
             .map(AuthenticatedTransaction)
@@ -686,30 +702,39 @@ enum EitherAuthenticatedTransaction {
     Certificate(tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>),
 }
 
-
-impl From<tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>> for AuthenticatedTransaction {
+impl From<tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>>
+    for AuthenticatedTransaction
+{
     fn from(tx: tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>) -> Self {
         AuthenticatedTransaction(EitherAuthenticatedTransaction::NoCertificate(tx))
     }
 }
 
-impl From<tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>> for AuthenticatedTransaction {
-    fn from(tx: tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>) -> Self {
+impl From<tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>>
+    for AuthenticatedTransaction
+{
+    fn from(
+        tx: tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>,
+    ) -> Self {
         AuthenticatedTransaction(EitherAuthenticatedTransaction::Certificate(tx))
     }
 }
 
 #[wasm_bindgen]
 impl AuthenticatedTransaction {
-/*     pub fn id(&self) -> TransactionSignDataHash {
+    /*     pub fn id(&self) -> TransactionSignDataHash {
         self.0.hash().into()
     } */
 
     /// Get a copy of the inner Transaction, discarding the signatures
     pub fn transaction(&self) -> Transaction {
         match &self.0 {
-            EitherAuthenticatedTransaction::Certificate(auth_tx) => auth_tx.transaction.clone().into(),
-            EitherAuthenticatedTransaction::NoCertificate(auth_tx) => auth_tx.transaction.clone().into(),
+            EitherAuthenticatedTransaction::Certificate(auth_tx) => {
+                auth_tx.transaction.clone().into()
+            }
+            EitherAuthenticatedTransaction::NoCertificate(auth_tx) => {
+                auth_tx.transaction.clone().into()
+            }
         }
     }
 }
@@ -1026,12 +1051,12 @@ impl Certificate {
         certificate::Certificate::StakeDelegation(content).into()
     }
 
-/*     pub fn stake_pool_registration(pool_info: StakePoolInfo) -> Certificate {
+    /*     pub fn stake_pool_registration(pool_info: StakePoolInfo) -> Certificate {
         certificate::Certificate::StakePoolRegistration(
             certificate::Certificate::StakePoolRegistration(pool_info.0))
     } */
 
-/*     /// Add signature to certificate
+    /*     /// Add signature to certificate
     pub fn sign(&mut self, private_key: PrivateKey) {
         let signature = match &self.0.content {
             certificate::Certificate::StakeDelegation(s) => {
@@ -1047,13 +1072,13 @@ impl Certificate {
         self.0.signatures.push(signature);
     } */
 
-/*     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
+    /*     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
         self.0
             .serialize_as_vec()
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
     } */
 
-/*     pub fn to_bech32(&self) -> Result<String, JsValue> {
+    /*     pub fn to_bech32(&self) -> Result<String, JsValue> {
         Bech32::new("cert".to_string(), self.as_bytes()?.to_base32())
             .map(|bech32| bech32.to_string())
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
@@ -1115,7 +1140,7 @@ impl From<chain::certificate::PoolId> for StakePoolId {
 
 #[wasm_bindgen]
 impl StakePoolId {
-/*     pub fn from_hex(hex_string: &str) -> Result<StakePoolId, JsValue> {
+    /*     pub fn from_hex(hex_string: &str) -> Result<StakePoolId, JsValue> {
         key::Hash::from_str(hex_string)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
             .map(|hash| StakePoolId(hash.into()))
@@ -1330,50 +1355,50 @@ impl Fragment {
             EitherAuthenticatedTransaction::Certificate(auth_tx) => {
                 match &auth_tx.transaction.extra {
                     Certificate::PoolRegistration(c) => {
-                        fragment::Fragment::PoolRegistration(
-                            tx::AuthenticatedTransaction {
+                        fragment::Fragment::PoolRegistration(tx::AuthenticatedTransaction {
                             transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
                             witnesses: auth_tx.witnesses,
                         })
                     }
                     Certificate::PoolManagement(c) => {
-                        fragment::Fragment::PoolManagement(
-                            tx::AuthenticatedTransaction {
+                        fragment::Fragment::PoolManagement(tx::AuthenticatedTransaction {
                             transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
                             witnesses: auth_tx.witnesses,
                         })
                     }
                     Certificate::StakeDelegation(c) => {
-                        fragment::Fragment::StakeDelegation(
-                            tx::AuthenticatedTransaction {
+                        fragment::Fragment::StakeDelegation(tx::AuthenticatedTransaction {
                             transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
                             witnesses: auth_tx.witnesses,
                         })
                     }
                     Certificate::OwnerStakeDelegation(c) => {
-                        fragment::Fragment::OwnerStakeDelegation(
-                            tx::AuthenticatedTransaction {
+                        fragment::Fragment::OwnerStakeDelegation(tx::AuthenticatedTransaction {
                             transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
                             witnesses: auth_tx.witnesses,
                         })
                     }
                 }
-            },
+            }
             EitherAuthenticatedTransaction::NoCertificate(auth_tx) => {
                 chain::fragment::Fragment::Transaction(tx::AuthenticatedTransaction {
                     transaction: auth_tx.transaction.clone().replace_extra(tx::NoExtra),
                     witnesses: auth_tx.witnesses,
                 })
-            },
-        }.into()
+            }
+        }
+        .into()
+    }
+
+    /// Deprecated: Use `from_authenticated_transaction` instead
+    pub fn from_generated_transaction(tx: AuthenticatedTransaction) -> Self {
+        Self::from_authenticated_transaction(tx)
     }
 
     /// Get a Transaction if the Fragment represents one
     pub fn get_transaction(self) -> Result<AuthenticatedTransaction, JsValue> {
         match self.0 {
-            chain::fragment::Fragment::Transaction(auth) => {
-                Ok(auth.into())
-            }
+            chain::fragment::Fragment::Transaction(auth) => Ok(auth.into()),
             _ => Err(JsValue::from_str("Invalid message type")),
         }
     }
@@ -1411,7 +1436,7 @@ impl Fragment {
             _ => false,
         }
     }
-    
+
     pub fn is_pool_registration(&self) -> bool {
         match self.0 {
             chain::fragment::Fragment::PoolRegistration(_) => true,
