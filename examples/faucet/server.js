@@ -63,7 +63,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       fastify.config.JORMUNGANDR_API
     );
 
-    const txbuilder = new TransactionBuilder();
+    const txbuilder = TransactionBuilder.new_no_payload();
 
     const secretKey = PrivateKey.from_bech32(fastify.config.SECRET_KEY);
     const faucetAccount = Account.from_public_key(secretKey.to_public());
