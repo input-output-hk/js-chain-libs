@@ -42,7 +42,7 @@
     "eject": "react-scripts eject",
     "eslint": "./node_modules/eslint/bin/eslint.js . --ext .jsx --ext .js",
     "eslint-fix": "./node_modules/eslint/bin/eslint.js . --ext .jsx --ext .js --fix",
-    "relay": "relay-compiler --src ./src --schema ./schema.graphql --extensions js jsx"
+    "relay": "relay-compiler --src ./src --schema ./data/schema.graphql --extensions js jsx"
   },
   "eslintConfig": {
     "extends": "react-app"

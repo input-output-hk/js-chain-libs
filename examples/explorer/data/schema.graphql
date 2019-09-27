@@ -1,19 +1,36 @@
+"""
+Workaround needed due to relay issue https://github.com/facebook/relay/issues/1880
+"""
+type Hack {
+  id: ID
+}
+
 type Address {
-  """The base32 representation of an address"""
+  """
+  The base32 representation of an address
+  """
   id: String!
   delegation: StakePool!
   transactions: [Transaction!]!
 }
 
-"""A Block"""
+"""
+A Block
+"""
 type Block {
-  """The Block unique identifier"""
+  """
+  The Block unique identifier
+  """
   id: String!
 
-  """Date the Block was included in the blockchain"""
+  """
+  Date the Block was included in the blockchain
+  """
   date: BlockDate!
 
-  """The transactions contained in the block"""
+  """
+  The transactions contained in the block
+  """
   transactions: [Transaction!]!
   previousBlock: Block!
   chainLength: ChainLength!
@@ -21,7 +38,9 @@ type Block {
 
 scalar BlockCount
 
-"""Block's date, composed of an Epoch and a Slot"""
+"""
+Block's date, composed of an Epoch and a Slot
+"""
 type BlockDate {
   epoch: Epoch!
   slot: Slot!
@@ -32,10 +51,14 @@ scalar ChainLength
 type Epoch {
   id: EpochNumber!
 
-  """Not yet implemented"""
+  """
+  Not yet implemented
+  """
   stakeDistribution: StakeDistribution!
 
-  """Not yet implemented"""
+  """
+  Not yet implemented
+  """
   blocks: [Block!]!
   firstBlock: Block
   lastBlock: Block
@@ -83,12 +106,18 @@ type Status {
   feeSettings: FeeSettings!
 }
 
-"""A transaction in the blockchain"""
+"""
+A transaction in the blockchain
+"""
 type Transaction {
-  """The hash that identifies the transaction"""
+  """
+  The hash that identifies the transaction
+  """
   id: String!
 
-  """The block this transaction is in"""
+  """
+  The block this transaction is in
+  """
   block: Block!
   inputs: [TransactionInput!]!
   outputs: [TransactionOutput!]!

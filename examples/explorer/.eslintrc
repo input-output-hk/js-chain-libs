@@ -30,6 +30,7 @@
     "promise/catch-or-return": "error",
     "promise/no-native": "off",
     "react/jsx-no-bind": "off",
+    "react/jsx-props-no-spreading": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
     "react/jsx-closing-bracket-location": "warn",
     "react/jsx-one-expression-per-line": "off",
