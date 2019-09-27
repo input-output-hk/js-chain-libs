@@ -244,14 +244,14 @@ impl Into<chain_addr::Discrimination> for AddressDiscrimination {
 pub struct Transaction(EitherTransaction);
 
 enum EitherTransaction {
-    TransactionWithoutCertificate(tx::Transaction<chain_addr::Address, tx::NoExtra>),
-    TransactionWithCertificate(tx::Transaction<chain_addr::Address, certificate::Certificate>),
+    NoCertificate(tx::Transaction<chain_addr::Address, tx::NoExtra>),
+    Certificate(tx::Transaction<chain_addr::Address, certificate::Certificate>),
 }
 
 impl EitherTransaction {
     fn id(&self) -> TransactionSignDataHash {
         match &self {
-            EitherTransaction::TransactionWithoutCertificate(tx) => {
+            EitherTransaction::NoCertificate(tx) => {
                 let finalizer_tx = tx::Transaction {
                     inputs: tx.inputs.clone(),
                     outputs: tx.outputs.clone(),
@@ -259,7 +259,7 @@ impl EitherTransaction {
                 };
                 chain::txbuilder::TransactionFinalizer::new(finalizer_tx).get_tx_sign_data_hash()
             }
-            EitherTransaction::TransactionWithCertificate(tx) => {
+            EitherTransaction::Certificate(tx) => {
                 let finalizer_tx = tx::Transaction {
                     inputs: tx.inputs.clone(),
                     outputs: tx.outputs.clone(),
@@ -273,16 +273,16 @@ impl EitherTransaction {
 
     fn inputs(&self) -> Vec<tx::Input> {
         match &self {
-            EitherTransaction::TransactionWithoutCertificate(tx) => tx.inputs.clone(),
-            EitherTransaction::TransactionWithCertificate(tx) => tx.inputs.clone(),
+            EitherTransaction::NoCertificate(tx) => tx.inputs.clone(),
+            EitherTransaction::Certificate(tx) => tx.inputs.clone(),
         }
         .to_vec()
     }
 
     fn outputs(&self) -> Vec<tx::Output<chain_addr::Address>> {
         match &self {
-            EitherTransaction::TransactionWithoutCertificate(ref tx) => tx.outputs.clone(),
-            EitherTransaction::TransactionWithCertificate(ref tx) => tx.outputs.clone(),
+            EitherTransaction::NoCertificate(ref tx) => tx.outputs.clone(),
+            EitherTransaction::Certificate(ref tx) => tx.outputs.clone(),
         }
         .to_vec()
     }
@@ -290,13 +290,13 @@ impl EitherTransaction {
 
 impl From<tx::Transaction<chain_addr::Address, tx::NoExtra>> for Transaction {
     fn from(tx: tx::Transaction<chain_addr::Address, tx::NoExtra>) -> Self {
-        Transaction(EitherTransaction::TransactionWithoutCertificate(tx))
+        Transaction(EitherTransaction::NoCertificate(tx))
     }
 }
 
 impl From<tx::Transaction<chain_addr::Address, certificate::Certificate>> for Transaction {
     fn from(tx: tx::Transaction<chain_addr::Address, certificate::Certificate>) -> Self {
-        Transaction(EitherTransaction::TransactionWithCertificate(tx))
+        Transaction(EitherTransaction::Certificate(tx))
     }
 }
 
@@ -630,7 +630,7 @@ impl TransactionFinalizer {
     #[wasm_bindgen(constructor)]
     pub fn new(transaction: Transaction) -> Self {
         match transaction.0 {
-            EitherTransaction::TransactionWithCertificate(tx) => {
+            EitherTransaction::Certificate(tx) => {
                 txbuilder::TransactionFinalizer::new(tx::Transaction {
                     inputs: tx.inputs,
                     outputs: tx.outputs,
@@ -638,7 +638,7 @@ impl TransactionFinalizer {
                 })
                 .into()
             }
-            EitherTransaction::TransactionWithoutCertificate(tx) => {
+            EitherTransaction::NoCertificate(tx) => {
                 txbuilder::TransactionFinalizer::new(tx::Transaction {
                     inputs: tx.inputs,
                     outputs: tx.outputs,
@@ -1352,15 +1352,11 @@ impl Fee {
 
     /// Compute the fee if possible (it can fail in case the values are out of range)
     pub fn calculate(&self, tx: Transaction) -> Option<Value> {
-        use EitherTransaction::TransactionWithCertificate;
-        use EitherTransaction::TransactionWithoutCertificate;
+        use EitherTransaction::Certificate;
+        use EitherTransaction::NoCertificate;
         match (&self.0, tx.0) {
-            (FeeVariant::Linear(algorithm), TransactionWithCertificate(ref tx)) => {
-                algorithm.calculate(tx)
-            }
-            (FeeVariant::Linear(algorithm), TransactionWithoutCertificate(ref tx)) => {
-                algorithm.calculate(tx)
-            }
+            (FeeVariant::Linear(algorithm), Certificate(ref tx)) => algorithm.calculate(tx),
+            (FeeVariant::Linear(algorithm), NoCertificate(ref tx)) => algorithm.calculate(tx),
         }
         .map(Value)
     }
