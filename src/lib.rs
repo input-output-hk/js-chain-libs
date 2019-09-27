@@ -1113,51 +1113,6 @@ impl U128 {
 #[wasm_bindgen]
 pub struct Certificate(certificate::Certificate);
 
-#[wasm_bindgen]
-impl Certificate {
-    /// Create a stake delegation certificate from account (stake key) to pool_id
-    pub fn stake_delegation(pool_id: PoolId, account: PublicKey) -> Certificate {
-        let content = certificate::StakeDelegation {
-            account_id: tx::AccountIdentifier::from_single_account(account.0.into()),
-            pool_id: pool_id.0,
-        };
-        certificate::Certificate::StakeDelegation(content).into()
-    }
-
-    /*     pub fn stake_pool_registration(pool_info: StakePoolInfo) -> Certificate {
-        certificate::Certificate::StakePoolRegistration(
-            certificate::Certificate::StakePoolRegistration(pool_info.0))
-    } */
-
-    /*     /// Add signature to certificate
-    pub fn sign(&mut self, private_key: PrivateKey) {
-        let signature = match &self.0.content {
-            certificate::Certificate::StakeDelegation(s) => {
-                s.make_certificate(&private_key.0)
-            }
-            certificate::Certificate::StakePoolRegistration(s) => {
-                s.make_certificate(&private_key.0)
-            }
-            certificate::Certificate::StakePoolRetirement(s) => {
-                s.make_certificate(&private_key.0)
-            }
-        };
-        self.0.signatures.push(signature);
-    } */
-
-    /*     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
-        self.0
-            .serialize_as_vec()
-            .map_err(|error| JsValue::from_str(&format!("{}", error)))
-    } */
-
-    /*     pub fn to_bech32(&self) -> Result<String, JsValue> {
-        Bech32::new("cert".to_string(), self.as_bytes()?.to_base32())
-            .map(|bech32| bech32.to_string())
-            .map_err(|error| JsValue::from_str(&format!("{}", error)))
-    } */
-}
-
 impl From<certificate::Certificate> for Certificate {
     fn from(certificate: certificate::Certificate) -> Certificate {
         Certificate(certificate)
@@ -1174,23 +1129,44 @@ impl From<chain::certificate::PoolRegistration> for PoolRegistration {
 }
 
 #[wasm_bindgen]
-pub struct TimeOffsetSeconds(chain_time::timeline::TimeOffsetSeconds);
+pub struct StakeDelegation(chain::certificate::StakeDelegation);
 
-impl From<chain_time::timeline::TimeOffsetSeconds> for TimeOffsetSeconds {
-    fn from(inner: chain_time::timeline::TimeOffsetSeconds) -> TimeOffsetSeconds {
-        TimeOffsetSeconds(inner)
+impl From<chain::certificate::StakeDelegation> for StakeDelegation {
+    fn from(info: chain::certificate::StakeDelegation) -> StakeDelegation {
+        StakeDelegation(info)
     }
 }
 
 #[wasm_bindgen]
-impl TimeOffsetSeconds {
-    /// Parse the given string into a 64 bits unsigned number
-    pub fn from_string(number: &str) -> Result<TimeOffsetSeconds, JsValue> {
-        number
-            .parse::<u64>()
-            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
-            .map(chain_time::DurationSeconds)
-            .map(|duration| chain_time::timeline::TimeOffsetSeconds::from(duration).into())
+impl StakeDelegation {
+    /// Create a stake delegation object from account (stake key) to pool_id
+    pub fn new(pool_id: PoolId, account: PublicKey) -> StakeDelegation {
+        certificate::StakeDelegation {
+            account_id: tx::AccountIdentifier::from_single_account(account.0.into()),
+            pool_id: pool_id.0,
+        }
+        .into()
+    }
+}
+
+#[wasm_bindgen]
+impl Certificate {
+    /// Create a Certificate for StakeDelegation
+    pub fn stake_delegation(stake_delegation: StakeDelegation) -> Certificate {
+        certificate::Certificate::StakeDelegation(stake_delegation.0).into()
+    }
+
+    /// Create a Certificate for PoolRegistration
+    pub fn stake_pool_registration(pool_registration: PoolRegistration) -> Certificate {
+        certificate::Certificate::PoolRegistration(pool_registration.0).into()
+    }
+
+    // Prevent the warning on private_key, as I don't want an underscore in the js signature
+    #[allow(unused_variables)]
+    pub fn sign(&mut self, private_key: PrivateKey) {
+        // FIXME: NOP
+        // This is what the JCLI does, so I'll keep it just in case
+        ()
     }
 }
 
@@ -1222,6 +1198,27 @@ impl PoolRegistration {
 
     pub fn id(&self) -> PoolId {
         self.0.to_id().into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct TimeOffsetSeconds(chain_time::timeline::TimeOffsetSeconds);
+
+impl From<chain_time::timeline::TimeOffsetSeconds> for TimeOffsetSeconds {
+    fn from(inner: chain_time::timeline::TimeOffsetSeconds) -> TimeOffsetSeconds {
+        TimeOffsetSeconds(inner)
+    }
+}
+
+#[wasm_bindgen]
+impl TimeOffsetSeconds {
+    /// Parse the given string into a 64 bits unsigned number
+    pub fn from_string(number: &str) -> Result<TimeOffsetSeconds, JsValue> {
+        number
+            .parse::<u64>()
+            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+            .map(chain_time::DurationSeconds)
+            .map(|duration| chain_time::timeline::TimeOffsetSeconds::from(duration).into())
     }
 }
 
