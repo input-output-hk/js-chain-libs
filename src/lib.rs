@@ -887,6 +887,20 @@ impl Input {
         }
     }
 
+    pub fn is_account(&self) -> bool {
+        match self.0.get_type() {
+            tx::InputType::Account => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_utxo(&self) -> bool {
+        match self.0.get_type() {
+            tx::InputType::Utxo => true,
+            _ => false,
+        }
+    }
+
     pub fn value(&self) -> Value {
         self.0.value.into()
     }
@@ -1289,6 +1303,27 @@ impl Balance {
             tx::Balance::Negative(_) => "negative",
             tx::Balance::Zero => "zero",
         })
+    }
+
+    pub fn is_positive(&self) -> bool {
+        match self.0 {
+            tx::Balance::Positive(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_negative(&self) -> bool {
+        match self.0 {
+            tx::Balance::Negative(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        match self.0 {
+            tx::Balance::Zero => true,
+            _ => false,
+        }
     }
 
     /// Get value without taking into account if the balance is positive or negative
