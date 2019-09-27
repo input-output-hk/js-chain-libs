@@ -971,13 +971,12 @@ impl Account {
         }
     }
 
-    pub fn to_address(&self) -> Address {
+    pub fn to_address(&self, discriminant: AddressDiscrimination) -> Address {
         let kind = match self.0.to_single_account() {
             Some(key) => chain_addr::Kind::Account(key.into()),
             None => panic!(),
         };
-        let discriminant = chain_addr::Discrimination::Production;
-        chain_addr::Address(discriminant, kind).into()
+        chain_addr::Address(discriminant.into(), kind).into()
     }
 
     pub fn from_public_key(key: PublicKey) -> Account {
