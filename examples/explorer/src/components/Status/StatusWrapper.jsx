@@ -3,6 +3,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
 import Status from './Status';
+import Loading from '../Loading/Loading';
 
 /** Wraps Status component with GraphQl data */
 const StatusWrapper = () => (
@@ -22,7 +23,7 @@ const StatusWrapper = () => (
         return <div>Error!</div>;
       }
       if (!props) {
-        return <div>Loading...</div>;
+        return <Loading />;
       }
 
       return <Status {...props} />;

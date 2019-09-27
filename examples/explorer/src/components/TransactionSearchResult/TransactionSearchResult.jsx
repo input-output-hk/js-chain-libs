@@ -1,13 +1,35 @@
 import React from 'react';
-import Jumbotron from 'react-bootstrap/Jumbotron';
-import Container from 'react-bootstrap/Container';
 
-const TransactionSearchResult = () => (
-  <Jumbotron>
-    <Container>
-      <h1> Here it is... the transaction you have been looking for</h1>
-    </Container>
-  </Jumbotron>
+import graphql from 'babel-plugin-relay/macro';
+import { QueryRenderer } from 'react-relay';
+import environment from '../../graphql/environment';
+import TransactionInfo from './TransactionInfo';
+import Loading from '../Loading/Loading';
+
+const TransactionSearchResult = ({ id }) => (
+  <QueryRenderer
+    environment={environment}
+    query={graphql`
+      query TransactionSearchResultQuery($id: String!) {
+        transaction(id: $id) {
+          id
+          ...TransactionInfo_transaction
+        }
+      }
+    `}
+    variables={{ id }}
+    render={response => {
+      const { error, props } = response;
+      if (error) {
+        return <div>Error!</div>;
+      }
+      if (!props) {
+        return <Loading />;
+      }
+
+      return <TransactionInfo {...props} />;
+    }}
+  />
 );
 
 export default TransactionSearchResult;

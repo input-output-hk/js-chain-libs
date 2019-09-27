@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { navigate } from '@reach/router';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -6,8 +7,15 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
+import { SearchType, getSearchType } from '../../helpers/searchHelper';
+
 const onSearchClick = searchValue => {
-  // Do something to redirect using the searchvalue
+  const type = getSearchType(searchValue);
+  if (type === SearchType.UNKNOWN) {
+    alert('Do something prettier');
+    return;
+  }
+  navigate(`/${type}/${searchValue}`);
 };
 
 const Search = () => {
@@ -23,7 +31,7 @@ const Search = () => {
               <Form.Control
                 type="text"
                 onChange={event => setSearchValue(event.target.value)}
-                placeholder="Search for transaction id, block id ..."
+                placeholder="Search for transaction, block or certificate id ..."
               />
             </Col>
             <Col md={{ span: 1 }}>
