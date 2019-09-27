@@ -5,7 +5,6 @@ use chain::{account, certificate, fee, key, transaction as tx, txbuilder, value}
 use chain_core::property::Block as _;
 use chain_core::property::Deserialize as _;
 use chain_core::property::Fragment as _;
-use chain_core::property::HasFragments as _;
 use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
@@ -675,38 +674,45 @@ impl TransactionFinalizer {
         self.0
             .finalize()
             .map(|auth_tx| match auth_tx.transaction.extra.clone() {
-                Some(extra) => {
-                    EitherAuthenticatedTransaction::Certificate(tx::AuthenticatedTransaction {
-                        transaction: auth_tx.transaction.replace_extra(extra.clone()),
-                        witnesses: auth_tx.witnesses,
-                    })
-                }
-                None => {
-                    EitherAuthenticatedTransaction::NoCertificate(tx::AuthenticatedTransaction {
-                        transaction: auth_tx.transaction.replace_extra(tx::NoExtra),
-                        witnesses: auth_tx.witnesses,
-                    })
-                }
+                Some(extra) => AuthenticatedTransaction::from(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.replace_extra(extra.clone()),
+                    witnesses: auth_tx.witnesses,
+                }),
+                None => AuthenticatedTransaction::from(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.replace_extra(tx::NoExtra),
+                    witnesses: auth_tx.witnesses,
+                }),
             })
-            .map(AuthenticatedTransaction)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 }
 
 /// Type for representing a Transaction with Witnesses (signatures)
 #[wasm_bindgen]
-pub struct AuthenticatedTransaction(EitherAuthenticatedTransaction);
+pub struct AuthenticatedTransaction(AuthenticatedTransactionType);
 
-enum EitherAuthenticatedTransaction {
+// This allows to circumvent the lack of generics when exposing the type to js
+// I find this simpler as it requires only one level of pattern matching and but it
+// also leads to more boilerplate
+enum AuthenticatedTransactionType {
     NoCertificate(tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>),
-    Certificate(tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>),
+    PoolRegistration(
+        tx::AuthenticatedTransaction<chain_addr::Address, certificate::PoolRegistration>,
+    ),
+    PoolManagement(tx::AuthenticatedTransaction<chain_addr::Address, certificate::PoolManagement>),
+    StakeDelegation(
+        tx::AuthenticatedTransaction<chain_addr::Address, certificate::StakeDelegation>,
+    ),
+    OwnerStakeDelegation(
+        tx::AuthenticatedTransaction<chain_addr::Address, certificate::OwnerStakeDelegation>,
+    ),
 }
 
 impl From<tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>>
     for AuthenticatedTransaction
 {
     fn from(tx: tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>) -> Self {
-        AuthenticatedTransaction(EitherAuthenticatedTransaction::NoCertificate(tx))
+        AuthenticatedTransaction(AuthenticatedTransactionType::NoCertificate(tx))
     }
 }
 
@@ -714,26 +720,80 @@ impl From<tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certifi
     for AuthenticatedTransaction
 {
     fn from(
-        tx: tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>,
+        auth_tx: tx::AuthenticatedTransaction<chain_addr::Address, certificate::Certificate>,
     ) -> Self {
-        AuthenticatedTransaction(EitherAuthenticatedTransaction::Certificate(tx))
+        use certificate::Certificate;
+        let inner = match &auth_tx.transaction.extra {
+            Certificate::PoolRegistration(c) => {
+                AuthenticatedTransactionType::PoolRegistration(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
+                    witnesses: auth_tx.witnesses,
+                })
+            }
+            Certificate::PoolManagement(c) => {
+                AuthenticatedTransactionType::PoolManagement(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
+                    witnesses: auth_tx.witnesses,
+                })
+            }
+            Certificate::StakeDelegation(c) => {
+                AuthenticatedTransactionType::StakeDelegation(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
+                    witnesses: auth_tx.witnesses,
+                })
+            }
+            Certificate::OwnerStakeDelegation(c) => {
+                AuthenticatedTransactionType::OwnerStakeDelegation(tx::AuthenticatedTransaction {
+                    transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
+                    witnesses: auth_tx.witnesses,
+                })
+            }
+        };
+        AuthenticatedTransaction(inner)
     }
 }
 
 #[wasm_bindgen]
 impl AuthenticatedTransaction {
-    /*     pub fn id(&self) -> TransactionSignDataHash {
-        self.0.hash().into()
-    } */
-
     /// Get a copy of the inner Transaction, discarding the signatures
     pub fn transaction(&self) -> Transaction {
         match &self.0 {
-            EitherAuthenticatedTransaction::Certificate(auth_tx) => {
-                auth_tx.transaction.clone().into()
+            AuthenticatedTransactionType::NoCertificate(auth_tx) => auth_tx
+                .transaction
+                .clone()
+                .replace_extra(tx::NoExtra)
+                .into(),
+            AuthenticatedTransactionType::PoolRegistration(auth_tx) => {
+                let cert = auth_tx.transaction.extra.clone();
+                auth_tx
+                    .transaction
+                    .clone()
+                    .replace_extra(certificate::Certificate::PoolRegistration(cert))
+                    .into()
             }
-            EitherAuthenticatedTransaction::NoCertificate(auth_tx) => {
-                auth_tx.transaction.clone().into()
+            AuthenticatedTransactionType::PoolManagement(auth_tx) => {
+                let cert = auth_tx.transaction.extra.clone();
+                auth_tx
+                    .transaction
+                    .clone()
+                    .replace_extra(certificate::Certificate::PoolManagement(cert))
+                    .into()
+            }
+            AuthenticatedTransactionType::StakeDelegation(auth_tx) => {
+                let cert = auth_tx.transaction.extra.clone();
+                auth_tx
+                    .transaction
+                    .clone()
+                    .replace_extra(certificate::Certificate::StakeDelegation(cert))
+                    .into()
+            }
+            AuthenticatedTransactionType::OwnerStakeDelegation(auth_tx) => {
+                let cert = auth_tx.transaction.extra.clone();
+                auth_tx
+                    .transaction
+                    .clone()
+                    .replace_extra(certificate::Certificate::OwnerStakeDelegation(cert))
+                    .into()
             }
         }
     }
@@ -1372,42 +1432,22 @@ impl From<chain::fragment::Fragment> for Fragment {
 #[wasm_bindgen]
 impl Fragment {
     pub fn from_authenticated_transaction(tx: AuthenticatedTransaction) -> Fragment {
-        use certificate::Certificate;
         use chain::fragment;
         match tx.0 {
-            EitherAuthenticatedTransaction::Certificate(auth_tx) => {
-                match &auth_tx.transaction.extra {
-                    Certificate::PoolRegistration(c) => {
-                        fragment::Fragment::PoolRegistration(tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
-                            witnesses: auth_tx.witnesses,
-                        })
-                    }
-                    Certificate::PoolManagement(c) => {
-                        fragment::Fragment::PoolManagement(tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
-                            witnesses: auth_tx.witnesses,
-                        })
-                    }
-                    Certificate::StakeDelegation(c) => {
-                        fragment::Fragment::StakeDelegation(tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
-                            witnesses: auth_tx.witnesses,
-                        })
-                    }
-                    Certificate::OwnerStakeDelegation(c) => {
-                        fragment::Fragment::OwnerStakeDelegation(tx::AuthenticatedTransaction {
-                            transaction: auth_tx.transaction.clone().replace_extra(c.clone()),
-                            witnesses: auth_tx.witnesses,
-                        })
-                    }
-                }
+            AuthenticatedTransactionType::NoCertificate(auth_tx) => {
+                fragment::Fragment::Transaction(auth_tx)
             }
-            EitherAuthenticatedTransaction::NoCertificate(auth_tx) => {
-                chain::fragment::Fragment::Transaction(tx::AuthenticatedTransaction {
-                    transaction: auth_tx.transaction.clone().replace_extra(tx::NoExtra),
-                    witnesses: auth_tx.witnesses,
-                })
+            AuthenticatedTransactionType::PoolRegistration(auth_tx) => {
+                fragment::Fragment::PoolRegistration(auth_tx)
+            }
+            AuthenticatedTransactionType::PoolManagement(auth_tx) => {
+                fragment::Fragment::PoolManagement(auth_tx)
+            }
+            AuthenticatedTransactionType::StakeDelegation(auth_tx) => {
+                fragment::Fragment::StakeDelegation(auth_tx)
+            }
+            AuthenticatedTransactionType::OwnerStakeDelegation(auth_tx) => {
+                fragment::Fragment::OwnerStakeDelegation(auth_tx)
             }
         }
         .into()
@@ -1421,9 +1461,24 @@ impl Fragment {
     /// Get a Transaction if the Fragment represents one
     pub fn get_transaction(self) -> Result<AuthenticatedTransaction, JsValue> {
         match self.0 {
-            chain::fragment::Fragment::Transaction(auth) => Ok(auth.into()),
-            _ => Err(JsValue::from_str("Invalid message type")),
+            chain::fragment::Fragment::Transaction(auth) => {
+                Ok(AuthenticatedTransactionType::NoCertificate(auth))
+            }
+            chain::fragment::Fragment::OwnerStakeDelegation(auth) => {
+                Ok(AuthenticatedTransactionType::OwnerStakeDelegation(auth))
+            }
+            chain::fragment::Fragment::StakeDelegation(auth) => {
+                Ok(AuthenticatedTransactionType::StakeDelegation(auth))
+            }
+            chain::fragment::Fragment::PoolRegistration(auth) => {
+                Ok(AuthenticatedTransactionType::PoolRegistration(auth))
+            }
+            chain::fragment::Fragment::PoolManagement(auth) => {
+                Ok(AuthenticatedTransactionType::PoolManagement(auth))
+            }
+            _ => Err(JsValue::from_str("Invalid fragment type")),
         }
+        .map(AuthenticatedTransaction)
     }
 
     pub fn as_bytes(&self) -> Result<Vec<u8>, JsValue> {
