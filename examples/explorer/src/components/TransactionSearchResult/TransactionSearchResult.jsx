@@ -3,7 +3,7 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
-import TransactionInfo from './TransactionInfo';
+import TransactionInfo from '../TransactionInfo/TransactionInfo';
 import Loading from '../Loading/Loading';
 
 const TransactionSearchResult = ({ id }) => (

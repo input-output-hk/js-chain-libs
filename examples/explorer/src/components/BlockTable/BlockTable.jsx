@@ -1,5 +1,8 @@
 import React from 'react';
 
+import graphql from 'babel-plugin-relay/macro';
+import { createFragmentContainer } from 'react-relay';
+
 import Table from 'react-bootstrap/Table';
 
 const BlockTable = ({ blocks }) => (
@@ -34,4 +37,25 @@ const BlockTable = ({ blocks }) => (
   </Table>
 );
 
-export default BlockTable;
+export default createFragmentContainer(
+  BlockTable,
+  // Each key specified in this object will correspond to a prop available to the component
+  {
+    blocks: graphql`
+      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      fragment BlockTable_blocks on Block @relay(plural: true) {
+        id
+        date {
+          epoch {
+            id
+          }
+          slot
+        }
+        chainLength
+        previousBlock {
+          id
+        }
+      }
+    `
+  }
+);

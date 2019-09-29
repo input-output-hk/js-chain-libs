@@ -1,7 +1,5 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
 
 import graphql from 'babel-plugin-relay/macro';
@@ -10,19 +8,21 @@ import { createFragmentContainer } from 'react-relay';
 /** Shows information of las block */
 const BlockCard = ({ block }) => (
   <Card>
-    <Container>
-      <Row>
-        <h2 className="header"> Last Block </h2>
-      </Row>
-      <Row>
-        <Col>Hash:</Col>
-        <Col>{block.id}</Col>
-      </Row>
-      <Row>
-        <Col>Chain length:</Col>
-        <Col>{block.chainLength}</Col>
-      </Row>
-    </Container>
+    <Card.Header as="h5">Last Block</Card.Header>
+    <Card.Body>
+      <Table borderless>
+        <tbody>
+          <tr>
+            <td>Hash:</td>
+            <td>{block.id}</td>
+          </tr>
+          <tr>
+            <td>Chain length:</td>
+            <td>{block.chainLength} </td>
+          </tr>
+        </tbody>
+      </Table>
+    </Card.Body>
   </Card>
 );
 

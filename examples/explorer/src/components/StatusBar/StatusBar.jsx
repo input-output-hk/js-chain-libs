@@ -2,17 +2,17 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
-import Status from './Status';
+import StatusInfo from '../StatusInfo/StatusInfo';
 import Loading from '../Loading/Loading';
 
 /** Wraps Status component with GraphQl data */
-const StatusWrapper = () => (
+const StatusBar = () => (
   <QueryRenderer
     environment={environment}
     query={graphql`
-      query StatusWrapperQuery {
+      query StatusBarQuery {
         status {
-          ...Status_status
+          ...StatusInfo_status
         }
       }
     `}
@@ -26,9 +26,9 @@ const StatusWrapper = () => (
         return <Loading />;
       }
 
-      return <Status {...props} />;
+      return <StatusInfo {...props} />;
     }}
   />
 );
 
-export default StatusWrapper;
+export default StatusBar;

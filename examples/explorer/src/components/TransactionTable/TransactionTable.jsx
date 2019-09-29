@@ -2,7 +2,7 @@ import React from 'react';
 
 import Table from 'react-bootstrap/Table';
 
-const TransactionTable = ({ txs }) => (
+const TransactionTable = ({ transactions }) => (
   <Table striped bordered hover>
     <thead>
       <tr>
@@ -34,4 +34,15 @@ const TransactionTable = ({ txs }) => (
   </Table>
 );
 
-export default TransactionTable;
+export default createFragmentContainer(
+  TransactionTable,
+  // Each key specified in this object will correspond to a prop available to the component
+  {
+    transactions: graphql`
+      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      fragment TransactionTable_transactions on Transaction @relay(plural: true) {
+        id
+      }
+    `
+  }
+);

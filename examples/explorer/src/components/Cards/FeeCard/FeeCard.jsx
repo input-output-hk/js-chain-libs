@@ -1,7 +1,5 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
 
 import graphql from 'babel-plugin-relay/macro';
@@ -10,19 +8,21 @@ import { createFragmentContainer } from 'react-relay';
 /** Shows the current fee information */
 const FeeCard = ({ feeSettings }) => (
   <Card>
-    <Container>
-      <Row>
-        <h2 className="header"> Fee information </h2>
-      </Row>
-      <Row>
-        <Col>Constant:</Col>
-        <Col> {feeSettings.constant} </Col>
-      </Row>
-      <Row>
-        <Col>Coefficient:</Col>
-        <Col> {feeSettings.constant} </Col>
-      </Row>
-    </Container>
+    <Card.Header as="h5">Fee information</Card.Header>
+    <Card.Body>
+      <Table borderless>
+        <tbody>
+          <tr>
+            <td>Constant:</td>
+            <td>{feeSettings.constant}</td>
+          </tr>
+          <tr>
+            <td>Coefficient:</td>
+            <td>{feeSettings.constant} </td>
+          </tr>
+        </tbody>
+      </Table>
+    </Card.Body>
   </Card>
 );
 
