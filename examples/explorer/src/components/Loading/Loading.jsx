@@ -4,7 +4,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import './loading.scss';
 
 const Loading = () => (
-  <div className="Loading">
+  <div className="loading">
     <Spinner animation="border" variant="dark" />
   </div>
 );

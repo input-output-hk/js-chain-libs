@@ -8,7 +8,7 @@ import { createFragmentContainer } from 'react-relay';
 
 /** Shows information of current epoch */
 const EpochCard = ({ epoch }) => (
-  <div className="StatusCard">
+  <div className="statusCard">
     <Card>
       <Card.Header as="h5">Epoch</Card.Header>
       <Card.Body>

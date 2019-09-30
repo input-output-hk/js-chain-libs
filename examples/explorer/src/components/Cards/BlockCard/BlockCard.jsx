@@ -8,7 +8,7 @@ import { createFragmentContainer } from 'react-relay';
 
 /** Shows information of las block */
 const BlockCard = ({ block }) => (
-  <div className="StatusCard">
+  <div className="statusCard">
     <Card>
       <Card.Header as="h5">Last Block</Card.Header>
       <Card.Body>

@@ -9,7 +9,7 @@ import RecentBlocks from './components/RecentBlocks/RecentBlocks';
 import StatusBar from './components/StatusBar/StatusBar';
 import TransactionSearchResult from './components/TransactionSearchResult/TransactionSearchResult';
 import BlockSearchResult from './components/BlockSearchResult/BlockSearchResult';
-import CertificateSearchResult from './components/CertificateSearchResult/CertificateSearchResult';
+import BlockByLengthSearchResult from './components/BlockByLengthSearchResult/BlockByLengthSearchResult';
 
 import './App.css';
 
@@ -17,12 +17,12 @@ const App = () => (
   <Container fluid>
     <MainNavbar />
     <Container fluid>
-      <StatusBar />
+      {/* <StatusBar /> */}
       <Search />
       <Router>
         <BlockSearchResult path="block/:id" />
         <TransactionSearchResult path="tx/:id" />
-        <CertificateSearchResult path="cert/:id" />
+        <BlockByLengthSearchResult path="block/chainLength/:length" />
         <RecentBlocks path="/" />
       </Router>
     </Container>

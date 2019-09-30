@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@reach/router';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
@@ -9,7 +10,7 @@ const BlockTable = ({ blocks }) => (
   <Table striped bordered hover>
     <thead>
       <tr>
-        <th>chainLength</th>
+        <th>Chain Length</th>
         <th>Hash</th>
         <th>Epoch</th>
         <th>Slot</th>

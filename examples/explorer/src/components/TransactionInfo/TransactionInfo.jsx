@@ -6,36 +6,45 @@ import { createFragmentContainer } from 'react-relay';
 
 import './transactionInfo.scss';
 import Table from 'react-bootstrap/Table';
+import EmptyResult from '../commons/EmptyResult/EmptyResult';
 import TransactionInput from '../TransactionInput/TransactionInput';
 import TransactionOutput from '../TransactionOutput/TransactionOutput';
 
-const TransactionInfo = ({ transaction }) => (
-  <Jumbotron>
-    <div className="TransactionInfo">
-      <h2>Transaction: {transaction.id}</h2>
-      <Table striped bordered hover>
-        <tbody>
-          <tr>
-            <td>Hash:</td>
-            <td>{transaction.id}</td>
-          </tr>
-          <tr>
-            <td>Block:</td>
-            <td>{transaction.block.id}</td>
-          </tr>
-          <tr>
-            <td>Inputs count:</td>
-            <td>{transaction.inputs.length}</td>
-          </tr>
-          <tr>
-            <td>Outputs count:</td>
-            <td>{transaction.outputs.length}</td>
-          </tr>
-        </tbody>
-      </Table>
-    </div>
-  </Jumbotron>
-);
+import { inputsAmount, outputsAmount } from '../../helpers/transactionHelper';
+
+const TransactionInfo = ({ transaction }) => {
+  if (!transaction) {
+    return <EmptyResult {...{ entityName: 'Transaction' }} />;
+  }
+  return (
+    <Jumbotron>
+      <div className="transactionInfo">
+        <h2>Transaction: {transaction.id}</h2>
+        <Table striped bordered hover>
+          <tbody>
+            <tr>
+              <td>Hash:</td>
+              <td>{transaction.id}</td>
+            </tr>
+            <tr>
+              <td>Block:</td>
+              <td>{transaction.block.id}</td>
+            </tr>
+            <tr>
+              <td>Inputs amount:</td>
+              <td>{inputsAmount(transaction)}</td>
+            </tr>
+            <tr>
+              <td>Outputs amount:</td>
+              <td>{outputsAmount(transaction)}</td>
+            </tr>
+          </tbody>
+        </Table>
+        {/* TODO: Add Input-Output component */}
+      </div>
+    </Jumbotron>
+  );
+};
 
 export default createFragmentContainer(
   TransactionInfo,

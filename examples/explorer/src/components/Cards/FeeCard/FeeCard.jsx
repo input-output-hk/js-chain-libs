@@ -8,7 +8,7 @@ import { createFragmentContainer } from 'react-relay';
 import '../statusCard.scss';
 /** Shows the current fee information */
 const FeeCard = ({ feeSettings }) => (
-  <div className="StatusCard">
+  <div className="statusCard">
     <Card>
       <Card.Header as="h5">Fee information</Card.Header>
       <Card.Body>

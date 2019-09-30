@@ -5,15 +5,16 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import './search.scss';
-import { SearchType, getSearchType } from '../../helpers/searchHelper';
+import { SearchUrl, getSearchUrl } from '../../helpers/searchHelper';
 
 const onSearchClick = searchValue => {
-  const type = getSearchType(searchValue);
-  if (type === SearchType.UNKNOWN) {
+  const baseUrl = getSearchUrl(searchValue);
+  if (!baseUrl) {
+    // TODO: Handle this in a proper way
     alert('Do something prettier');
     return;
   }
-  navigate(`/${type}/${searchValue}`);
+  navigate(`/${baseUrl}/${searchValue}`);
 };
 
 const Search = () => {
@@ -21,9 +22,9 @@ const Search = () => {
 
   return (
     <Jumbotron>
-      <div className="SearchContainer">
+      <div className="searchContainer">
         <h1 className="header"> Search for transactions or blocks </h1>
-        <div className="SearchForm">
+        <div className="searchForm">
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}

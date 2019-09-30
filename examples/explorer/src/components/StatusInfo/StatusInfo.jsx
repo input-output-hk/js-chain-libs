@@ -13,7 +13,7 @@ import FeeCard from '../Cards/FeeCard/FeeCard';
 const StatusInfo = ({ status }) => {
   const { currentEpoch, latestBlock, feeSettings } = status;
   return (
-    <div className="CardsContainer">
+    <div className="cardsContainer">
       <EpochCard {...{ epoch: currentEpoch }} />
       <BlockCard {...{ block: latestBlock }} />
       <FeeCard {...{ feeSettings }} />

@@ -1,37 +1,35 @@
 import React from 'react';
-
 import Table from 'react-bootstrap/Table';
+import Card from 'react-bootstrap/Card';
 
+import graphql from 'babel-plugin-relay/macro';
+import { createFragmentContainer } from 'react-relay';
+
+import { inputsAmount, outputsAmount } from '../../helpers/transactionHelper';
+// TODO: Review which values should be shown here
 const TransactionTable = ({ transactions }) => (
-  <Table striped bordered hover>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Username</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td colSpan="2">Larry the Bird</td>
-        <td>@twitter</td>
-      </tr>
-    </tbody>
-  </Table>
+  <Card>
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>Hash</th>
+          <th>Block</th>
+          <th>Inputs amount</th>
+          <th>Outputs amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map(tx => (
+          <tr>
+            <td>{tx.id}</td>
+            <td>{tx.block.id}</td>
+            <td>{inputsAmount(tx)}</td>
+            <td>{outputsAmount(tx)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </Card>
 );
 
 export default createFragmentContainer(
@@ -42,6 +40,15 @@ export default createFragmentContainer(
       # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
       fragment TransactionTable_transactions on Transaction @relay(plural: true) {
         id
+        block {
+          id
+        }
+        inputs {
+          amount
+        }
+        outputs {
+          amount
+        }
       }
     `
   }
