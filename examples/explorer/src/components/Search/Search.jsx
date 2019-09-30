@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import './search.scss';
-import { SearchUrl, getSearchUrl } from '../../helpers/searchHelper';
+import { getSearchUrl } from '../../helpers/searchHelper';
 
 const onSearchClick = searchValue => {
   const baseUrl = getSearchUrl(searchValue);

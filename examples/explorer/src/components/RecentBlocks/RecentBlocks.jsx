@@ -6,7 +6,7 @@ import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
 
 import BlockTable from '../BlockTable/BlockTable';
-import Loading from '../Loading/Loading';
+import Loading from '../commons/Loading/Loading';
 
 /** TODO: Refactor this component extracting QueryRenderer
  *        Create Query for getting recent blocks

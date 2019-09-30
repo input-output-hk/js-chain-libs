@@ -7,10 +7,7 @@ import { createFragmentContainer } from 'react-relay';
 import './transactionInfo.scss';
 import Table from 'react-bootstrap/Table';
 import EmptyResult from '../commons/EmptyResult/EmptyResult';
-import TransactionInput from '../TransactionInput/TransactionInput';
-import TransactionOutput from '../TransactionOutput/TransactionOutput';
-
-import { inputsAmount, outputsAmount } from '../../helpers/transactionHelper';
+import TransactionInputsOutputs from '../TransactionInputsOutputs/TransactionInputsOutputs';
 
 const TransactionInfo = ({ transaction }) => {
   if (!transaction) {
@@ -31,16 +28,16 @@ const TransactionInfo = ({ transaction }) => {
               <td>{transaction.block.id}</td>
             </tr>
             <tr>
-              <td>Inputs amount:</td>
-              <td>{inputsAmount(transaction)}</td>
+              <td>Inputs count:</td>
+              <td>{transaction.inputs.length}</td>
             </tr>
             <tr>
-              <td>Outputs amount:</td>
-              <td>{outputsAmount(transaction)}</td>
+              <td>Outputs count:</td>
+              <td>{transaction.outputs.length}</td>
             </tr>
           </tbody>
         </Table>
-        {/* TODO: Add Input-Output component */}
+        <TransactionInputsOutputs {...{ transaction }} />
       </div>
     </Jumbotron>
   );

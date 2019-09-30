@@ -1,26 +1,22 @@
 import React from 'react';
-import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
+import './transactionOutput.scss';
+import AdaAmount from '../commons/AdaAmount/AdaAmount';
+
 const TransactionOutput = ({ transactionOutput }) => (
-  <Table striped bordered hover>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Amount</th>
-        <th>Id</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>500000</td>
-        <td>asdln65168v365096wea5f131r5</td>
-      </tr>
-    </tbody>
-  </Table>
+  <div className="transactionOutput">
+    <div>
+      <div>Address: </div>
+      <div>{transactionOutput.address.id}</div>
+    </div>
+    <div>
+      <div>Amount: </div>
+      <AdaAmount lovelaceAmount={transactionOutput.amount} />
+    </div>
+  </div>
 );
 
 export default createFragmentContainer(

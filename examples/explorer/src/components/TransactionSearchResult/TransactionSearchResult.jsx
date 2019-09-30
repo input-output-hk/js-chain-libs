@@ -4,7 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
 import TransactionInfo from '../TransactionInfo/TransactionInfo';
-import Loading from '../Loading/Loading';
+import Loading from '../commons/Loading/Loading';
 
 const TransactionSearchResult = ({ id }) => (
   <QueryRenderer
