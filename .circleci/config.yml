@@ -1,0 +1,75 @@
+version: 2
+jobs:
+  cargo_fetch:
+    docker:
+      - image: rust:latest
+    working_directory: /mnt/crate
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - restore_cache:
+          keys:
+            - cargo-v3-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+            - cargo-v3-{{ checksum "Cargo.toml" }}
+            - cargo-v3-
+      - run: cargo fetch
+      - run: cargo install wasm-pack
+      - save_cache:
+          key: cargo-v3-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+          paths:
+            - /usr/local/cargo/registry
+            - /usr/local/cargo/git
+            - /usr/local/cargo/bin
+
+  rustfmt:
+    docker:
+      - image: rust:latest
+    working_directory: /mnt/crate
+    steps:
+      - checkout
+      - run:
+          name: Install rustfmt
+          command: rustup component add rustfmt
+      - run:
+          name: Print version information
+          command: cargo fmt -- --version
+      - run:
+          name: Check rustfmt
+          command: cargo fmt -- --check
+
+  test:
+    docker:
+      - image: rust:latest
+    environment:
+      CARGO_INCREMENTAL: 0
+    working_directory: /mnt/crate
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - restore_cache:
+          keys:
+            - cargo-v3-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Print version information
+          command: rustc --version; cargo --version; wasm-pack --version
+      - run:
+          name: Build binaries
+          command: wasm-pack build
+      - run:
+          name: Test
+          environment:
+            RUST_BACKTRACE: 1
+          command: wasm-pack test --node --headless
+
+workflows:
+  version: 2
+  test_all:
+    jobs:
+      - cargo_fetch
+      - rustfmt
+      - test:
+          requires:
+            - rustfmt
+            - cargo_fetch
