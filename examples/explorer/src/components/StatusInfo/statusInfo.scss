@@ -1,0 +1,7 @@
+@import '../generalStyling.scss';
+
+.cardsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
