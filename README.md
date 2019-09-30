@@ -16,6 +16,7 @@ A possible use-case is for building explorers and wallets in javascript, either 
 Make sure to update the submodule:
 
 ```sh
+git submodule init
 git submodule update
 ```
 
