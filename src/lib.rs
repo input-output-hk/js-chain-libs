@@ -532,7 +532,7 @@ impl TransactionBuilder {
     /// see the unchecked_finalize for the non-assisted version
     ///
     /// Example
-    /// 
+    ///
     /// ```javascript
     /// const feeAlgorithm = Fee.linear_fee(
     ///     Value.from_str('20'), Value.from_str('5'), Value.from_str('10')
