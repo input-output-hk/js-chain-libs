@@ -60,7 +60,7 @@ jobs:
           name: Test
           environment:
             RUST_BACKTRACE: 1
-          command: wasm-pack test --node --headless
+          command: wasm-pack test --node
 
 workflows:
   version: 2
