@@ -13,11 +13,11 @@ import FeeCard from '../Cards/FeeCard/FeeCard';
 const StatusInfo = ({ status }) => {
   const { currentEpoch, latestBlock, feeSettings } = status;
   return (
-    <CardGroup>
+    <div className="CardsContainer">
       <EpochCard {...{ epoch: currentEpoch }} />
       <BlockCard {...{ block: latestBlock }} />
       <FeeCard {...{ feeSettings }} />
-    </CardGroup>
+    </div>
   );
 };
 

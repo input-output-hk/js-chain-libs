@@ -1,0 +1,13 @@
+@import '../generalStyling.scss';
+
+.SearchContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.SearchForm {
+  width: 60%;
+  display: flex;
+  flex-direction: row;
+}

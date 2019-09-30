@@ -81,6 +81,8 @@ type PoolStakeDistribution {
 }
 
 type Query {
+  # TODO: Fake query, replace with real one
+  recentBlocks: [Block!]
   block(id: String!): Block!
   blockByChainLength(length: ChainLength!): Block
   transaction(id: String!): Transaction!

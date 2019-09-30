@@ -9,19 +9,18 @@ import BlockTable from '../BlockTable/BlockTable';
 import Loading from '../Loading/Loading';
 
 /** TODO: Refactor this component extracting QueryRenderer
- *        Create Query for getting more than one block
+ *        Create Query for getting recent blocks
  *
  */
 const RecentBlocks = () => (
   <Jumbotron>
     <h2 className="header"> Recent blocks </h2>
-    {/* <QueryRenderer
+    <QueryRenderer
       environment={environment}
       query={graphql`
-        query RecentBlocksQuery($id: String!) {
-          recentBlocks() {
-            id
-            ...BlockInfo_block
+        query RecentBlocksQuery {
+          recentBlocks {
+            ...BlockTable_blocks
           }
         }
       `}
@@ -35,9 +34,9 @@ const RecentBlocks = () => (
           return <Loading />;
         }
 
-        return <BlockTable {...props} />;
+        return <BlockTable {...{ blocks: props.recentBlocks }} />;
       }}
-    /> */}
+    />
   </Jumbotron>
 );
 
