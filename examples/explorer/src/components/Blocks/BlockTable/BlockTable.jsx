@@ -4,6 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
 import Table from 'react-bootstrap/Table';
+import BlockLink from '../../Commons/BlockLink/BlockLink';
 
 const BlockTable = ({ blocks }) => (
   <Table striped bordered hover>
@@ -18,8 +19,12 @@ const BlockTable = ({ blocks }) => (
     <tbody>
       {blocks.map(block => (
         <tr>
-          <td>{block.chainLength}</td>
-          <td>{block.id}</td>
+          <td>
+            <BlockLink chainLength={block.chainLength} />
+          </td>
+          <td>
+            <BlockLink id={block.id} />
+          </td>
           <td>{block.date.epoch.id}</td>
           <td>{block.date.slot}</td>
         </tr>

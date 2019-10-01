@@ -7,3 +7,12 @@ $dark-grey: #94a8c2;
 $darker-grey: #4f5050;
 $medium-grey: #c5d0de;
 $light-grey: #f3f6f8;
+
+.basicLink {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  :hover {
+    color: $light-grey;
+  }
+}

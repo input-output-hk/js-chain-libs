@@ -6,7 +6,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 
 import './searchBar.scss';
-import { getSearchUrl } from '../../../helpers/searchHelper';
+import { isBlockNumber } from '../../../helpers/blockHelper';
 
 const onBlockSearchClick = searchValue => {
   let baseUrl = 'block';

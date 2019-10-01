@@ -8,6 +8,7 @@ import { createFragmentContainer } from 'react-relay';
 import './blockInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import TransactionTable from '../../Transactions/TransactionTable/TransactionTable';
+import BlockLink from '../../Commons/BlockLink/BlockLink';
 
 const BlockInfo = ({ block }) => {
   if (!block) {
@@ -24,7 +25,9 @@ const BlockInfo = ({ block }) => {
             <tbody>
               <tr>
                 <td>Hash:</td>
-                <td>{block.id}</td>
+                <td>
+                  <BlockLink id={block.id} />
+                </td>
               </tr>
               <tr>
                 <td>Epoch:</td>
@@ -40,7 +43,9 @@ const BlockInfo = ({ block }) => {
               </tr>
               <tr>
                 <td>Previous block:</td>
-                <td>{block.previousBlock.id}</td>
+                <td>
+                  <BlockLink id={block.previousBlock.id} />
+                </td>
               </tr>
             </tbody>
           </Table>

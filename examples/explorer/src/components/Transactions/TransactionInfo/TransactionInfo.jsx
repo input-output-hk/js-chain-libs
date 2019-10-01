@@ -10,6 +10,9 @@ import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import TransactionInputsOutputs from '../TransactionInputsOutputs/TransactionInputsOutputs';
 import CertificateInfo from '../../Certificates/CertificateInfo/CertificateInfo';
 
+import BlockLink from '../../Commons/BlockLink/BlockLink';
+import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
+
 const TransactionInfo = ({ transaction }) => {
   if (!transaction) {
     return <EmptyResult {...{ entityName: 'Transaction' }} />;
@@ -23,11 +26,15 @@ const TransactionInfo = ({ transaction }) => {
           <tbody>
             <tr>
               <td>Hash:</td>
-              <td>{transaction.id}</td>
+              <td>
+                <TransactionLink id={transaction.id} />
+              </td>
             </tr>
             <tr>
               <td>Block:</td>
-              <td>{transaction.block.id}</td>
+              <td>
+                <BlockLink id={transaction.block.id} />
+              </td>
             </tr>
             <tr>
               <td>Inputs count:</td>

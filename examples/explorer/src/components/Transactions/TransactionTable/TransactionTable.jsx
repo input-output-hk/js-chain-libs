@@ -7,6 +7,8 @@ import { createFragmentContainer } from 'react-relay';
 
 import { inputsAmount, outputsAmount } from '../../../helpers/transactionHelper';
 import AdaAmount from '../../Commons/AdaAmount/AdaAmount';
+import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
+import BlockLink from '../../Commons/BlockLink/BlockLink';
 // TODO: Review which values should be shown here
 const TransactionTable = ({ transactions }) => (
   <Card>
@@ -22,8 +24,12 @@ const TransactionTable = ({ transactions }) => (
       <tbody>
         {transactions.map(tx => (
           <tr>
-            <td>{tx.id}</td>
-            <td>{tx.block.id}</td>
+            <td>
+              <TransactionLink id={tx.id} />
+            </td>
+            <td>
+              <BlockLink id={tx.block.id} />
+            </td>
             <td>
               <AdaAmount lovelaceAmount={inputsAmount(tx)} />
             </td>
