@@ -8,7 +8,7 @@ A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with J
 
 # Install dependencies
 
-- Use nodejs v8.12: `nvm install 8.16.0 && nvm use 8.16.0`
+- Use nodejs v8.16: `nvm install 8.16.0 && nvm use 8.16.0` or you can just run `nvm use` in the root of the project.
 - Node dependencies: `npm install`
 
 # Configure

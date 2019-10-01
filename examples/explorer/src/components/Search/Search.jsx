@@ -2,18 +2,24 @@ import React, { useState } from 'react';
 import { navigate } from '@reach/router';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Form from 'react-bootstrap/Form';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 
 import './search.scss';
-import { getSearchUrl } from '../../helpers/searchHelper';
+import { isBlockNumber } from '../../helpers/blockHelper';
 
-const onSearchClick = searchValue => {
-  const baseUrl = getSearchUrl(searchValue);
-  if (!baseUrl) {
-    // TODO: Handle this in a proper way
-    alert('Do something prettier');
-    return;
+const onBlockSearchClick = searchValue => {
+  let baseUrl = 'block';
+
+  if (isBlockNumber(searchValue)) {
+    baseUrl = 'block/chainLength';
   }
+
+  navigate(`/${baseUrl}/${searchValue}`);
+};
+
+const onTxSearchClick = searchValue => {
+  const baseUrl = 'tx';
   navigate(`/${baseUrl}/${searchValue}`);
 };
 
@@ -28,12 +34,16 @@ const Search = () => {
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}
-            placeholder="Search for transaction, block or certificate id ..."
+            placeholder="Search for block, transaction or certificate id ..."
           />
-          <Button variant="primary" onClick={() => onSearchClick(searchValue)}>
-            {' '}
-            Search{' '}
-          </Button>
+          <ButtonGroup>
+            <Button variant="primary" onClick={() => onBlockSearchClick(searchValue)}>
+              Block
+            </Button>
+            <Button variant="primary" onClick={() => onTxSearchClick(searchValue)}>
+              Transaction
+            </Button>
+          </ButtonGroup>
         </div>
       </div>
     </Jumbotron>
