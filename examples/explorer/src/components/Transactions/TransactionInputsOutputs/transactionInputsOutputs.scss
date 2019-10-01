@@ -1,0 +1,16 @@
+@import '../../generalStyling.scss';
+
+.transactionInputsOutputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+  padding: 10px;
+}

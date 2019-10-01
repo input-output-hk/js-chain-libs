@@ -2,14 +2,14 @@ import React from 'react';
 import { Router } from '@reach/router';
 import Container from 'react-bootstrap/Container';
 
-import Search from './components/Search/Search';
+import SearchBar from './components/Search/SearchBar/SearchBar';
 import MainNavbar from './components/MainNavbar/MainNavbar';
-import RecentBlocks from './components/RecentBlocks/RecentBlocks';
+import RecentBlocks from './components/Blocks/RecentBlocks/RecentBlocks';
 
-import StatusBar from './components/StatusBar/StatusBar';
-import TransactionSearchResult from './components/TransactionSearchResult/TransactionSearchResult';
-import BlockSearchResult from './components/BlockSearchResult/BlockSearchResult';
-import BlockByLengthSearchResult from './components/BlockByLengthSearchResult/BlockByLengthSearchResult';
+import StatusBar from './components/Status/StatusBar/StatusBar';
+import TransactionSearchResult from './components/Search/TransactionSearchResult/TransactionSearchResult';
+import BlockSearchResult from './components/Search/BlockSearchResult/BlockSearchResult';
+import BlockByLengthSearchResult from './components/Search/BlockByLengthSearchResult/BlockByLengthSearchResult';
 
 import './App.css';
 
@@ -18,7 +18,7 @@ const App = () => (
     <MainNavbar />
     <Container fluid>
       {/* <StatusBar /> */}
-      <Search />
+      <SearchBar />
       <Router>
         <BlockSearchResult path="block/:id" />
         <TransactionSearchResult path="tx/:id" />
