@@ -8,11 +8,13 @@ import './transactionInfo.scss';
 import Table from 'react-bootstrap/Table';
 import EmptyResult from '../commons/EmptyResult/EmptyResult';
 import TransactionInputsOutputs from '../TransactionInputsOutputs/TransactionInputsOutputs';
+import CertificateInfo from '../CertificateInfo/CertificateInfo';
 
 const TransactionInfo = ({ transaction }) => {
   if (!transaction) {
     return <EmptyResult {...{ entityName: 'Transaction' }} />;
   }
+  const { inputs, outputs } = transaction;
   return (
     <Jumbotron>
       <div className="transactionInfo">
@@ -37,7 +39,8 @@ const TransactionInfo = ({ transaction }) => {
             </tr>
           </tbody>
         </Table>
-        <TransactionInputsOutputs {...{ transaction }} />
+        <TransactionInputsOutputs {...{ inputs, outputs }} />
+        <CertificateInfo certificate={transaction.certificate} />
       </div>
     </Jumbotron>
   );
@@ -55,10 +58,13 @@ export default createFragmentContainer(
           id
         }
         inputs {
-          ...TransactionInput_transactionInput
+          ...TransactionInputsOutputs_inputs
         }
         outputs {
-          ...TransactionOutput_transactionOutput
+          ...TransactionInputsOutputs_outputs
+        }
+        certificate {
+          ...CertificateInfo_certificate
         }
       }
     `

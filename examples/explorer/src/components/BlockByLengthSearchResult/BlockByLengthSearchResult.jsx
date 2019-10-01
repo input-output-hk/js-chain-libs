@@ -3,7 +3,7 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../graphql/environment';
-import BlockInfo from '../BlockInfo.jsx/BlockInfo';
+import BlockInfo from '../BlockInfo/BlockInfo';
 import Loading from '../commons/Loading/Loading';
 
 const BlockByLengthSearchResult = ({ length }) => (
