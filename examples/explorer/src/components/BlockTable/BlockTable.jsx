@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from '@reach/router';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';

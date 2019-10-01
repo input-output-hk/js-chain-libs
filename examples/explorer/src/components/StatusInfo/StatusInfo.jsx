@@ -4,7 +4,6 @@ import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
 import './statusInfo.scss';
-import CardGroup from 'react-bootstrap/CardGroup';
 import BlockCard from '../Cards/BlockCard/BlockCard';
 import EpochCard from '../Cards/EpochCard/EpochCard';
 import FeeCard from '../Cards/FeeCard/FeeCard';

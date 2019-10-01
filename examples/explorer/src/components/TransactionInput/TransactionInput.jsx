@@ -1,5 +1,4 @@
 import React from 'react';
-import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';

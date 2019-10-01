@@ -6,6 +6,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
 import { inputsAmount, outputsAmount } from '../../helpers/transactionHelper';
+import AdaAmount from '../commons/AdaAmount/AdaAmount';
 // TODO: Review which values should be shown here
 const TransactionTable = ({ transactions }) => (
   <Card>
@@ -23,8 +24,12 @@ const TransactionTable = ({ transactions }) => (
           <tr>
             <td>{tx.id}</td>
             <td>{tx.block.id}</td>
-            <td>{inputsAmount(tx)}</td>
-            <td>{outputsAmount(tx)}</td>
+            <td>
+              <AdaAmount lovelaceAmount={inputsAmount(tx)} />
+            </td>
+            <td>
+              <AdaAmount lovelaceAmount={outputsAmount(tx)} />
+            </td>
           </tr>
         ))}
       </tbody>
