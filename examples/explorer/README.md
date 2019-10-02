@@ -8,12 +8,16 @@ A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with J
 
 # Install dependencies
 
-- Use nodejs v8.12: `nvm install 8.16.0 && nvm use 8.16.0`
+- Use nodejs v8.16: `nvm install 8.16.0 && nvm use 8.16.0` or you can just run `nvm use` in the root of the project.
 - Node dependencies: `npm install`
 
 # Configure
 
-- Put the Jormungandr's Explorer API URL into the configuration file in `src/config.json` in the `explorerUrl` key. To learn where to get this URL you can take a look [here](https://input-output-hk.github.io/jormungandr/quickstart/03_rest_api.html)
+- You can change `src/config.json` to configure the application:
+  - `explorerUrl`: The URL of the Jormungandr's Explorer API. To learn where to get this URL you can take a look [here](https://input-output-hk.github.io/jormungandr/quickstart/03_rest_api.html)
+  - `currency`: In this key there are configuration about the used currency.
+    - `symbol`: Symbol of the currency. It will be displayed next to every value amount in the app.
+    - `decimals`: Currency decimals. For Cardano, the value is 6.
 
 # Build
 

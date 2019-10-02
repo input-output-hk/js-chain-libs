@@ -1,7 +1,7 @@
 """
 Workaround needed due to relay issue https://github.com/facebook/relay/issues/1880
 """
-type Hack {
+type Node {
   id: ID
 }
 
@@ -10,7 +10,7 @@ type Address {
   The base32 representation of an address
   """
   id: String!
-  delegation: StakePool!
+  delegation: Pool!
   transactions: [Transaction!]!
 }
 
@@ -46,6 +46,8 @@ type BlockDate {
   slot: Slot!
 }
 
+union Certificate = StakeDelegation | OwnerStakeDelegation | PoolRegistration
+
 scalar ChainLength
 
 type Epoch {
@@ -73,33 +75,71 @@ type FeeSettings {
   certificate: Value!
 }
 
+type OwnerStakeDelegation {
+  pool: Pool!
+}
+
+type Pool {
+  id: PoolId!
+}
+
 scalar PoolId
 
+type PoolRegistration {
+  pool: Pool!
+
+  """
+  A random value, for user purpose similar to a UUID.
+  it may not be unique over a blockchain, so shouldn't be used a unique identifier
+  """
+  serial: Serial!
+
+  """
+  Beginning of validity for this pool, this is used
+  to keep track of the period of the expected key and the expiry
+  """
+  startValidity: TimeOffsetSeconds!
+
+  """
+  Management threshold for owners, this need to be <= #owners and > 0
+  """
+  managementThreshold: Int!
+
+  """
+  Owners of this pool
+  """
+  owners: [PublicKey!]!
+}
+
 type PoolStakeDistribution {
-  pool: StakePool!
+  pool: Pool!
   delegatedStake: Value!
 }
 
+scalar PublicKey
+
 type Query {
-  # TODO: Fake query, replace with real one
-  recentBlocks: [Block!]
   block(id: String!): Block!
+  recentBlocks: [Block!]
   blockByChainLength(length: ChainLength!): Block
   transaction(id: String!): Transaction!
   epoch(id: EpochNumber!): Epoch!
   address(bech32: String!): Address!
-  stakePool(id: PoolId!): StakePool!
+  stakePool(id: PoolId!): Pool!
   status: Status!
 }
 
+scalar Serial
+
 scalar Slot
+
+type StakeDelegation {
+  account: Address!
+  pool: Pool!
+}
 
 type StakeDistribution {
   pools: [PoolStakeDistribution!]!
-}
-
-type StakePool {
-  id: PoolId!
 }
 
 type Status {
@@ -107,6 +147,8 @@ type Status {
   latestBlock: Block!
   feeSettings: FeeSettings!
 }
+
+scalar TimeOffsetSeconds
 
 """
 A transaction in the blockchain
@@ -123,6 +165,7 @@ type Transaction {
   block: Block!
   inputs: [TransactionInput!]!
   outputs: [TransactionOutput!]!
+  certificate: Certificate
 }
 
 type TransactionInput {

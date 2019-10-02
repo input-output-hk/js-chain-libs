@@ -1,0 +1,9 @@
+@import '../../generalStyling.scss';
+
+.amount {
+  display: flex;
+  flex-direction: row;
+  div {
+    margin: 2px;
+  }
+}
