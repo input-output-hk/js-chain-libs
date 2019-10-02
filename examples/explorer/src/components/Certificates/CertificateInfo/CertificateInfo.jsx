@@ -32,6 +32,7 @@ const CertificateInfo = ({ certificate }) => {
       </div>
     );
   }
+  return null;
 };
 
 export default createFragmentContainer(

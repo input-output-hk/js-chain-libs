@@ -19,7 +19,8 @@ const TransactionInfo = ({ transaction }) => {
   const { inputs, outputs } = transaction;
   return (
     <div className="transactionInfo">
-      <h2>Transaction: {transaction.id}</h2>
+      <h2>Transaction</h2>
+
       <div className="keyValueTable">
         <Table striped bordered hover>
           <tbody>

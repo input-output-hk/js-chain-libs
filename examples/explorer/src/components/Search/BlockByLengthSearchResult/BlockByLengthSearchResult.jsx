@@ -5,6 +5,7 @@ import { QueryRenderer } from 'react-relay';
 import environment from '../../../graphql/environment';
 import BlockInfo from '../../Blocks/BlockInfo/BlockInfo';
 import Loading from '../../Commons/Loading/Loading';
+import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 
 import '../../generalStyling.scss';
 
@@ -23,7 +24,7 @@ const BlockByLengthSearchResult = ({ length }) => (
     render={response => {
       const { error, props } = response;
       if (error) {
-        return <div>Error!</div>;
+        return <EmptyResult />;
       }
       if (!props) {
         return <Loading />;

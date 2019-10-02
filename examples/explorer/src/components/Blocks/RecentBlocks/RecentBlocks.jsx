@@ -6,12 +6,13 @@ import environment from '../../../graphql/environment';
 
 import BlockTable from '../BlockTable/BlockTable';
 import Loading from '../../Commons/Loading/Loading';
+import ErrorResult from '../../Commons/ErrorResult/ErrorResult';
 
 import './recentBlocks.scss';
 
 const RecentBlocks = () => (
   <div className="recentBlocks">
-    <h2 className="header"> Recent blocks </h2>
+    <h2> Recent blocks </h2>
     <QueryRenderer
       environment={environment}
       query={graphql`
@@ -25,7 +26,7 @@ const RecentBlocks = () => (
       render={response => {
         const { error, props } = response;
         if (error) {
-          return <div>Error!</div>;
+          return <ErrorResult />;
         }
         if (!props) {
           return <Loading />;

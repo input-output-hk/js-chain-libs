@@ -8,25 +8,30 @@ import TransactionInput from '../TransactionInput/TransactionInput';
 import TransactionOutput from '../TransactionOutput/TransactionOutput';
 
 const TransactionInputsOutputs = ({ inputs, outputs }) => {
-  return (
-    <div className="transactionIOContainer">
-      <h2>Inputs and Outputs</h2>
-      <div className="transactionIOTable">
-        <div className="column">
-          <h5>Inputs</h5>
-          {inputs.map(transactionInput => (
-            <TransactionInput {...{ transactionInput }} />
-          ))}
-        </div>
-        <div className="column">
-          <h5>Outputs</h5>
-          {outputs.map(transactionOutput => (
-            <TransactionOutput {...{ transactionOutput }} />
-          ))}
+  if (inputs.length > 0 || outputs.length > 0) {
+    return (
+      <div className="transactionIOContainer">
+        <h2>Inputs and Outputs</h2>
+        <div className="transactionIOTable">
+          <div className="column">
+            <h5>Inputs</h5>
+            {inputs.map(transactionInput => (
+              <TransactionInput {...{ transactionInput }} />
+            ))}
+          </div>
+          <div className="column">
+            <h5>Outputs</h5>
+            {outputs.map(transactionOutput => (
+              <TransactionOutput {...{ transactionOutput }} />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  // If there are no inputs or outputs, render nothing
+  // TODO: maybe add something prittier in the future
+  return null;
 };
 
 export default createFragmentContainer(

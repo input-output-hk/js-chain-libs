@@ -10,11 +10,10 @@ import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 // TODO: Review which values should be shown here
 const TransactionTable = ({ transactions }) => (
-  <Table striped bordered hover>
+  <Table striped bordered hover responsive>
     <thead>
       <tr>
         <th>Hash</th>
-        <th>Block</th>
         <th>Inputs amount</th>
         <th>Outputs amount</th>
       </tr>
@@ -24,9 +23,6 @@ const TransactionTable = ({ transactions }) => (
         <tr>
           <td>
             <TransactionLink id={tx.id} />
-          </td>
-          <td>
-            <BlockLink id={tx.block.id} />
           </td>
           <td>
             <Amount decimalAmount={inputsAmount(tx)} />
@@ -48,9 +44,6 @@ export default createFragmentContainer(
       # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
       fragment TransactionTable_transactions on Transaction @relay(plural: true) {
         id
-        block {
-          id
-        }
         inputs {
           amount
         }

@@ -1,11 +1,12 @@
 import React from 'react';
-import Card from 'react-bootstrap/Card';
+
+import './emptyResult.scss';
 
 // TODO: improve this component
 const EmptyResult = entityName => (
-  <Card bg="danger" text="white">
+  <div className="emptyResult">
     <h4> Not found</h4>
-  </Card>
+  </div>
 );
 
 export default EmptyResult;

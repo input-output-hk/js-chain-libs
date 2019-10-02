@@ -5,15 +5,18 @@ import { createFragmentContainer } from 'react-relay';
 
 import './transactionInput.scss';
 import Amount from '../../Commons/Amount/Amount';
+import AccountLink from '../../Commons/AccountLink/AccountLink';
 
 const TransactionInput = ({ transactionInput }) => (
   <div className="transactionUtxo">
     <div>
-      <h5>Address: </h5>
-      <div>{transactionInput.address.id}</div>
+      <h5>Account </h5>
+      <div>
+        <AccountLink id={transactionInput.address.id} />
+      </div>
     </div>
     <div>
-      <h5>Amount: </h5>
+      <h5>Amount </h5>
       <Amount decimalAmount={transactionInput.amount} />
     </div>
   </div>

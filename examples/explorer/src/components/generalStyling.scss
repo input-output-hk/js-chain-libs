@@ -9,6 +9,9 @@ $medium-grey: #c5d0de;
 $light-grey: #f3f6f8;
 
 .basicLink {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -29,8 +32,13 @@ $light-grey: #f3f6f8;
 
 .transactionUtxo {
   display: flex;
+  overflow: hidden;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
   padding: 1%;
   box-shadow: 0 0 4px 0px grey;
+  div {
+    width: 100%;
+  }
 }

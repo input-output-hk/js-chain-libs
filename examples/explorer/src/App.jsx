@@ -10,6 +10,7 @@ import MainSection from './components/MainSection/MainSection';
 import TransactionSearchResult from './components/Search/TransactionSearchResult/TransactionSearchResult';
 import BlockSearchResult from './components/Search/BlockSearchResult/BlockSearchResult';
 import BlockByLengthSearchResult from './components/Search/BlockByLengthSearchResult/BlockByLengthSearchResult';
+import EmptyResult from './components/Commons/EmptyResult/EmptyResult';
 
 import './App.scss';
 
@@ -21,6 +22,7 @@ const App = () => (
       <SearchBar />
       <MainSection>
         <Router id="router">
+          <EmptyResult default />
           <BlockSearchResult path="block/:id" />
           <TransactionSearchResult path="tx/:id" />
           <BlockByLengthSearchResult path="block/chainLength/:length" />

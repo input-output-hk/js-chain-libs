@@ -17,9 +17,11 @@ const BlockInfo = ({ block }) => {
 
   return (
     <div className="blockInfo">
-      <h2>Block: {block.id}</h2>
+      <div className="header">
+        <h2>Block</h2>
+      </div>
       <div className="keyValueTable">
-        <Table striped bordered hover>
+        <Table striped bordered hover responsive>
           <tbody>
             <tr>
               <td>Hash:</td>
