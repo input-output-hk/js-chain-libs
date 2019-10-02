@@ -1,12 +1,11 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
-import Card from 'react-bootstrap/Card';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
 import { inputsAmount, outputsAmount } from '../../../helpers/transactionHelper';
-import AdaAmount from '../../Commons/AdaAmount/AdaAmount';
+import Amount from '../../Commons/Amount/Amount';
 import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 // TODO: Review which values should be shown here
@@ -30,10 +29,10 @@ const TransactionTable = ({ transactions }) => (
             <BlockLink id={tx.block.id} />
           </td>
           <td>
-            <AdaAmount lovelaceAmount={inputsAmount(tx)} />
+            <Amount decimalAmount={inputsAmount(tx)} />
           </td>
           <td>
-            <AdaAmount lovelaceAmount={outputsAmount(tx)} />
+            <Amount decimalAmount={outputsAmount(tx)} />
           </td>
         </tr>
       ))}

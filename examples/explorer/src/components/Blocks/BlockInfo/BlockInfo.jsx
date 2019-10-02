@@ -1,5 +1,4 @@
 import React from 'react';
-import Jumbotron from 'react-bootstrap/Jumbotron';
 import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';

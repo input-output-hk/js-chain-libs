@@ -4,7 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
 import './transactionOutput.scss';
-import AdaAmount from '../../Commons/AdaAmount/AdaAmount';
+import Amount from '../../Commons/Amount/Amount';
 
 const TransactionOutput = ({ transactionOutput }) => (
   <div className="transactionOutput">
@@ -14,7 +14,7 @@ const TransactionOutput = ({ transactionOutput }) => (
     </div>
     <div>
       <div>Amount: </div>
-      <AdaAmount lovelaceAmount={transactionOutput.amount} />
+      <Amount decimalAmount={transactionOutput.amount} />
     </div>
   </div>
 );

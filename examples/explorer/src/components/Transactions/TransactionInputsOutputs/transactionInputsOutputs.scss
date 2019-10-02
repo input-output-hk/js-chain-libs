@@ -1,6 +1,13 @@
 @import '../../generalStyling.scss';
 
-.transactionInputsOutputs {
+.transactionIOContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.transactionIOTable {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

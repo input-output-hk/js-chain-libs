@@ -9,18 +9,21 @@ import TransactionOutput from '../TransactionOutput/TransactionOutput';
 
 const TransactionInputsOutputs = ({ inputs, outputs }) => {
   return (
-    <div className="transactionInputsOutputs">
-      <div className="column">
-        <h5>Inputs</h5>
-        {inputs.map(transactionInput => (
-          <TransactionInput {...{ transactionInput }} />
-        ))}
-      </div>
-      <div className="column">
-        <h5>Outputs</h5>
-        {outputs.map(transactionOutput => (
-          <TransactionOutput {...{ transactionOutput }} />
-        ))}
+    <div className="transactionIOContainer">
+      <h2>Inputs and Outputs</h2>
+      <div className="transactionIOTable">
+        <div className="column">
+          <h5>Inputs</h5>
+          {inputs.map(transactionInput => (
+            <TransactionInput {...{ transactionInput }} />
+          ))}
+        </div>
+        <div className="column">
+          <h5>Outputs</h5>
+          {outputs.map(transactionOutput => (
+            <TransactionOutput {...{ transactionOutput }} />
+          ))}
+        </div>
       </div>
     </div>
   );
