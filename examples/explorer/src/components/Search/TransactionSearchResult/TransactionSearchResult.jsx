@@ -6,8 +6,11 @@ import environment from '../../../graphql/environment';
 import TransactionInfo from '../../Transactions/TransactionInfo/TransactionInfo';
 import Loading from '../../Commons/Loading/Loading';
 
+import '../../generalStyling.scss';
+
 const TransactionSearchResult = ({ id }) => (
   <QueryRenderer
+    className="queryResult"
     environment={environment}
     query={graphql`
       query TransactionSearchResultQuery($id: String!) {

@@ -14,6 +14,7 @@ const BlockTable = ({ blocks }) => (
         <th>Hash</th>
         <th>Epoch</th>
         <th>Slot</th>
+        <th>Tx count</th>
       </tr>
     </thead>
     <tbody>
@@ -27,6 +28,7 @@ const BlockTable = ({ blocks }) => (
           </td>
           <td>{block.date.epoch.id}</td>
           <td>{block.date.slot}</td>
+          <td>{block.transactions.length}</td>
         </tr>
       ))}
     </tbody>
@@ -48,7 +50,7 @@ export default createFragmentContainer(
           slot
         }
         chainLength
-        previousBlock {
+        transactions {
           id
         }
       }

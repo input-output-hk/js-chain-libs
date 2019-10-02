@@ -11,36 +11,34 @@ import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 // TODO: Review which values should be shown here
 const TransactionTable = ({ transactions }) => (
-  <Card>
-    <Table striped bordered hover>
-      <thead>
+  <Table striped bordered hover>
+    <thead>
+      <tr>
+        <th>Hash</th>
+        <th>Block</th>
+        <th>Inputs amount</th>
+        <th>Outputs amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {transactions.map(tx => (
         <tr>
-          <th>Hash</th>
-          <th>Block</th>
-          <th>Inputs amount</th>
-          <th>Outputs amount</th>
+          <td>
+            <TransactionLink id={tx.id} />
+          </td>
+          <td>
+            <BlockLink id={tx.block.id} />
+          </td>
+          <td>
+            <AdaAmount lovelaceAmount={inputsAmount(tx)} />
+          </td>
+          <td>
+            <AdaAmount lovelaceAmount={outputsAmount(tx)} />
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        {transactions.map(tx => (
-          <tr>
-            <td>
-              <TransactionLink id={tx.id} />
-            </td>
-            <td>
-              <BlockLink id={tx.block.id} />
-            </td>
-            <td>
-              <AdaAmount lovelaceAmount={inputsAmount(tx)} />
-            </td>
-            <td>
-              <AdaAmount lovelaceAmount={outputsAmount(tx)} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  </Card>
+      ))}
+    </tbody>
+  </Table>
 );
 
 export default createFragmentContainer(

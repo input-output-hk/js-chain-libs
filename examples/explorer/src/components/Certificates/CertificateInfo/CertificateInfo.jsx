@@ -5,7 +5,7 @@ import { createFragmentContainer } from 'react-relay';
 
 import OwnerStakeDelegation from '../OwnerStakeDelegation/OwnerStakeDelegation';
 import StakeDelegation from '../StakeDelegation/StakeDelegation';
-import PoolRegistration from '../../PoolRegistration/PoolRegistration';
+import PoolRegistration from '../PoolRegistration/PoolRegistration';
 import UnknownCertificate from '../UnknownCertificate/UnknownCertificate';
 
 const CertificateInfo = ({ certificate }) => {

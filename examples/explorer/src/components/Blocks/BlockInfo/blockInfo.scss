@@ -5,9 +5,15 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 80%;
 }
 
 .blockInfoContainer {
-  width: 80%;
+  width: 100%;
+  padding: 0.5%;
+}
+
+.transactionInfoContainer {
+  width: 100%;
   padding: 0.5%;
 }

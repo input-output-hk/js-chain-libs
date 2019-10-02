@@ -1,5 +1,4 @@
 import React from 'react';
-import Jumbotron from 'react-bootstrap/Jumbotron';
 
 import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
@@ -8,12 +7,10 @@ import environment from '../../../graphql/environment';
 import BlockTable from '../BlockTable/BlockTable';
 import Loading from '../../Commons/Loading/Loading';
 
-/** TODO: Refactor this component extracting QueryRenderer
- *        Create Query for getting recent blocks
- *
- */
+import './recentBlocks.scss';
+
 const RecentBlocks = () => (
-  <Jumbotron>
+  <div className="recentBlocks">
     <h2 className="header"> Recent blocks </h2>
     <QueryRenderer
       environment={environment}
@@ -37,7 +34,7 @@ const RecentBlocks = () => (
         return <BlockTable {...{ blocks: props.recentBlocks }} />;
       }}
     />
-  </Jumbotron>
+  </div>
 );
 
 export default RecentBlocks;

@@ -6,8 +6,11 @@ import environment from '../../../graphql/environment';
 import BlockInfo from '../../Blocks/BlockInfo/BlockInfo';
 import Loading from '../../Commons/Loading/Loading';
 
+import '../../generalStyling.scss';
+
 const BlockByLengthSearchResult = ({ length }) => (
   <QueryRenderer
+    className="queryResult"
     environment={environment}
     query={graphql`
       query BlockByLengthSearchResultQuery($length: ChainLength!) {

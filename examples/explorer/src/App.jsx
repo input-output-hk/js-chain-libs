@@ -7,26 +7,29 @@ import MainNavbar from './components/MainNavbar/MainNavbar';
 import RecentBlocks from './components/Blocks/RecentBlocks/RecentBlocks';
 
 import StatusBar from './components/Status/StatusBar/StatusBar';
+import MainSection from './components/MainSection/MainSection';
 import TransactionSearchResult from './components/Search/TransactionSearchResult/TransactionSearchResult';
 import BlockSearchResult from './components/Search/BlockSearchResult/BlockSearchResult';
 import BlockByLengthSearchResult from './components/Search/BlockByLengthSearchResult/BlockByLengthSearchResult';
 
-import './App.css';
+import './App.scss';
 
 const App = () => (
-  <Container fluid>
+  <div>
     <MainNavbar />
-    <Container fluid>
+    <div>
       {/* <StatusBar /> */}
       <SearchBar />
-      <Router>
-        <BlockSearchResult path="block/:id" />
-        <TransactionSearchResult path="tx/:id" />
-        <BlockByLengthSearchResult path="block/chainLength/:length" />
-        <RecentBlocks path="/" />
-      </Router>
-    </Container>
-  </Container>
+      <MainSection>
+        <Router id="router">
+          <BlockSearchResult path="block/:id" />
+          <TransactionSearchResult path="tx/:id" />
+          <BlockByLengthSearchResult path="block/chainLength/:length" />
+          <RecentBlocks path="/" />
+        </Router>
+      </MainSection>
+    </div>
+  </div>
 );
 
 export default App;

@@ -17,45 +17,43 @@ const BlockInfo = ({ block }) => {
   const { transactions } = block;
 
   return (
-    <Jumbotron>
-      <div className="blockInfo">
-        <h2>Block: {block.id}</h2>
-        <div className="blockInfoContainer">
-          <Table striped bordered hover>
-            <tbody>
-              <tr>
-                <td>Hash:</td>
-                <td>
-                  <BlockLink id={block.id} />
-                </td>
-              </tr>
-              <tr>
-                <td>Epoch:</td>
-                <td>{block.date.epoch.id}</td>
-              </tr>
-              <tr>
-                <td>Slot:</td>
-                <td>{block.date.slot}</td>
-              </tr>
-              <tr>
-                <td>Chain length:</td>
-                <td>{block.chainLength}</td>
-              </tr>
-              <tr>
-                <td>Previous block:</td>
-                <td>
-                  <BlockLink id={block.previousBlock.id} />
-                </td>
-              </tr>
-            </tbody>
-          </Table>
-        </div>
-
-        <div className="blockInfoContainer">
-          <TransactionTable {...{ transactions }} />
-        </div>
+    <div className="blockInfo">
+      <h2>Block: {block.id}</h2>
+      <div className="blockInfoContainer">
+        <Table striped bordered hover>
+          <tbody>
+            <tr>
+              <td>Hash:</td>
+              <td>
+                <BlockLink id={block.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Epoch:</td>
+              <td>{block.date.epoch.id}</td>
+            </tr>
+            <tr>
+              <td>Slot:</td>
+              <td>{block.date.slot}</td>
+            </tr>
+            <tr>
+              <td>Chain length:</td>
+              <td>{block.chainLength}</td>
+            </tr>
+            <tr>
+              <td>Previous block:</td>
+              <td>
+                <BlockLink id={block.previousBlock.id} />
+              </td>
+            </tr>
+          </tbody>
+        </Table>
       </div>
-    </Jumbotron>
+      <h3>Transactions</h3>
+      <div className="transactionInfoContainer">
+        <TransactionTable {...{ transactions }} />
+      </div>
+    </div>
   );
 };
 

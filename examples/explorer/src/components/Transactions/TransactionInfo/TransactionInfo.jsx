@@ -19,37 +19,35 @@ const TransactionInfo = ({ transaction }) => {
   }
   const { inputs, outputs } = transaction;
   return (
-    <Jumbotron>
-      <div className="transactionInfo">
-        <h2>Transaction: {transaction.id}</h2>
-        <Table striped bordered hover>
-          <tbody>
-            <tr>
-              <td>Hash:</td>
-              <td>
-                <TransactionLink id={transaction.id} />
-              </td>
-            </tr>
-            <tr>
-              <td>Block:</td>
-              <td>
-                <BlockLink id={transaction.block.id} />
-              </td>
-            </tr>
-            <tr>
-              <td>Inputs count:</td>
-              <td>{transaction.inputs.length}</td>
-            </tr>
-            <tr>
-              <td>Outputs count:</td>
-              <td>{transaction.outputs.length}</td>
-            </tr>
-          </tbody>
-        </Table>
-        <TransactionInputsOutputs {...{ inputs, outputs }} />
-        <CertificateInfo certificate={transaction.certificate} />
-      </div>
-    </Jumbotron>
+    <div className="transactionInfo">
+      <h2>Transaction: {transaction.id}</h2>
+      <Table striped bordered hover>
+        <tbody>
+          <tr>
+            <td>Hash:</td>
+            <td>
+              <TransactionLink id={transaction.id} />
+            </td>
+          </tr>
+          <tr>
+            <td>Block:</td>
+            <td>
+              <BlockLink id={transaction.block.id} />
+            </td>
+          </tr>
+          <tr>
+            <td>Inputs count:</td>
+            <td>{transaction.inputs.length}</td>
+          </tr>
+          <tr>
+            <td>Outputs count:</td>
+            <td>{transaction.outputs.length}</td>
+          </tr>
+        </tbody>
+      </Table>
+      <TransactionInputsOutputs {...{ inputs, outputs }} />
+      <CertificateInfo certificate={transaction.certificate} />
+    </div>
   );
 };
 
