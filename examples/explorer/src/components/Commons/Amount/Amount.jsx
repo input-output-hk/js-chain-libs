@@ -1,6 +1,21 @@
 import React from 'react';
+import Big from 'big.js';
 
-//TODO: Fix this, create a real component
-const Amount = ({ decimalAmount }) => <div className="amount">{decimalAmount / 10 ** 18} ADA</div>;
+import { currency } from '../../../config.json';
+
+import './amount.scss';
+
+const decimalToAmount = decimalAmount => {
+  return Big(decimalAmount)
+    .div(10 ** currency.decimals)
+    .toFixed(currency.decimals);
+};
+
+const Amount = ({ decimalAmount }) => (
+  <div className="amount">
+    <div>{decimalToAmount(decimalAmount)} </div>
+    <div> {' ' + currency.symbol}</div>
+  </div>
+);
 
 export default Amount;

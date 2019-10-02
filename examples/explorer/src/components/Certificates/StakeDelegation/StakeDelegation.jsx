@@ -16,11 +16,11 @@ const StakeDelegation = ({ certificate }) => {
             <td>{certificate.__typename}</td>
           </tr>
           <tr>
-            <td>Account Id:</td>
+            <td>Account:</td>
             <td>{certificate.account.id}</td>
           </tr>
           <tr>
-            <td>Pool Id:</td>
+            <td>Pool:</td>
             <td>{certificate.pool.id}</td>
           </tr>
         </tbody>

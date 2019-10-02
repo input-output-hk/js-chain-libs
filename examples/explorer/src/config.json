@@ -1,3 +1,7 @@
 {
-  "explorerUrl": "http://localhost:8443/explorer/graphql"
+  "explorerUrl": "http://localhost:8443/explorer/graphql",
+  "currency": {
+    "symbol": "ADA",
+    "decimals": 6
+  }
 }
