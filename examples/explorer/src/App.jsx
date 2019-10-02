@@ -1,6 +1,5 @@
 import React from 'react';
 import { Router } from '@reach/router';
-import Container from 'react-bootstrap/Container';
 
 import SearchBar from './components/Search/SearchBar/SearchBar';
 import MainNavbar from './components/MainNavbar/MainNavbar';

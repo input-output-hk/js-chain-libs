@@ -7,13 +7,13 @@ import './transactionInput.scss';
 import Amount from '../../Commons/Amount/Amount';
 
 const TransactionInput = ({ transactionInput }) => (
-  <div className="transactionInput">
+  <div className="transactionUtxo">
     <div>
-      <div>Address: </div>
+      <h5>Address: </h5>
       <div>{transactionInput.address.id}</div>
     </div>
     <div>
-      <div>Amount: </div>
+      <h5>Amount: </h5>
       <Amount decimalAmount={transactionInput.amount} />
     </div>
   </div>

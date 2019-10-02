@@ -1,5 +1,4 @@
 import React from 'react';
-import Jumbotron from 'react-bootstrap/Jumbotron';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
@@ -21,30 +20,32 @@ const TransactionInfo = ({ transaction }) => {
   return (
     <div className="transactionInfo">
       <h2>Transaction: {transaction.id}</h2>
-      <Table striped bordered hover>
-        <tbody>
-          <tr>
-            <td>Hash:</td>
-            <td>
-              <TransactionLink id={transaction.id} />
-            </td>
-          </tr>
-          <tr>
-            <td>Block:</td>
-            <td>
-              <BlockLink id={transaction.block.id} />
-            </td>
-          </tr>
-          <tr>
-            <td>Inputs count:</td>
-            <td>{transaction.inputs.length}</td>
-          </tr>
-          <tr>
-            <td>Outputs count:</td>
-            <td>{transaction.outputs.length}</td>
-          </tr>
-        </tbody>
-      </Table>
+      <div className="keyValueTable">
+        <Table striped bordered hover>
+          <tbody>
+            <tr>
+              <td>Hash:</td>
+              <td>
+                <TransactionLink id={transaction.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Block:</td>
+              <td>
+                <BlockLink id={transaction.block.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Inputs count:</td>
+              <td>{transaction.inputs.length}</td>
+            </tr>
+            <tr>
+              <td>Outputs count:</td>
+              <td>{transaction.outputs.length}</td>
+            </tr>
+          </tbody>
+        </Table>
+      </div>
       <TransactionInputsOutputs {...{ inputs, outputs }} />
       <CertificateInfo certificate={transaction.certificate} />
     </div>

@@ -18,7 +18,7 @@ const BlockInfo = ({ block }) => {
   return (
     <div className="blockInfo">
       <h2>Block: {block.id}</h2>
-      <div className="blockInfoContainer">
+      <div className="keyValueTable">
         <Table striped bordered hover>
           <tbody>
             <tr>
@@ -49,7 +49,7 @@ const BlockInfo = ({ block }) => {
         </Table>
       </div>
       <h3>Transactions</h3>
-      <div className="transactionInfoContainer">
+      <div className="transactionsInfoContainer">
         <TransactionTable {...{ transactions }} />
       </div>
     </div>

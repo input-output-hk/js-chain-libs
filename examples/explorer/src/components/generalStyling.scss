@@ -16,3 +16,21 @@ $light-grey: #f3f6f8;
     color: $light-grey;
   }
 }
+
+.keyValueTable {
+  tr {
+    td {
+      width: 50%;
+    }
+  }
+  width: 100%;
+  padding: 0.5%;
+}
+
+.transactionUtxo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1%;
+  box-shadow: 0 0 4px 0px grey;
+}

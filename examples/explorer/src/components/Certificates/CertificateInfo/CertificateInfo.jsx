@@ -8,7 +8,9 @@ import StakeDelegation from '../StakeDelegation/StakeDelegation';
 import PoolRegistration from '../PoolRegistration/PoolRegistration';
 import UnknownCertificate from '../UnknownCertificate/UnknownCertificate';
 
-const CertificateInfo = ({ certificate }) => {
+import './certificateInfo.scss';
+
+const certificateComponent = certificate => {
   switch (certificate.__typename) {
     case 'OwnerStakeDelegation':
       return <OwnerStakeDelegation {...{ certificate }} />;
@@ -18,6 +20,17 @@ const CertificateInfo = ({ certificate }) => {
       return <PoolRegistration {...{ certificate }} />;
     default:
       return <UnknownCertificate />;
+  }
+};
+
+const CertificateInfo = ({ certificate }) => {
+  if (certificate) {
+    return (
+      <div className="certificateInfo">
+        <h3> Certificate </h3>
+        {certificateComponent(certificate)}
+      </div>
+    );
   }
 };
 
