@@ -8,6 +8,7 @@ import './blockInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import TransactionTable from '../../Transactions/TransactionTable/TransactionTable';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
+import EpochLink from '../../Commons/EpochLink/EpochLink';
 
 const BlockInfo = ({ block }) => {
   if (!block) {
@@ -31,7 +32,9 @@ const BlockInfo = ({ block }) => {
             </tr>
             <tr>
               <td>Epoch:</td>
-              <td>{block.date.epoch.id}</td>
+              <td>
+                <EpochLink number={block.date.epoch.id} />
+              </td>
             </tr>
             <tr>
               <td>Slot:</td>
@@ -60,10 +63,9 @@ const BlockInfo = ({ block }) => {
 
 export default createFragmentContainer(
   BlockInfo,
-  
+
   {
     block: graphql`
-      
       fragment BlockInfo_block on Block {
         id
         date {
