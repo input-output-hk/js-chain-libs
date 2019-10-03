@@ -34,7 +34,7 @@ const Search = () => {
   return (
     <Jumbotron>
       <div className="searchContainer">
-        <h1 className="header"> Search for transactions or blocks </h1>
+        <h1> Search for transactions or blocks </h1>
         <div className="searchForm">
           <Form.Control
             type="text"

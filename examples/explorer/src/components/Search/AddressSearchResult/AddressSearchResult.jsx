@@ -1,16 +1,16 @@
 import graphql from 'babel-plugin-relay/macro';
 
-import AddressInfo from '../../Addresses/AddressInfo/AddressInfo';
+import FullAddressInfo from '../../Addresses/FullAddressInfo/FullAddressInfo';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
 const addressQuery = graphql`
   query AddressSearchResultQuery($bech32: String!) {
     address(bech32: $bech32) {
-      ...AddressInfo_address
+      ...FullAddressInfo_address
     }
   }
 `;
 
-const AddressSearchResult = QueryWrapper(AddressInfo, addressQuery);
+const AddressSearchResult = QueryWrapper(FullAddressInfo, addressQuery);
 
 export default AddressSearchResult;

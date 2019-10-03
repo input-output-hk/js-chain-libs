@@ -15,6 +15,7 @@ const EpochInfo = ({ epoch }) => {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
   const { blocks } = epoch;
+
   return (
     <div className="epochInfo">
       <h2>Epoch</h2>

@@ -1,17 +1,16 @@
 import graphql from 'babel-plugin-relay/macro';
 
-import TransactionInfo from '../../Transactions/TransactionInfo/TransactionInfo';
+import FullTransactionInfo from '../../Transactions/FullTransactionInfo/FullTransactionInfo';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
 const transactionQuery = graphql`
   query TransactionSearchResultQuery($id: String!) {
     transaction(id: $id) {
-      id
-      ...TransactionInfo_transaction
+      ...FullTransactionInfo_transaction
     }
   }
 `;
 
-const TransactionSearchResult = QueryWrapper(TransactionInfo, transactionQuery);
+const TransactionSearchResult = QueryWrapper(FullTransactionInfo, transactionQuery);
 
 export default TransactionSearchResult;

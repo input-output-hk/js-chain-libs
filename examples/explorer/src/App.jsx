@@ -14,7 +14,7 @@ import BlockByLengthSearchResult from './components/Search/BlockByLengthSearchRe
 import AddressSearchResult from './components/Search/AddressSearchResult/AddressSearchResult';
 import EmptyResult from './components/Commons/EmptyResult/EmptyResult';
 
-import './App.scss';
+import './generalStyling.scss';
 
 const App = () => (
   <div>

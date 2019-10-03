@@ -1,17 +1,16 @@
 import graphql from 'babel-plugin-relay/macro';
 
-import BlockInfo from '../../Blocks/BlockInfo/BlockInfo';
+import FullBlockInfo from '../../Blocks/FullBlockInfo/FullBlockInfo';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
 const blockQuery = graphql`
   query BlockSearchResultQuery($id: String!) {
     block(id: $id) {
-      id
-      ...BlockInfo_block
+      ...FullBlockInfo_block
     }
   }
 `;
 
-const BlockSearchResult = QueryWrapper(BlockInfo, blockQuery);
+const BlockSearchResult = QueryWrapper(FullBlockInfo, blockQuery);
 
 export default BlockSearchResult;

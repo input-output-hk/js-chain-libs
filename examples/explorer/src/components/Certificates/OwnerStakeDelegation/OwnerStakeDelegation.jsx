@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import '../../generalStyling.scss';
+import '../../../generalStyling.scss';
 
 const OwnerStakeDelegation = ({ certificate }) => {
   return (
@@ -27,10 +27,9 @@ const OwnerStakeDelegation = ({ certificate }) => {
 
 export default createFragmentContainer(
   OwnerStakeDelegation,
-  
+
   {
     certificate: graphql`
-      
       fragment OwnerStakeDelegation_certificate on OwnerStakeDelegation {
         __typename
         pool {

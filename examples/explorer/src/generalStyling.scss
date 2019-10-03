@@ -4,15 +4,25 @@ $black: #000;
 $white: #fff;
 $grey: #b3bec5;
 $dark-grey: #94a8c2;
-$darker-grey: #4f5050;
+$darker-grey: #212529;
 $medium-grey: #c5d0de;
 $light-grey: #f3f6f8;
+
+#router {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+* {
+  color: $darker-grey;
+}
 
 .basicLink {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: black;
+  color: $darker-grey;
   text-decoration: none;
   cursor: pointer;
   :hover {
