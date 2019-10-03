@@ -37,10 +37,10 @@ const BlockTable = ({ blocks }) => (
 
 export default createFragmentContainer(
   BlockTable,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     blocks: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment BlockTable_blocks on Block @relay(plural: true) {
         id
         date {

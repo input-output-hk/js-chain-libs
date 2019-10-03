@@ -39,10 +39,10 @@ const PoolRegistration = ({ certificate }) => {
 
 export default createFragmentContainer(
   PoolRegistration,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     certificate: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment PoolRegistration_certificate on PoolRegistration {
         __typename
         pool {

@@ -24,7 +24,7 @@ const App = () => (
       <MainSection>
         <Router id="router">
           <EmptyResult default />
-          <AddressSearchResult path="address/:id" />
+          <AddressSearchResult path="address/:bech32" />
           <TransactionSearchResult path="tx/:id" />
           <BlockSearchResult path="block/:id" />
           <BlockByLengthSearchResult path="block/chainLength/:length" />

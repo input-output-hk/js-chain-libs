@@ -60,10 +60,10 @@ const BlockInfo = ({ block }) => {
 
 export default createFragmentContainer(
   BlockInfo,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     block: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment BlockInfo_block on Block {
         id
         date {

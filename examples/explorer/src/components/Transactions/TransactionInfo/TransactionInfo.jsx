@@ -55,10 +55,10 @@ const TransactionInfo = ({ transaction }) => {
 
 export default createFragmentContainer(
   TransactionInfo,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     transaction: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment TransactionInfo_transaction on Transaction {
         id
         block {

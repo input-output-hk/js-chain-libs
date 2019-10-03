@@ -22,10 +22,10 @@ const StatusInfo = ({ status }) => {
 
 export default createFragmentContainer(
   StatusInfo,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     status: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment StatusInfo_status on Status {
         currentEpoch {
           ...EpochCard_epoch

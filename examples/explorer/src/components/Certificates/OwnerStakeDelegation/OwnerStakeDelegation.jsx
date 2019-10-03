@@ -27,10 +27,10 @@ const OwnerStakeDelegation = ({ certificate }) => {
 
 export default createFragmentContainer(
   OwnerStakeDelegation,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     certificate: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment OwnerStakeDelegation_certificate on OwnerStakeDelegation {
         __typename
         pool {

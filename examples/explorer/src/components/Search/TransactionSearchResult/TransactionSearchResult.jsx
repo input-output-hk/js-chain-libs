@@ -1,39 +1,17 @@
-import React from 'react';
-
 import graphql from 'babel-plugin-relay/macro';
-import { QueryRenderer } from 'react-relay';
-import environment from '../../../graphql/environment';
+
 import TransactionInfo from '../../Transactions/TransactionInfo/TransactionInfo';
-import Loading from '../../Commons/Loading/Loading';
-import ErrorResult from '../../Commons/ErrorResult/ErrorResult';
+import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
-import '../../generalStyling.scss';
+const transactionQuery = graphql`
+  query TransactionSearchResultQuery($id: String!) {
+    transaction(id: $id) {
+      id
+      ...TransactionInfo_transaction
+    }
+  }
+`;
 
-const TransactionSearchResult = ({ id }) => (
-  <QueryRenderer
-    className="queryResult"
-    environment={environment}
-    query={graphql`
-      query TransactionSearchResultQuery($id: String!) {
-        transaction(id: $id) {
-          id
-          ...TransactionInfo_transaction
-        }
-      }
-    `}
-    variables={{ id }}
-    render={response => {
-      const { error, props } = response;
-      if (error) {
-        return <ErrorResult />;
-      }
-      if (!props) {
-        return <Loading />;
-      }
-
-      return <TransactionInfo {...props} />;
-    }}
-  />
-);
+const TransactionSearchResult = QueryWrapper(TransactionInfo, transactionQuery);
 
 export default TransactionSearchResult;

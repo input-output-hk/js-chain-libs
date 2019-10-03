@@ -42,10 +42,10 @@ const AddressInfo = ({ address }) => {
 
 export default createFragmentContainer(
   AddressInfo,
-  // Each key specified in this object will correspond to a prop available to the component
+
   {
     address: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment AddressInfo_address on Address {
         id
         transactions {

@@ -13,10 +13,10 @@ const EpochCard = ({ epoch }) => (
 
 export default createFragmentContainer(
   EpochCard,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     epoch: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment EpochCard_epoch on Epoch {
         id
       }

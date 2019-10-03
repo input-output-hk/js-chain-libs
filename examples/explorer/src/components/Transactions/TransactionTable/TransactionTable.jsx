@@ -38,10 +38,10 @@ const TransactionTable = ({ transactions }) => (
 
 export default createFragmentContainer(
   TransactionTable,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     transactions: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment TransactionTable_transactions on Transaction @relay(plural: true) {
         id
         inputs {
