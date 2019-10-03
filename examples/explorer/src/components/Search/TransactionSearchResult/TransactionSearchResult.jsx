@@ -5,7 +5,7 @@ import { QueryRenderer } from 'react-relay';
 import environment from '../../../graphql/environment';
 import TransactionInfo from '../../Transactions/TransactionInfo/TransactionInfo';
 import Loading from '../../Commons/Loading/Loading';
-import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
+import ErrorResult from '../../Commons/ErrorResult/ErrorResult';
 
 import '../../generalStyling.scss';
 
@@ -25,7 +25,7 @@ const TransactionSearchResult = ({ id }) => (
     render={response => {
       const { error, props } = response;
       if (error) {
-        return <EmptyResult />;
+        return <ErrorResult />;
       }
       if (!props) {
         return <Loading />;

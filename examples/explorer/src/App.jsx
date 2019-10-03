@@ -10,6 +10,7 @@ import MainSection from './components/MainSection/MainSection';
 import TransactionSearchResult from './components/Search/TransactionSearchResult/TransactionSearchResult';
 import BlockSearchResult from './components/Search/BlockSearchResult/BlockSearchResult';
 import BlockByLengthSearchResult from './components/Search/BlockByLengthSearchResult/BlockByLengthSearchResult';
+import AddressSearchResult from './components/Search/AddressSearchResult/AddressSearchResult';
 import EmptyResult from './components/Commons/EmptyResult/EmptyResult';
 
 import './App.scss';
@@ -23,8 +24,9 @@ const App = () => (
       <MainSection>
         <Router id="router">
           <EmptyResult default />
-          <BlockSearchResult path="block/:id" />
+          <AddressSearchResult path="address/:id" />
           <TransactionSearchResult path="tx/:id" />
+          <BlockSearchResult path="block/:id" />
           <BlockByLengthSearchResult path="block/chainLength/:length" />
           <RecentBlocks path="/" />
         </Router>

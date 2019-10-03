@@ -5,14 +5,14 @@ import { createFragmentContainer } from 'react-relay';
 
 import './transactionOutput.scss';
 import Amount from '../../Commons/Amount/Amount';
-import AccountLink from '../../Commons/AccountLink/AccountLink';
+import Addresslink from '../../Commons/AddressLink/AddressLink';
 
 const TransactionOutput = ({ transactionOutput }) => (
   <div className="transactionUtxo">
     <div>
-      <h5>Account </h5>
+      <h5>Address </h5>
       <div>
-        <AccountLink id={transactionOutput.address.id} />
+        <Addresslink id={transactionOutput.address.id} />
       </div>
     </div>
     <div>

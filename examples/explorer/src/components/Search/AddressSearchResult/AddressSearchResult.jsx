@@ -3,25 +3,24 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { QueryRenderer } from 'react-relay';
 import environment from '../../../graphql/environment';
-import BlockInfo from '../../Blocks/BlockInfo/BlockInfo';
+import AddressInfo from '../../Addresses/AddressInfo/AddressInfo';
 import Loading from '../../Commons/Loading/Loading';
 import ErrorResult from '../../Commons/ErrorResult/ErrorResult';
 
 import '../../generalStyling.scss';
 
-const BlockSearchResult = ({ id }) => (
+const AddressSearchResult = ({ id }) => (
   <QueryRenderer
     className="queryResult"
     environment={environment}
     query={graphql`
-      query BlockSearchResultQuery($id: String!) {
-        block(id: $id) {
-          id
-          ...BlockInfo_block
+      query AddressSearchResultQuery($bech32: String!) {
+        address(bech32: $bech32) {
+          ...AddressInfo_address
         }
       }
     `}
-    variables={{ id }}
+    variables={{ bech32: id }}
     render={response => {
       const { error, props } = response;
       if (error) {
@@ -31,9 +30,9 @@ const BlockSearchResult = ({ id }) => (
         return <Loading />;
       }
 
-      return <BlockInfo {...props} />;
+      return <AddressInfo {...props} />;
     }}
   />
 );
 
-export default BlockSearchResult;
+export default AddressSearchResult;
