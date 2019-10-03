@@ -4,8 +4,18 @@ export type counterStateType = {
   +counter: number
 };
 
+export type AddressState = {
+  address: string,
+  balance: number
+}
+
 export type Action = {
   +type: string
+};
+
+export type SetAddressAction = {
+  +type: string,
+  address: string
 };
 
 export type GetState = () => counterStateType;
