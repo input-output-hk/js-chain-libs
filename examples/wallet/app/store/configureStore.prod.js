@@ -12,11 +12,7 @@ const router = routerMiddleware(history);
 const enhancer = applyMiddleware(thunk, router);
 
 function configureStore(initialState?: appState) {
-  return createStore<*, appState, *>(
-    rootReducer,
-    initialState,
-    enhancer
-  );
+  return createStore<*, appState, *>(rootReducer, initialState, enhancer);
 }
 
 export default { configureStore, history };

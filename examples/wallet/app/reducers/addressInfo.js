@@ -11,7 +11,10 @@ export default function addressInfo(
   }
   switch (action.type) {
     case SET_ADDRESS:
-      return Object.assign({}, state, { address: action.address });
+      return Object.assign({}, state, {
+        address: action.address,
+        balance: action.balance
+      });
     default:
       return state;
   }

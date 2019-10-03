@@ -7,7 +7,7 @@ export type appState = {
 export type AddressState = {
   address: string,
   balance: number
-}
+};
 
 export type Action = {
   +type: string
@@ -15,7 +15,8 @@ export type Action = {
 
 export type SetAddressAction = {
   +type: string,
-  address: string
+  address: string,
+  balance: number
 };
 
 export type GetState = () => appState;

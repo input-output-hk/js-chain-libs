@@ -2,34 +2,33 @@
 import React, { useState } from 'react';
 
 type Props = {
-  setNewAddress: (address: string) => void,
+  setAddress: (address: string) => void,
   balance: number,
   address: string
 };
 
-export default ({ setNewAddress, balance, address }: Props) => {
+export default ({ setAddress, balance, address }: Props) => {
   const handleSubmit = function handleSubmit(event) {
-    console.log(event.target.address);
     event.preventDefault();
-    setNewAddress(newAddress);
+    setAddress(newAddress);
   };
-  const [newAddress, setAddress] = useState(address);
+  const [newAddress, setNewAddress] = useState(address);
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <label id="address">
+        <label htmlFor="address">
           address:
           <input
             type="text"
             name="address"
             value={newAddress}
-            onChange={event => setAddress(event.target.value)}
+            onChange={event => setNewAddress(event.target.value)}
           />
         </label>
         <input type="submit" value="Get balance!" />
       </form>
       <p>Current Address: {address}</p>
-      <p>Balance: {newAddress}</p>
+      <p>Balance: {balance}</p>
     </div>
   );
 };
