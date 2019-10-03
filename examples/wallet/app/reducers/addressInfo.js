@@ -6,7 +6,7 @@ export default function addressInfo(
   state: AddressState,
   action: SetAddressAction
 ) {
-  if (typeof address === 'undefined') {
+  if (typeof state === 'undefined') {
     return { address: '--', balance: 0 };
   }
   switch (action.type) {
