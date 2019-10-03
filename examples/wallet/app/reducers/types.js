@@ -1,7 +1,7 @@
 import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux';
 
-export type counterStateType = {
-  +counter: number
+export type appState = {
+  addressInfo: AddressState
 };
 
 export type AddressState = {
@@ -18,7 +18,7 @@ export type SetAddressAction = {
   address: string
 };
 
-export type GetState = () => counterStateType;
+export type GetState = () => appState;
 
 export type Dispatch = ReduxDispatch<Action>;
 
