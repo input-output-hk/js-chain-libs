@@ -1,26 +1,14 @@
-import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux';
+import { Address, Balance } from '../models';
 
 export type appState = {
   addressInfo: AddressState
 };
 
 export type AddressState = {
-  address: string,
-  balance: number
+  address: Address,
+  balance: Balance
 };
 
 export type Action = {
   +type: string
 };
-
-export type SetAddressAction = {
-  +type: string,
-  address: string,
-  balance: number
-};
-
-export type GetState = () => appState;
-
-export type Dispatch = ReduxDispatch<Action>;
-
-export type Store = ReduxStore<GetState, Action>;

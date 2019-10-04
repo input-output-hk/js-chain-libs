@@ -17,7 +17,8 @@ export default ({ setAddress, balance, address }: Props) => {
     <div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="address">
-          address:
+          {/* FIXME: get the address here and compute the accountId from it somewhere else */}
+          accountId:
           <input
             type="text"
             name="address"
@@ -27,7 +28,7 @@ export default ({ setAddress, balance, address }: Props) => {
         </label>
         <input type="submit" value="Get balance!" />
       </form>
-      <p>Current Address: {address}</p>
+      <p>Current Account Id: {address}</p>
       <p>Balance: {balance}</p>
     </div>
   );
