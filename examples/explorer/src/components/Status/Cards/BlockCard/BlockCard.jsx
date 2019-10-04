@@ -31,10 +31,9 @@ const BlockCard = ({ block }) => (
 
 export default createFragmentContainer(
   BlockCard,
-  
+
   {
     block: graphql`
-      
       fragment BlockCard_block on Block {
         id
         chainLength

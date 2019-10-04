@@ -31,10 +31,9 @@ const FeeCard = ({ feeSettings }) => (
 
 export default createFragmentContainer(
   FeeCard,
-  
+
   {
     feeSettings: graphql`
-      
       fragment FeeCard_feeSettings on FeeSettings {
         constant
         coefficient

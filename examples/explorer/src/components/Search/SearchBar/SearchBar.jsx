@@ -39,7 +39,7 @@ const Search = () => {
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}
-            placeholder="Search for block, transaction or certificate id ..."
+            placeholder="Search by block hash, chain length and transaction hash..."
           />
           <ButtonGroup>
             <Button variant="primary" onClick={() => onBlockSearchClick(searchValue)}>

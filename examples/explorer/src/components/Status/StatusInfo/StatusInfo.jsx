@@ -22,10 +22,9 @@ const StatusInfo = ({ status }) => {
 
 export default createFragmentContainer(
   StatusInfo,
-  
+
   {
     status: graphql`
-      
       fragment StatusInfo_status on Status {
         currentEpoch {
           ...EpochCard_epoch

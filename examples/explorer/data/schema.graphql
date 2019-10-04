@@ -4,7 +4,6 @@ Workaround needed due to relay issue https://github.com/facebook/relay/issues/18
 type Node {
   id: ID
 }
-
 type Address {
   """
   The base32 representation of an address
@@ -36,7 +35,18 @@ type Block {
   chainLength: ChainLength!
 }
 
+type BlockConnection {
+  pageInfo: PageInfo!
+  edges: [BlockEdge!]!
+  totalCount: BlockCount!
+}
+
 scalar BlockCount
+
+"""
+Opaque cursor to use in block pagination
+"""
+scalar BlockCursor
 
 """
 Block's date, composed of an Epoch and a Slot
@@ -44,6 +54,11 @@ Block's date, composed of an Epoch and a Slot
 type BlockDate {
   epoch: Epoch!
   slot: Slot!
+}
+
+type BlockEdge {
+  node: Block!
+  cursor: BlockCursor!
 }
 
 union Certificate = StakeDelegation | OwnerStakeDelegation | PoolRegistration
@@ -59,9 +74,9 @@ type Epoch {
   stakeDistribution: StakeDistribution!
 
   """
-  Not yet implemented
+  Get a paginated view of all the blocks in this epoch
   """
-  blocks: [Block!]!
+  blocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection
   firstBlock: Block
   lastBlock: Block
   totalBlocks: BlockCount!
@@ -77,6 +92,13 @@ type FeeSettings {
 
 type OwnerStakeDelegation {
   pool: Pool!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: BlockCursor!
+  endCursor: BlockCursor!
 }
 
 type Pool {
@@ -120,8 +142,12 @@ scalar PublicKey
 
 type Query {
   block(id: String!): Block!
-  recentBlocks: [Block!]
   blockByChainLength(length: ChainLength!): Block
+
+  """
+  query all the blocks in a paginated view
+  """
+  allBlocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection!
   transaction(id: String!): Transaction!
   epoch(id: EpochNumber!): Epoch!
   address(bech32: String!): Address!
