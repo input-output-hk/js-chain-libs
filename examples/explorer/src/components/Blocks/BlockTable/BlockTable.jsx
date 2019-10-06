@@ -1,57 +1,115 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import Pagination from 'react-bootstrap/Pagination';
 
 import graphql from 'babel-plugin-relay/macro';
-import { createFragmentContainer } from 'react-relay';
+import { createRefetchContainer } from 'react-relay';
 
-import BlockLink from '../../Commons/BlockLink/BlockLink';
-import EpochLink from '../../Commons/EpochLink/EpochLink';
+import BlockTablePage from '../BlockTablePage/BlockTablePage';
 
-const BlockTable = ({ blocks }) => (
-  <Table striped bordered hover>
-    <thead>
-      <tr>
-        <th>Chain Length</th>
-        <th>Hash</th>
-        <th>Epoch</th>
-        <th>Slot</th>
-        <th>Tx count</th>
-      </tr>
-    </thead>
-    <tbody>
-      {blocks.map(block => (
-        <tr>
-          <td>
-            <BlockLink chainLength={block.chainLength} />
-          </td>
-          <td>
-            <BlockLink id={block.id} />
-          </td>
-          <td>
-            <EpochLink number={block.date.epoch.id} />
-          </td>
-          <td>{block.date.slot}</td>
-          <td>{block.transactions.length}</td>
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-);
+const getBlocksFromConnection = data => {
+  return data.allBlocks.edges.map(edge => edge.node);
+};
 
-export default createFragmentContainer(BlockTable, {
-  blocks: graphql`
-    fragment BlockTable_blocks on Block @relay(plural: true) {
-      id
-      date {
-        epoch {
-          id
+const BlockTable = ({ data, relay }) => {
+  const [start, setStart] = useState(1);
+  const blocks = getBlocksFromConnection(data);
+
+  const handlePageChange = (vars, callback) => {
+    relay.refetch(
+      {
+        first: vars.first || null,
+        last: vars.last || null,
+        after: vars.after || null,
+        before: vars.before || null
+      },
+      error => {
+        if (error) {
+          console.error(error); // eslint-disable-line no-console
         }
-        slot
+        callback();
       }
-      chainLength
-      transactions {
-        id
+    );
+  };
+
+  const openPreviousPage = () => {
+    handlePageChange({ before: pageInfo.startCursor, last: 10 }, () => setStart(start - 10));
+  };
+
+  const openNextPage = () => {
+    handlePageChange({ after: pageInfo.endCursor, first: 10 }, () => setStart(start + 10));
+  };
+
+  const openLastPage = () => {
+    handlePageChange({ last: 10 }, () => setStart(start - 10));
+  };
+
+  const openFirstPage = () => {
+    handlePageChange({ first: 10 }, () => setStart(0));
+  };
+
+  const { pageInfo } = data.allBlocks;
+  return (
+    <>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Chain Length</th>
+            <th>Hash</th>
+            <th>Epoch</th>
+            <th>Slot</th>
+            <th>Tx count</th>
+          </tr>
+        </thead>
+        <BlockTablePage {...{ blocks }} />
+      </Table>
+      <Pagination>
+        <Pagination.First onClick={openLastPage} />
+        <Pagination.Prev onClick={openNextPage} enabled={false} />
+        <Pagination.Ellipsis />
+        <Pagination.Next onClick={openPreviousPage} />
+        <Pagination.Last onClick={openFirstPage} />
+      </Pagination>
+    </>
+  );
+};
+
+export default createRefetchContainer(
+  BlockTable,
+  {
+    data: graphql`
+      fragment BlockTable_data on Query
+        @argumentDefinitions(
+          first: { type: "Int" }
+          last: { type: "Int" }
+          after: { type: "BlockCursor" }
+          before: { type: "BlockCursor" }
+        ) {
+        allBlocks(first: $first, last: $last, after: $after, before: $before) {
+          edges {
+            cursor
+            node {
+              ...BlockTablePage_blocks
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+            startCursor
+          }
+          totalCount
+        }
       }
+    `
+  },
+  graphql`
+    query BlockTableRefetchQuery(
+      $first: Int
+      $last: Int
+      $after: BlockCursor
+      $before: BlockCursor
+    ) {
+      ...BlockTable_data @arguments(first: $first, last: $last, after: $after, before: $before)
     }
   `
-});
+);

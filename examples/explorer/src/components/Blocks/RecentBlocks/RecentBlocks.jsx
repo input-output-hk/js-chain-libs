@@ -9,20 +9,18 @@ import './recentBlocks.scss';
 
 /** Getting Last blocks  */
 const recentBlocksQuery = graphql`
-  query RecentBlocksQuery {
-    recentBlocks {
-      ...BlockTable_blocks
-    }
+  query RecentBlocksQuery($last: Int!) {
+    ...BlockTable_data @arguments(last: $last)
   }
 `;
-/** Function to format props from query results to Components props needs  */
-const propsConverter = props => ({ blocks: props.recentBlocks });
+
+const propsConverter = props => ({ data: props });
 const WrappedBlockTable = QueryWrapper(BlockTable, recentBlocksQuery, propsConverter);
 
 const RecentBlocks = () => (
   <div className="recentBlocks">
     <h2> Recent blocks </h2>
-    <WrappedBlockTable />
+    <WrappedBlockTable last={10} />
   </div>
 );
 

@@ -48,27 +48,22 @@ const EpochInfo = ({ epoch }) => {
           </tbody>
         </Table>
       </div>
-      <h3>Blocks</h3>
       {/* <BlockTable {...{ blocks }} /> */}
     </div>
   );
 };
 
-export default createFragmentContainer(
-  EpochInfo,
-
-  {
-    epoch: graphql`
-      fragment EpochInfo_epoch on Epoch {
+export default createFragmentContainer(EpochInfo, {
+  epoch: graphql`
+    fragment EpochInfo_epoch on Epoch {
+      id
+      firstBlock {
         id
-        firstBlock {
-          id
-        }
-        lastBlock {
-          id
-        }
-        totalBlocks
       }
-    `
-  }
-);
+      lastBlock {
+        id
+      }
+      totalBlocks
+    }
+  `
+});
