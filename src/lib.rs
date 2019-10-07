@@ -982,6 +982,10 @@ impl Account {
     pub fn from_public_key(key: PublicKey) -> Account {
         Account(tx::AccountIdentifier::from_single_account(key.0.into()))
     }
+
+    pub fn to_identifier(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
+    }
 }
 
 /// Type for representing a Transaction Output, composed of an Address and a Value
