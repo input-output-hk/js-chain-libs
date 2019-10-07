@@ -1,10 +1,11 @@
 import React from 'react';
+import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import Table from 'react-bootstrap/Table';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
+import EpochLink from '../../Commons/EpochLink/EpochLink';
 
 const BlockTable = ({ blocks }) => (
   <Table striped bordered hover>
@@ -26,7 +27,9 @@ const BlockTable = ({ blocks }) => (
           <td>
             <BlockLink id={block.id} />
           </td>
-          <td>{block.date.epoch.id}</td>
+          <td>
+            <EpochLink number={block.date.epoch.id} />
+          </td>
           <td>{block.date.slot}</td>
           <td>{block.transactions.length}</td>
         </tr>
@@ -35,25 +38,20 @@ const BlockTable = ({ blocks }) => (
   </Table>
 );
 
-export default createFragmentContainer(
-  BlockTable,
-  // Each key specified in this object will correspond to a prop available to the component
-  {
-    blocks: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
-      fragment BlockTable_blocks on Block @relay(plural: true) {
-        id
-        date {
-          epoch {
-            id
-          }
-          slot
-        }
-        chainLength
-        transactions {
+export default createFragmentContainer(BlockTable, {
+  blocks: graphql`
+    fragment BlockTable_blocks on Block @relay(plural: true) {
+      id
+      date {
+        epoch {
           id
         }
+        slot
       }
-    `
-  }
-);
+      chainLength
+      transactions {
+        id
+      }
+    }
+  `
+});

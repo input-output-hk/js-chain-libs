@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import '../../generalStyling.scss';
+import '../../../generalStyling.scss';
 
 const PoolRegistration = ({ certificate }) => {
   return (
@@ -39,10 +39,9 @@ const PoolRegistration = ({ certificate }) => {
 
 export default createFragmentContainer(
   PoolRegistration,
-  // Each key specified in this object will correspond to a prop available to the component
+
   {
     certificate: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
       fragment PoolRegistration_certificate on PoolRegistration {
         __typename
         pool {

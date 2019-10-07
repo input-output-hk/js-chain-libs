@@ -4,7 +4,8 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import '../../generalStyling.scss';
+import '../../../generalStyling.scss';
+import AddressLink from '../../Commons/AddressLink/AddressLink';
 
 const StakeDelegation = ({ certificate }) => {
   return (
@@ -17,7 +18,9 @@ const StakeDelegation = ({ certificate }) => {
           </tr>
           <tr>
             <td>Account:</td>
-            <td>{certificate.account.id}</td>
+            <td>
+              <AddressLink id={certificate.account.id} />
+            </td>
           </tr>
           <tr>
             <td>Pool:</td>
@@ -31,10 +34,9 @@ const StakeDelegation = ({ certificate }) => {
 
 export default createFragmentContainer(
   StakeDelegation,
-  // Each key specified in this object will correspond to a prop available to the component
+
   {
     certificate: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
       fragment StakeDelegation_certificate on StakeDelegation {
         __typename
         account {

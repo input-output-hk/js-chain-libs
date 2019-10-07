@@ -1,38 +1,18 @@
-import React from 'react';
-
 import graphql from 'babel-plugin-relay/macro';
-import { QueryRenderer } from 'react-relay';
-import environment from '../../../graphql/environment';
-import BlockInfo from '../../Blocks/BlockInfo/BlockInfo';
-import Loading from '../../Commons/Loading/Loading';
-import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 
-import '../../generalStyling.scss';
+import FullBlockInfo from '../../Blocks/FullBlockInfo/FullBlockInfo';
+import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
-const BlockByLengthSearchResult = ({ length }) => (
-  <QueryRenderer
-    className="queryResult"
-    environment={environment}
-    query={graphql`
-      query BlockByLengthSearchResultQuery($length: ChainLength!) {
-        blockByChainLength(length: $length) {
-          ...BlockInfo_block
-        }
-      }
-    `}
-    variables={{ length }}
-    render={response => {
-      const { error, props } = response;
-      if (error) {
-        return <EmptyResult />;
-      }
-      if (!props) {
-        return <Loading />;
-      }
+const blockQuery = graphql`
+  query BlockByLengthSearchResultQuery($length: ChainLength!) {
+    blockByChainLength(length: $length) {
+      ...FullBlockInfo_block
+    }
+  }
+`;
 
-      return <BlockInfo {...{ block: props.blockByChainLength }} />;
-    }}
-  />
-);
+const propsConvert = props => ({ block: props.blockByChainLength });
+
+const BlockByLengthSearchResult = QueryWrapper(FullBlockInfo, blockQuery, propsConvert);
 
 export default BlockByLengthSearchResult;

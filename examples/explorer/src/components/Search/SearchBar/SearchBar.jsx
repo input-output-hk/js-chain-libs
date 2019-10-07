@@ -23,13 +23,18 @@ const onTxSearchClick = searchValue => {
   navigate(`/${baseUrl}/${searchValue}`);
 };
 
+const onAddressSearchClick = searchValue => {
+  const baseUrl = 'address';
+  navigate(`/${baseUrl}/${searchValue}`);
+};
+
 const Search = () => {
   const [searchValue, setSearchValue] = useState(0);
 
   return (
     <Jumbotron>
       <div className="searchContainer">
-        <h1 className="header"> Search for transactions or blocks </h1>
+        <h1> Search for transactions or blocks </h1>
         <div className="searchForm">
           <Form.Control
             type="text"
@@ -42,6 +47,9 @@ const Search = () => {
             </Button>
             <Button variant="primary" onClick={() => onTxSearchClick(searchValue)}>
               Transaction
+            </Button>
+            <Button variant="primary" onClick={() => onAddressSearchClick(searchValue)}>
+              Address
             </Button>
           </ButtonGroup>
         </div>

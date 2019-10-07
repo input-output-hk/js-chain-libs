@@ -37,10 +37,10 @@ const CertificateInfo = ({ certificate }) => {
 
 export default createFragmentContainer(
   CertificateInfo,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     certificate: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment CertificateInfo_certificate on Certificate {
         __typename
         ... on OwnerStakeDelegation {

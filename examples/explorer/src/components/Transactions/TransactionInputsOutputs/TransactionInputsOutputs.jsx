@@ -15,14 +15,14 @@ const TransactionInputsOutputs = ({ inputs, outputs }) => {
         <div className="transactionIOTable">
           <div className="column">
             <h5>Inputs</h5>
-            {inputs.map(transactionInput => (
-              <TransactionInput {...{ transactionInput }} />
+            {inputs.map(txItem => (
+              <TransactionInput {...{ txItem }} />
             ))}
           </div>
           <div className="column">
             <h5>Outputs</h5>
-            {outputs.map(transactionOutput => (
-              <TransactionOutput {...{ transactionOutput }} />
+            {outputs.map(txItem => (
+              <TransactionOutput {...{ txItem }} />
             ))}
           </div>
         </div>
@@ -34,21 +34,15 @@ const TransactionInputsOutputs = ({ inputs, outputs }) => {
   return null;
 };
 
-export default createFragmentContainer(
-  TransactionInputsOutputs,
-  // Each key specified in this object will correspond to a prop available to the component
-  {
-    inputs: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
-      fragment TransactionInputsOutputs_inputs on TransactionInput @relay(plural: true) {
-        ...TransactionInput_transactionInput
-      }
-    `,
-    outputs: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
-      fragment TransactionInputsOutputs_outputs on TransactionOutput @relay(plural: true) {
-        ...TransactionOutput_transactionOutput
-      }
-    `
-  }
-);
+export default createFragmentContainer(TransactionInputsOutputs, {
+  inputs: graphql`
+    fragment TransactionInputsOutputs_inputs on TransactionInput @relay(plural: true) {
+      ...TransactionInput_txItem
+    }
+  `,
+  outputs: graphql`
+    fragment TransactionInputsOutputs_outputs on TransactionOutput @relay(plural: true) {
+      ...TransactionOutput_txItem
+    }
+  `
+});

@@ -31,10 +31,10 @@ const FeeCard = ({ feeSettings }) => (
 
 export default createFragmentContainer(
   FeeCard,
-  // Each key specified in this object will correspond to a prop available to the component
+  
   {
     feeSettings: graphql`
-      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      
       fragment FeeCard_feeSettings on FeeSettings {
         constant
         coefficient
