@@ -6,6 +6,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
 import BlockTablePage from '../BlockTablePage/BlockTablePage';
+import { TABLE_PAGE_SIZE } from '../../../helpers/constants';
 
 const getBlocksFromConnection = data => {
   return data.allBlocks.edges.map(edge => edge.node);
@@ -33,19 +34,23 @@ const BlockTable = ({ data, relay }) => {
   };
 
   const openPreviousPage = () => {
-    handlePageChange({ before: pageInfo.startCursor, last: 10 }, () => setStart(start - 10));
+    handlePageChange({ before: pageInfo.startCursor, last: TABLE_PAGE_SIZE }, () =>
+      setStart(start - TABLE_PAGE_SIZE)
+    );
   };
 
   const openNextPage = () => {
-    handlePageChange({ after: pageInfo.endCursor, first: 10 }, () => setStart(start + 10));
+    handlePageChange({ after: pageInfo.endCursor, first: TABLE_PAGE_SIZE }, () =>
+      setStart(start + TABLE_PAGE_SIZE)
+    );
   };
 
   const openLastPage = () => {
-    handlePageChange({ last: 10 }, () => setStart(start - 10));
+    handlePageChange({ last: TABLE_PAGE_SIZE }, () => setStart(start - TABLE_PAGE_SIZE));
   };
 
   const openFirstPage = () => {
-    handlePageChange({ first: 10 }, () => setStart(0));
+    handlePageChange({ first: TABLE_PAGE_SIZE }, () => setStart(0));
   };
 
   const { pageInfo } = data.allBlocks;
