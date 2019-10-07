@@ -1,16 +1,16 @@
 import graphql from 'babel-plugin-relay/macro';
 
-import EpochInfo from '../../Epochs/EpochInfo/EpochInfo';
+import FullEpochInfo from '../../Epochs/FullEpochInfo/FullEpochInfo';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
 const epochQuery = graphql`
   query EpochSearchResultQuery($id: EpochNumber!) {
     epoch(id: $id) {
-      ...EpochInfo_epoch
+      ...FullEpochInfo_epoch
     }
   }
 `;
 
-const EpochSearchResult = QueryWrapper(EpochInfo, epochQuery);
+const EpochSearchResult = QueryWrapper(FullEpochInfo, epochQuery);
 
 export default EpochSearchResult;

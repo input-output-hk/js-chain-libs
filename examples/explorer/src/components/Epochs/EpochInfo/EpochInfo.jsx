@@ -6,7 +6,6 @@ import { createFragmentContainer } from 'react-relay';
 
 import './epochInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
-import BlockTable from '../../Blocks/BlockTable/BlockTable';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 import EpochLink from '../../Commons/EpochLink/EpochLink';
 
@@ -48,14 +47,19 @@ const EpochInfo = ({ epoch }) => {
           </tbody>
         </Table>
       </div>
-      {/* <BlockTable {...{ blocks }} /> */}
     </div>
   );
 };
 
 export default createFragmentContainer(EpochInfo, {
   epoch: graphql`
-    fragment EpochInfo_epoch on Epoch {
+    fragment EpochInfo_epoch on Epoch
+      @argumentDefinitions(
+        first: { type: "Int" }
+        last: { type: "Int" }
+        after: { type: "BlockCursor" }
+        before: { type: "BlockCursor" }
+      ) {
       id
       firstBlock {
         id

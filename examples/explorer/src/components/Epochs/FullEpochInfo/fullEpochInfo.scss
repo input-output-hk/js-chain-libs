@@ -1,0 +1,12 @@
+@import '../../../generalStyling.scss';
+
+.fullEpochInfo {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 6px 1px grey;
+  padding: 1%;
+  width: 80%;
+}
