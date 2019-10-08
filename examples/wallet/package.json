@@ -61,6 +61,7 @@
     "files": [
       "app/dist/",
       "app/app.html",
+      "node_modules/js-chain-libs/js_chain_libs_bg.wasm",
       "app/main.prod.js",
       "app/main.prod.js.map",
       "package.json"
@@ -268,6 +269,7 @@
     "electron-log": "3.0.4",
     "electron-updater": "4.0.6",
     "history": "4.9.0",
+    "js-chain-libs": "0.1.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-hot-loader": "4.8.2",
