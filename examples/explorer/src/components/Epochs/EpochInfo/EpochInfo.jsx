@@ -13,7 +13,7 @@ const EpochInfo = ({ epoch }) => {
   if (!epoch) {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
-  const { blocks } = epoch;
+  const { blocks, firstBlock, lastBlock } = epoch;
 
   return (
     <div className="epochInfo">
@@ -30,15 +30,11 @@ const EpochInfo = ({ epoch }) => {
             </tr>
             <tr>
               <td>First Block:</td>
-              <td>
-                <BlockLink id={epoch.firstBlock.id} />
-              </td>
+              <td>{firstBlock && <BlockLink id={firstBlock.id} />}</td>
             </tr>
             <tr>
               <td>Last Block:</td>
-              <td>
-                <BlockLink id={epoch.lastBlock.id} />
-              </td>
+              <td>{lastBlock && <BlockLink id={lastBlock.id} />}</td>
             </tr>
             <tr>
               <td>Blocks count:</td>

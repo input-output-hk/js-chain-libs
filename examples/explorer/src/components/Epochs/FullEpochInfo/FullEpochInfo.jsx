@@ -17,7 +17,6 @@ const FullEpochInfo = ({ epoch }) => {
   return (
     <div className="fullEpochInfo">
       <EpochInfo {...{ epoch }} />
-      <h3>Blocks</h3>
       <EpochBlockTable {...{ epoch }} />
     </div>
   );

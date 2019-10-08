@@ -11,6 +11,10 @@ import { blocksFromBlockConnection } from '../../../helpers/blockHelper';
 // TODO: Think on some way of extract shared code between EpochBlockTable and BlockPagedTable
 const EpochBlockTable = ({ epoch, relay }) => {
   const [start, setStart] = useState(1);
+  if (!epoch.blocks) {
+    return null;
+  }
+
   const blocks = blocksFromBlockConnection(epoch.blocks);
   const { pageInfo } = epoch.blocks;
 

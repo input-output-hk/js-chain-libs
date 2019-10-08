@@ -25,17 +25,7 @@ const FullBlockInfo = ({ block }) => {
 export default createFragmentContainer(FullBlockInfo, {
   block: graphql`
     fragment FullBlockInfo_block on Block {
-      id
-      date {
-        epoch {
-          id
-        }
-        slot
-      }
-      chainLength
-      previousBlock {
-        id
-      }
+      ...BlockInfo_block
       transactions {
         ...TransactionTable_transactions
       }

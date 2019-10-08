@@ -8,6 +8,12 @@ import Button from 'react-bootstrap/Button';
 import './searchBar.scss';
 import { isBlockNumber } from '../../../helpers/blockHelper';
 
+const onEpochSearchClick = searchValue => {
+  const baseUrl = 'epoch';
+
+  navigate(`/${baseUrl}/${searchValue}`);
+};
+
 const onBlockSearchClick = searchValue => {
   let baseUrl = 'block';
 
@@ -42,6 +48,9 @@ const Search = () => {
             placeholder="Search by block hash, chain length and transaction hash..."
           />
           <ButtonGroup>
+            <Button variant="primary" onClick={() => onEpochSearchClick(searchValue)}>
+              Epoch
+            </Button>
             <Button variant="primary" onClick={() => onBlockSearchClick(searchValue)}>
               Block
             </Button>
