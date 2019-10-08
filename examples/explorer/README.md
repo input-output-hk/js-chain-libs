@@ -7,11 +7,11 @@ A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with J
 - Transaction search by Hash.
 - Block search by hash.
 - Block search by chain length.
+- Epoch search by Epoch number.
 - Block table showing all blocks ordered from more recents to older.
 
 # What does this explorer not have (and should have)?
 
-- Search by Epoch number.
 - Logging tool.
 - Automated tests.
 - Complete responsiveness.

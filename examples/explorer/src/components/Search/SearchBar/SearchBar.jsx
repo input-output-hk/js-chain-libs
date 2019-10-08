@@ -40,12 +40,12 @@ const Search = () => {
   return (
     <Jumbotron>
       <div className="searchContainer">
-        <h1> Search for transactions or blocks </h1>
+        <h1> Cardano blockchain search </h1>
         <div className="searchForm">
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}
-            placeholder="Search by block hash, chain length and transaction hash..."
+            placeholder="Search by epoch number, block hash, chain length, transaction hash or address..."
           />
           <DropdownButton id="dropdown-basic-button" title="Search">
             <Dropdown.Item variant="primary" onClick={() => onEpochSearchClick(searchValue)}>

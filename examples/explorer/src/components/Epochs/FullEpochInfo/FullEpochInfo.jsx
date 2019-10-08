@@ -12,10 +12,9 @@ const FullEpochInfo = ({ epoch }) => {
   if (!epoch) {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
-  const { blocks } = epoch;
 
   return (
-    <div className="fullEpochInfo">
+    <div className="entityInfoContainer">
       <EpochInfo {...{ epoch }} />
       <EpochBlockTable {...{ epoch }} />
     </div>

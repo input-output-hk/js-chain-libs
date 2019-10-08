@@ -15,7 +15,7 @@ const FullBlockInfo = ({ block }) => {
   const { transactions } = block;
 
   return (
-    <div className="fullBlockInfo">
+    <div className="entityInfoContainer">
       <BlockInfo {...{ block }} />
       <TransactionTable {...{ transactions }} />
     </div>

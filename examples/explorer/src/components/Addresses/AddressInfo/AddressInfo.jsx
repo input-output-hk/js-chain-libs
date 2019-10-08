@@ -14,7 +14,7 @@ const AddressInfo = ({ address }) => {
   }
 
   return (
-    <div className="addressInfo">
+    <div className="entityInfoTable">
       <h2>Address</h2>
       <div className="keyValueTable">
         <Table striped bordered hover responsive>

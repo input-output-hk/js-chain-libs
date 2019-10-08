@@ -1,31 +1,21 @@
 import React, { useState } from 'react';
 import Pagination from 'react-bootstrap/Pagination';
 
+import graphql from 'babel-plugin-relay/macro';
+import { createFragmentContainer } from 'react-relay';
+
 import BlockTable from '../BlockTable/BlockTable';
 import { TABLE_PAGE_SIZE } from '../../../helpers/constants';
 import { blocksFromBlockConnection } from '../../../helpers/blockHelper';
 
-const BlockPagedTable = ({ data, relay }) => {
-  const [start, setStart] = useState(1);
-  const blocks = blocksFromBlockConnection(data.blocks);
-  const { pageInfo } = data.blocks;
-
-  const handlePageChange = (vars, callback) => {
-    relay.refetch(
-      {
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
-      },
-      error => {
-        if (error) {
-          console.error(error); // eslint-disable-line no-console
-        }
-        callback();
-      }
-    );
-  };
+/**
+ * This component receives a BlockConnection and a function to refetch data
+ * and renders a paged table.
+ */
+const BlockPagedTable = ({ blockConnection, handlePageChange }) => {
+  const [start, setStart] = useState();
+  const { pageInfo } = blockConnection;
+  const blocks = blocksFromBlockConnection(blockConnection);
 
   const openPreviousPage = () => {
     handlePageChange({ before: pageInfo.startCursor, last: TABLE_PAGE_SIZE }, () =>
@@ -65,4 +55,22 @@ const BlockPagedTable = ({ data, relay }) => {
   );
 };
 
-export default BlockPagedTable;
+export default createFragmentContainer(BlockPagedTable, {
+  blockConnection: graphql`
+    fragment BlockPagedTable_blockConnection on BlockConnection {
+      edges {
+        cursor
+        node {
+          ...BlockTable_blocks
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        endCursor
+        startCursor
+      }
+      totalCount
+    }
+  `
+});

@@ -5,15 +5,12 @@ import { createRefetchContainer } from 'react-relay';
 
 import BlockPagedTable from '../BlockPagedTable/BlockPagedTable';
 
-const EpochBlockTable = ({ epoch, relay }) => {
-  if (!epoch.blocks) {
-    return null;
-  }
-  const blockConnection = epoch.blocks;
+const RecentBlocksTable = ({ data, relay }) => {
+  const blockConnection = data.blocks;
+
   const handlePageChange = (vars, callback) => {
     relay.refetch(
       {
-        epochId: epoch.id,
         first: vars.first || null,
         last: vars.last || null,
         after: vars.after || null,
@@ -29,43 +26,39 @@ const EpochBlockTable = ({ epoch, relay }) => {
   };
 
   return (
-    <>
-      <h2>Blocks</h2>
-      <BlockPagedTable {...{ handlePageChange, blockConnection }} />
-    </>
+    <div className="entityInfoContainer">
+      <h2> Recent blocks </h2>
+      <BlockPagedTable {...{ blockConnection, handlePageChange }} />;
+    </div>
   );
 };
 
 export default createRefetchContainer(
-  EpochBlockTable,
+  RecentBlocksTable,
   {
-    epoch: graphql`
-      fragment EpochBlockTable_epoch on Epoch
+    data: graphql`
+      fragment RecentBlocksTable_data on Query
         @argumentDefinitions(
           first: { type: "Int" }
-          last: { type: "Int" }
+          last: { type: "Int", defaultValue: 10 }
           after: { type: "BlockCursor" }
           before: { type: "BlockCursor" }
         ) {
-        id
-        blocks(first: $first, last: $last, after: $after, before: $before) {
+        blocks: allBlocks(first: $first, last: $last, after: $after, before: $before) {
           ...BlockPagedTable_blockConnection
         }
       }
     `
   },
   graphql`
-    query EpochBlockTableRefetchQuery(
-      $epochId: EpochNumber!
+    query RecentBlocksTableRefetchQuery(
       $first: Int
       $last: Int
       $after: BlockCursor
       $before: BlockCursor
     ) {
-      epoch(id: $epochId) {
-        ...EpochBlockTable_epoch
-          @arguments(first: $first, last: $last, after: $after, before: $before)
-      }
+      ...RecentBlocksTable_data
+        @arguments(first: $first, last: $last, after: $after, before: $before)
     }
   `
 );

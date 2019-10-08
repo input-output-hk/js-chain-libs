@@ -9,7 +9,7 @@ import BlockLink from '../../Commons/BlockLink/BlockLink';
 import EpochLink from '../../Commons/EpochLink/EpochLink';
 
 const BlockInfo = ({ block }) => (
-  <div className="blockInfo">
+  <div className="entityInfoTable">
     <h2>Block</h2>
     <div className="keyValueTable">
       <Table striped bordered hover responsive>

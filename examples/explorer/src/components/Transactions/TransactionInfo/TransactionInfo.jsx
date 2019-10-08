@@ -10,7 +10,7 @@ import BlockLink from '../../Commons/BlockLink/BlockLink';
 import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
 
 const TransactionInfo = ({ transaction }) => (
-  <div className="transactionInfo">
+  <div className="entityInfoTable">
     <h2>Transaction</h2>
     <div className="keyValueTable">
       <Table striped bordered hover>
