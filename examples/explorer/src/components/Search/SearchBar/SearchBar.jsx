@@ -29,7 +29,7 @@ const onAddressSearchClick = searchValue => {
 };
 
 const Search = () => {
-  const [searchValue, setSearchValue] = useState(0);
+  const [searchValue, setSearchValue] = useState('');
 
   return (
     <Jumbotron>

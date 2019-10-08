@@ -19,7 +19,7 @@ A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with J
 
 # Prerequesites
 
-- You need a Jormungandr node running in explorer mode in order to use this app. You You can learn how to run Jormungandr in Explorer mode [here](https://input-output-hk.github.io/jormungandr/quickstart/04_explorer.html).
+- You need a Jormungandr node running in explorer mode in order to use this app. You can learn how to run Jormungandr in Explorer mode [here](https://input-output-hk.github.io/jormungandr/quickstart/04_explorer.html).
 
 - Also you need the Jormungandr node to have CORS enabled and have the correct origin added to the `allowed_origins` list. More information on this [here](https://input-output-hk.github.io/jormungandr/configuration/network.html#rest-interface-configuration)
 
