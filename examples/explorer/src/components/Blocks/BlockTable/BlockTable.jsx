@@ -15,6 +15,7 @@ const getBlocksFromConnection = data => {
 const BlockTable = ({ data, relay }) => {
   const [start, setStart] = useState(1);
   const blocks = getBlocksFromConnection(data);
+  const { pageInfo } = data.allBlocks;
 
   const handlePageChange = (vars, callback) => {
     relay.refetch(
@@ -53,7 +54,6 @@ const BlockTable = ({ data, relay }) => {
     handlePageChange({ first: TABLE_PAGE_SIZE }, () => setStart(0));
   };
 
-  const { pageInfo } = data.allBlocks;
   return (
     <>
       <Table striped bordered hover>
@@ -69,11 +69,15 @@ const BlockTable = ({ data, relay }) => {
         <BlockTablePage {...{ blocks }} />
       </Table>
       <Pagination>
-        <Pagination.First onClick={openLastPage} />
-        <Pagination.Prev onClick={openNextPage} />
+        <Pagination.Item onClick={openLastPage} disabled={!pageInfo.hasNextPage}>
+          Last
+        </Pagination.Item>
+        <Pagination.Prev onClick={openNextPage} disabled={!pageInfo.hasNextPage} />
         <Pagination.Ellipsis disabled />
-        <Pagination.Next onClick={openPreviousPage} />
-        <Pagination.Last onClick={openFirstPage} />
+        <Pagination.Next onClick={openPreviousPage} disabled={!pageInfo.hasPreviousPage} />
+        <Pagination.Item onClick={openFirstPage} disabled={!pageInfo.hasPreviousPage}>
+          First
+        </Pagination.Item>
       </Pagination>
     </>
   );
@@ -99,6 +103,7 @@ export default createRefetchContainer(
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
             startCursor
           }
