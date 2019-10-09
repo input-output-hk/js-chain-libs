@@ -992,15 +992,10 @@ impl Account {
 #[wasm_bindgen]
 pub struct AccountIdentifier(Vec<u8>);
 
+#[wasm_bindgen]
 impl AccountIdentifier {
     pub fn to_hex(&self) -> String {
         hex::encode(&self.0)
-    }
-
-    pub fn from_hex(&self, hex_string: String) -> Result<Self, JsValue> {
-        hex::decode(hex_string)
-            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
-            .map(AccountIdentifier)
     }
 }
 
