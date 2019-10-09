@@ -56,11 +56,14 @@ jobs:
       - run:
           name: Build binaries
           command: wasm-pack build
-      - run:
-          name: Test
-          environment:
-            RUST_BACKTRACE: 1
-          command: wasm-pack test --node
+      #- run:
+      #    name: Test
+      #    environment:
+      #      RUST_BACKTRACE: 1
+      #    command: wasm-pack test --node
+      - persist_to_workspace:
+          root: /mnt/crate
+          paths: .
 
 workflows:
   version: 2
