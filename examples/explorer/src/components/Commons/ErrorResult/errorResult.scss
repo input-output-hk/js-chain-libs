@@ -1,0 +1,13 @@
+@import '../../../generalStyling.scss';
+
+.errorResult {
+  width: 80%;
+  h4 {
+    text-align: center;
+  }
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  box-shadow: 0px 0px 6px 1px grey;
+  padding: 1%;
+}

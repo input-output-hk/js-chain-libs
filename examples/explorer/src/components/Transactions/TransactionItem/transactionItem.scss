@@ -1,0 +1,11 @@
+@import '../../../generalStyling.scss';
+
+.transactionItem {
+  display: flex;
+  overflow: hidden;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1%;
+  box-shadow: 0 0 4px 0px grey;
+}
