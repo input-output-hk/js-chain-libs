@@ -5,7 +5,13 @@ WebAssembly library with Javascript bindings to the new chain libraries.
 This library can be used to do things like: create addresses, transactions and certificates, an encode them to be able to post to a node. It can also be used to parse the data fetched from a node (such as blocks).
 A possible use-case is for building explorers and wallets in javascript, either in the browser or in nodejs, making possible to build engaging blockchain apps with good user interfaces with the same low level primitives already used in the rust node.
 
-## Building 
+## Installing from npmjs
+
+```
+npm i --save js-chain-libs
+```
+
+## Building from source
 
 ### Requirements
 
@@ -40,12 +46,7 @@ The following example sets up an example project using Webpack to bundle the lib
 
 Try it yourself.
 
-1. Create a npm package of this repository:
-```sh
-wasm-pack pack
-```
-2. Copy the `pkg/js-chain-libs-0.1.0.tgz` file to a new directory. e.g: `make-transaction`
-3. Go to that new directory and create the following files.
+1. Go to that a directory and create the following files.
 
 #### package.json
 
@@ -63,7 +64,7 @@ wasm-pack pack
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
-    "js-chain-libs": "file:js-chain-libs-0.1.0.tgz"
+    "js-chain-libs": "^0.1"
   }
 }
 ```
