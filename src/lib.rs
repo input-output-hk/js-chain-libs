@@ -15,6 +15,7 @@ use std::convert::TryFrom;
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
+use hex;
 
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
@@ -983,8 +984,23 @@ impl Account {
         Account(tx::AccountIdentifier::from_single_account(key.0.into()))
     }
 
-    pub fn to_identifier(&self) -> Vec<u8> {
-        self.0.as_ref().to_vec()
+    pub fn to_identifier(&self) -> AccountIdentifier {
+        AccountIdentifier(self.0.as_ref().to_vec())
+    }
+}
+
+#[wasm_bindgen]
+pub struct AccountIdentifier(Vec<u8>);
+
+impl AccountIdentifier {
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0)
+    }
+
+    pub fn from_hex(&self, hex_string: String) -> Result<Self, JsValue> {
+        hex::decode(hex_string)
+            .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+            .map(AccountIdentifier)
     }
 }
 
