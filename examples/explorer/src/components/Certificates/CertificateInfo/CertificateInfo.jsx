@@ -8,8 +8,6 @@ import StakeDelegation from '../StakeDelegation/StakeDelegation';
 import PoolRegistration from '../PoolRegistration/PoolRegistration';
 import UnknownCertificate from '../UnknownCertificate/UnknownCertificate';
 
-import './certificateInfo.scss';
-
 const certificateComponent = certificate => {
   switch (certificate.__typename) {
     case 'OwnerStakeDelegation':

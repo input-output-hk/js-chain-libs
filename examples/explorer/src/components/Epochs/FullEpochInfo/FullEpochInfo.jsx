@@ -3,7 +3,6 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import './fullEpochInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import EpochBlockTable from '../../Blocks/EpochBlockTable/EpochBlockTable';
 import EpochInfo from '../EpochInfo/EpochInfo';

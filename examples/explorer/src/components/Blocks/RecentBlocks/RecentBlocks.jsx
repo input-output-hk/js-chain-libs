@@ -3,8 +3,6 @@ import graphql from 'babel-plugin-relay/macro';
 import RecentBlocksTable from '../RecentBlocksTable/RecentBlocksTable';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
-import './recentBlocks.scss';
-
 const allBlocksQuery = graphql`
   query RecentBlocksQuery {
     ...RecentBlocksTable_data

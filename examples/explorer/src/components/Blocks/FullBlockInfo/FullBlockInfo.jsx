@@ -3,7 +3,6 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import './fullBlockInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import TransactionTable from '../../Transactions/TransactionTable/TransactionTable';
 import BlockInfo from '../BlockInfo/BlockInfo';

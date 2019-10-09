@@ -4,7 +4,6 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import './addressInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import AddressLink from '../../Commons/AddressLink/AddressLink';
 

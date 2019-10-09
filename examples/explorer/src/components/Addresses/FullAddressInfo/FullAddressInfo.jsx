@@ -6,8 +6,6 @@ import { createFragmentContainer } from 'react-relay';
 import AddressInfo from '../AddressInfo/AddressInfo';
 import TransactionTable from '../../Transactions/TransactionTable/TransactionTable';
 
-import './fullAddressInfo.scss';
-
 const FullAddressInfo = ({ address }) => {
   const { transactions } = address;
   return (

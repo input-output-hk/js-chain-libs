@@ -4,7 +4,6 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import '../../../generalStyling.scss';
 import AddressLink from '../../Commons/AddressLink/AddressLink';
 
 const StakeDelegation = ({ certificate }) => (

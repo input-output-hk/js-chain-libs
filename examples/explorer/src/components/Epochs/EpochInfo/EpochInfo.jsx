@@ -4,7 +4,6 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import './epochInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 import EpochLink from '../../Commons/EpochLink/EpochLink';
