@@ -170,3 +170,14 @@ fn generate_private_key_ed25519_extended() {
     let key = PrivateKey::generate_ed25519extended().unwrap();
     assert!(key.to_bech32().starts_with("ed25519e_"));
 }
+
+#[wasm_bindgen_test]
+fn account_identifier_from_address() {
+    let address =
+        Address::from_string("ca1skmmqxvaesaew6aygcpkshrs0et80rh6hutkzlt6k6dpgewyarwv7zl5efq")
+            .unwrap();
+
+    let account = Account::from_address(&address).unwrap();
+    let expected = "b7b0199dcc3b976ba44603685c707e56778efabf17617d7ab69a1465c4e8dccf";
+    assert_eq!(account.to_identifier().to_hex(), expected);
+}

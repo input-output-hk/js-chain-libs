@@ -26,6 +26,7 @@ chain-core = { path = "./chain-libs/chain-core" }
 chain-time    = { path = "./chain-libs/chain-time" }
 serde = { version = "1.0.93", features = ["derive"] }
 bech32 = "0.6"
+hex = "0.4.0"
 js-sys = "0.3.24"
 rand_os = { version = "0.1", features = ["wasm-bindgen"] }
 

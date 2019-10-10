@@ -9,6 +9,7 @@ use chain_core::property::Serialize;
 use chain_crypto as crypto;
 use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
+use hex;
 use js_sys::Uint8Array;
 use rand_os::OsRng;
 use std::convert::TryFrom;
@@ -982,6 +983,20 @@ impl Account {
     pub fn from_public_key(key: PublicKey) -> Account {
         Account(tx::AccountIdentifier::from_single_account(key.0.into()))
     }
+
+    pub fn to_identifier(&self) -> AccountIdentifier {
+        AccountIdentifier(self.0.as_ref().to_vec())
+    }
+}
+
+#[wasm_bindgen]
+pub struct AccountIdentifier(Vec<u8>);
+
+#[wasm_bindgen]
+impl AccountIdentifier {
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0)
+    }
 }
 
 /// Type for representing a Transaction Output, composed of an Address and a Value
@@ -1613,7 +1628,7 @@ impl Block {
         self.0.parent_id().into()
     }
 
-    ///This involves copying all the messages
+    ///This involves copying all the fragments
     pub fn fragments(&self) -> Fragments {
         self.0
             .fragments()
@@ -1660,7 +1675,6 @@ impl FragmentId {
 }
 
 //this is useful for debugging, I'm not sure it is a good idea to have it here
-//also, the 'hex' module in chain_crypto is private, so I cannot use that
 
 #[wasm_bindgen]
 pub fn uint8array_to_hex(input: JsValue) -> Result<String, JsValue> {
@@ -1669,15 +1683,13 @@ pub fn uint8array_to_hex(input: JsValue) -> Result<String, JsValue> {
         .into_serde()
         .map_err(|e| JsValue::from_str(&format!("{}", e)))?;
 
-    let mut v = Vec::with_capacity(input_array.len() * 2);
+    let mut s = String::with_capacity(input_array.len() * 2);
 
-    const ALPHABET: &'static [u8] = b"0123456789abcdef";
     for &byte in input_array.values() {
-        v.push(ALPHABET[(byte >> 4) as usize]);
-        v.push(ALPHABET[(byte & 0xf) as usize]);
+        s.push_str(&hex::encode([byte]));
     }
 
-    String::from_utf8(v).map_err(|e| JsValue::from_str(&format!("{}", e)))
+    Ok(s)
 }
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
