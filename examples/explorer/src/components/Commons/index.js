@@ -6,3 +6,4 @@ export { default as EmptyResult } from './EmptyResult/EmptyResult';
 export { default as ErrorResult } from './ErrorResult/ErrorResult';
 export { default as Amount } from './Amount/Amount';
 export { default as Loading } from './Loading/Loading';
+export { default as NextPrev } from './NextPrev/NextPrev';

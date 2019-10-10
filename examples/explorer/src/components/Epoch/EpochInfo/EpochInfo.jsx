@@ -4,7 +4,8 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { EmptyResult, BlockLink, EpochLink } from '../../Commons';
+import { EmptyResult, BlockLink, EpochLink, NextPrev } from '../../Commons';
+import { getNextPrev } from '../../../helpers/epochHelper';
 
 const EpochInfo = ({ epoch }) => {
   if (!epoch) {
@@ -12,10 +13,13 @@ const EpochInfo = ({ epoch }) => {
   }
   const { firstBlock, lastBlock } = epoch;
 
+  const baseUrl = '/epoch/';
+  const { next, prev } = getNextPrev(epoch);
+
   return (
     <div className="entityInfoTable">
+      <NextPrev {...{ baseUrl, next, prev }} />
       <h2>Epoch</h2>
-
       <div className="keyValueTable">
         <Table striped bordered hover>
           <tbody>
