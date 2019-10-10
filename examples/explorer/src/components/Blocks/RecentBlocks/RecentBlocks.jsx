@@ -1,27 +1,18 @@
-import React from 'react';
-
 import graphql from 'babel-plugin-relay/macro';
 
-import BlockTable from '../BlockTable/BlockTable';
+import RecentBlocksTable from '../RecentBlocksTable/RecentBlocksTable';
 import QueryWrapper from '../../QueryWrapper/QueryWrapper';
 
 import './recentBlocks.scss';
 
-/** Getting Last blocks  */
-const recentBlocksQuery = graphql`
-  query RecentBlocksQuery($last: Int!) {
-    ...BlockTable_data @arguments(last: $last)
+const allBlocksQuery = graphql`
+  query RecentBlocksQuery {
+    ...RecentBlocksTable_data
   }
 `;
 
+// Without this converter, RecentBlockTable can't parse the fragment for some reason
 const propsConverter = props => ({ data: props });
-const WrappedBlockTable = QueryWrapper(BlockTable, recentBlocksQuery, propsConverter);
+const WrappedRecentBlocksTable = QueryWrapper(RecentBlocksTable, allBlocksQuery, propsConverter);
 
-const RecentBlocks = () => (
-  <div className="recentBlocks">
-    <h2> Recent blocks </h2>
-    <WrappedBlockTable last={10} />
-  </div>
-);
-
-export default RecentBlocks;
+export default WrappedRecentBlocksTable;

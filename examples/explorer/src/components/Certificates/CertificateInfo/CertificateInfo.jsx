@@ -26,7 +26,7 @@ const certificateComponent = certificate => {
 const CertificateInfo = ({ certificate }) => {
   if (certificate) {
     return (
-      <div className="certificateInfo">
+      <div className="entityInfoTable">
         <h3> Certificate </h3>
         {certificateComponent(certificate)}
       </div>

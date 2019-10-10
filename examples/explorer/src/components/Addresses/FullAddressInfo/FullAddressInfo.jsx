@@ -11,7 +11,7 @@ import './fullAddressInfo.scss';
 const FullAddressInfo = ({ address }) => {
   const { transactions } = address;
   return (
-    <div className="fullAddressInfo">
+    <div className="entityInfoContainer">
       <AddressInfo {...{ address }} />
       <TransactionTable {...{ transactions, showBlocks: true }} />
     </div>

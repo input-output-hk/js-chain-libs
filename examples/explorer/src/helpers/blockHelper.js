@@ -3,3 +3,7 @@
 export const isBlockNumber = searchValue => {
   return /^\d+$/.test(searchValue);
 };
+
+export const blocksFromBlockConnection = connection => {
+  return connection.edges.map(edge => edge.node);
+};

@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { navigate } from '@reach/router';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Form from 'react-bootstrap/Form';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Button from 'react-bootstrap/Button';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 import './searchBar.scss';
 import { isBlockNumber } from '../../../helpers/blockHelper';
+
+const onEpochSearchClick = searchValue => {
+  const baseUrl = 'epoch';
+
+  navigate(`/${baseUrl}/${searchValue}`);
+};
 
 const onBlockSearchClick = searchValue => {
   let baseUrl = 'block';
@@ -34,24 +40,27 @@ const Search = () => {
   return (
     <Jumbotron>
       <div className="searchContainer">
-        <h1> Search for transactions or blocks </h1>
+        <h1> Jörmungandr blockchain search </h1>
         <div className="searchForm">
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}
-            placeholder="Search by block hash, chain length and transaction hash..."
+            placeholder="Search by epoch number, block hash, chain length, transaction hash or address..."
           />
-          <ButtonGroup>
-            <Button variant="primary" onClick={() => onBlockSearchClick(searchValue)}>
+          <DropdownButton id="dropdown-basic-button" title="Search">
+            <Dropdown.Item variant="primary" onClick={() => onEpochSearchClick(searchValue)}>
+              Epoch
+            </Dropdown.Item>
+            <Dropdown.Item variant="primary" onClick={() => onBlockSearchClick(searchValue)}>
               Block
-            </Button>
-            <Button variant="primary" onClick={() => onTxSearchClick(searchValue)}>
+            </Dropdown.Item>
+            <Dropdown.Item variant="primary" onClick={() => onTxSearchClick(searchValue)}>
               Transaction
-            </Button>
-            <Button variant="primary" onClick={() => onAddressSearchClick(searchValue)}>
+            </Dropdown.Item>
+            <Dropdown.Item variant="primary" onClick={() => onAddressSearchClick(searchValue)}>
               Address
-            </Button>
-          </ButtonGroup>
+            </Dropdown.Item>
+          </DropdownButton>
         </div>
       </div>
     </Jumbotron>

@@ -6,7 +6,6 @@ import { createFragmentContainer } from 'react-relay';
 
 import './epochInfo.scss';
 import EmptyResult from '../../Commons/EmptyResult/EmptyResult';
-import BlockTable from '../../Blocks/BlockTable/BlockTable';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 import EpochLink from '../../Commons/EpochLink/EpochLink';
 
@@ -14,10 +13,10 @@ const EpochInfo = ({ epoch }) => {
   if (!epoch) {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
-  const { blocks } = epoch;
+  const { firstBlock, lastBlock } = epoch;
 
   return (
-    <div className="epochInfo">
+    <div className="entityInfoTable">
       <h2>Epoch</h2>
 
       <div className="keyValueTable">
@@ -31,15 +30,11 @@ const EpochInfo = ({ epoch }) => {
             </tr>
             <tr>
               <td>First Block:</td>
-              <td>
-                <BlockLink id={epoch.firstBlock.id} />
-              </td>
+              <td>{firstBlock && <BlockLink id={firstBlock.id} />}</td>
             </tr>
             <tr>
               <td>Last Block:</td>
-              <td>
-                <BlockLink id={epoch.lastBlock.id} />
-              </td>
+              <td>{lastBlock && <BlockLink id={lastBlock.id} />}</td>
             </tr>
             <tr>
               <td>Blocks count:</td>
@@ -48,14 +43,19 @@ const EpochInfo = ({ epoch }) => {
           </tbody>
         </Table>
       </div>
-      {/* <BlockTable {...{ blocks }} /> */}
     </div>
   );
 };
 
 export default createFragmentContainer(EpochInfo, {
   epoch: graphql`
-    fragment EpochInfo_epoch on Epoch {
+    fragment EpochInfo_epoch on Epoch
+      @argumentDefinitions(
+        first: { type: "Int" }
+        last: { type: "Int" }
+        after: { type: "BlockCursor" }
+        before: { type: "BlockCursor" }
+      ) {
       id
       firstBlock {
         id

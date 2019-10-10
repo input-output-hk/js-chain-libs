@@ -15,7 +15,7 @@ const FullTransactionInfo = ({ transaction }) => {
   }
   const { inputs, outputs, certificate } = transaction;
   return (
-    <div className="fullTransactionInfo">
+    <div className="entityInfoContainer">
       <TransactionInfo {...{ transaction }} />
       <TransactionInputsOutputs {...{ inputs, outputs }} />
       <CertificateInfo {...{ certificate }} />
