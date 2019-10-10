@@ -37,10 +37,9 @@ const CertificateInfo = ({ certificate }) => {
 
 export default createFragmentContainer(
   CertificateInfo,
-  
+
   {
     certificate: graphql`
-      
       fragment CertificateInfo_certificate on Certificate {
         __typename
         ... on OwnerStakeDelegation {

@@ -9,39 +9,37 @@ import Table from 'react-bootstrap/Table';
 import BlockLink from '../../Commons/BlockLink/BlockLink';
 import TransactionLink from '../../Commons/TransactionLink/TransactionLink';
 
-const TransactionInfo = ({ transaction }) => {
-  return (
-    <div className="transactionInfo">
-      <h2>Transaction</h2>
-      <div className="keyValueTable">
-        <Table striped bordered hover>
-          <tbody>
-            <tr>
-              <td>Hash:</td>
-              <td>
-                <TransactionLink id={transaction.id} />
-              </td>
-            </tr>
-            <tr>
-              <td>Block:</td>
-              <td>
-                <BlockLink id={transaction.block.id} />
-              </td>
-            </tr>
-            <tr>
-              <td>Inputs count:</td>
-              <td>{transaction.inputs.length}</td>
-            </tr>
-            <tr>
-              <td>Outputs count:</td>
-              <td>{transaction.outputs.length}</td>
-            </tr>
-          </tbody>
-        </Table>
-      </div>
+const TransactionInfo = ({ transaction }) => (
+  <div className="transactionInfo">
+    <h2>Transaction</h2>
+    <div className="keyValueTable">
+      <Table striped bordered hover>
+        <tbody>
+          <tr>
+            <td>Hash:</td>
+            <td>
+              <TransactionLink id={transaction.id} />
+            </td>
+          </tr>
+          <tr>
+            <td>Block:</td>
+            <td>
+              <BlockLink id={transaction.block.id} />
+            </td>
+          </tr>
+          <tr>
+            <td>Inputs count:</td>
+            <td>{transaction.inputs.length}</td>
+          </tr>
+          <tr>
+            <td>Outputs count:</td>
+            <td>{transaction.outputs.length}</td>
+          </tr>
+        </tbody>
+      </Table>
     </div>
-  );
-};
+  </div>
+);
 
 export default createFragmentContainer(TransactionInfo, {
   transaction: graphql`

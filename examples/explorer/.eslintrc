@@ -36,7 +36,7 @@
     "react/jsx-one-expression-per-line": "off",
     "react/prefer-stateless-function": "warn",
     "react/no-unused-prop-types": "error",
-    "react/prop-types": "warn",
+    "react/prop-types": "off",
     "react/sort-comp": "error",
     "jsx-a11y/label-has-associated-control": "off",
     "class-methods-use-this": "off",

@@ -12,7 +12,6 @@ const AddressInfo = ({ address }) => {
   if (!address) {
     return <EmptyResult {...{ entityName: 'Address' }} />;
   }
-  const { transactions } = address;
 
   return (
     <div className="addressInfo">

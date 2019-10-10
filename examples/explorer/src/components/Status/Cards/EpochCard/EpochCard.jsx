@@ -13,10 +13,9 @@ const EpochCard = ({ epoch }) => (
 
 export default createFragmentContainer(
   EpochCard,
-  
+
   {
     epoch: graphql`
-      
       fragment EpochCard_epoch on Epoch {
         id
       }

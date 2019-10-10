@@ -5,7 +5,7 @@ import SearchBar from './components/Search/SearchBar/SearchBar';
 import MainNavbar from './components/MainNavbar/MainNavbar';
 import RecentBlocks from './components/Blocks/RecentBlocks/RecentBlocks';
 
-import StatusBar from './components/Status/StatusBar/StatusBar';
+// import StatusBar from './components/Status/StatusBar/StatusBar';
 import MainSection from './components/MainSection/MainSection';
 import TransactionSearchResult from './components/Search/TransactionSearchResult/TransactionSearchResult';
 import BlockSearchResult from './components/Search/BlockSearchResult/BlockSearchResult';
