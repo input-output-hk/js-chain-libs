@@ -1,6 +1,6 @@
 # Basic Explorer
 
-A simple Cardano Explorer using Reactjs, React-bootstrap and Relay to use with Jorgunmandr node.
+A simple Explorer using Reactjs, React-bootstrap and Relay to use with Jorgunmandr node.
 
 # What does this Explorer have/ do?
 

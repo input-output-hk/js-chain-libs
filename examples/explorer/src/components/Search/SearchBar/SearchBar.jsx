@@ -40,7 +40,7 @@ const Search = () => {
   return (
     <Jumbotron>
       <div className="searchContainer">
-        <h1> Cardano blockchain search </h1>
+        <h1> Jörmungandr blockchain search </h1>
         <div className="searchForm">
           <Form.Control
             type="text"
