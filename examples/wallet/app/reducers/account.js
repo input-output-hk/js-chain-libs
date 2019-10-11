@@ -1,6 +1,7 @@
 // @flow
 import { SET_ACCOUNT } from '../actions/account';
-import type { SetAccountAction, AccountState } from './types';
+import type { SetAccountAction } from '../actions/account';
+import type { AccountState } from './types';
 
 export default function account(
   state: AccountState,

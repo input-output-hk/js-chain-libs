@@ -3,17 +3,23 @@ import React, { useState } from 'react';
 import { Redirect } from 'react-router';
 import routes from '../constants/routes.json';
 import typeof { setAccount as SetAccount } from '../actions/account';
+import typeof { updateBalance as UpdateBalance } from '../actions/balance';
 import getAccountFromPrivateKey from '../utils/wasmWrapper';
 
 type Props = {
   setAccount: SetAccount,
+  updateBalance: UpdateBalance,
   privateKey: string
 };
 
-export default ({ setAccount, privateKey }: Props) => {
+// FIXME: this has no error handling, neither while parsing the address
+// nor when fetching the balance.
+export default ({ updateBalance, setAccount, privateKey }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    return getAccountFromPrivateKey(newPrivateKey).then(setAccount);
+    return getAccountFromPrivateKey(newPrivateKey)
+      .then(setAccount)
+      .then(updateBalance);
   };
 
   if (privateKey) {
