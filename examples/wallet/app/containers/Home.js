@@ -1,10 +1,10 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AddressInfo from '../components/AddressInfo';
-import { setAddress } from '../actions/addressInfo';
+import Home from '../components/Home';
+import { setAddress } from '../actions/account';
 
 function mapStateToProps(state) {
-  return state.addressInfo;
+  return state.account;
 }
 
 function mapDispatchToProps(dispatch) {
@@ -14,4 +14,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(AddressInfo);
+)(Home);

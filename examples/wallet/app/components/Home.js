@@ -1,19 +1,34 @@
 // @flow
-import React, { Component } from 'react';
-import AddressInfoContainer from '../containers/AddressInfoContainer';
-import styles from './Home.css';
+import React, { useState } from 'react';
 
-type Props = {};
+type Props = {
+  setAddress: (address: string) => void,
+  balance: number,
+  address: string
+};
 
-export default class Home extends Component<Props> {
-  props: Props;
-
-  render() {
-    return (
-      <div className={styles.container} data-tid="container">
-        <h2>Example walllet</h2>
-        <AddressInfoContainer />
-      </div>
-    );
-  }
-}
+export default ({ setAddress, balance, address }: Props) => {
+  const handleSubmit = function handleSubmit(event) {
+    event.preventDefault();
+    setAddress(newAddress);
+  };
+  const [newAddress, setNewAddress] = useState(address);
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="address">
+          Address:
+          <input
+            type="text"
+            name="address"
+            value={newAddress}
+            onChange={event => setNewAddress(event.target.value)}
+          />
+        </label>
+        <input type="submit" value="Get balance!" />
+      </form>
+      <p>Current Address: {address}</p>
+      <p>Balance: {balance}</p>
+    </div>
+  );
+};

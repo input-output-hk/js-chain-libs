@@ -1,10 +1,10 @@
 import { Address, Balance } from '../models';
 
-export type appState = {
-  addressInfo: AddressState
+export type AppState = {
+  account: AccountState
 };
 
-export type AddressState = {
+export type AccountState = {
   address: Address,
   balance: Balance
 };

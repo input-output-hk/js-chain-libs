@@ -1,13 +1,10 @@
 // @flow
-import { SET_ADDRESS } from '../actions/addressInfo';
-import type { SetAddressAction, AddressState } from './types';
+import { SET_ADDRESS } from '../actions/account';
+import type { SetAddressAction, AccountState } from './types';
 
-export default function addressInfo(
-  state: AddressState,
-  action: SetAddressAction
-) {
+export default function account(state: AccountState, action: SetAddressAction) {
   if (typeof state === 'undefined') {
-    return { address: '--', balance: 0 };
+    return { address: '', balance: 0 };
   }
   switch (action.type) {
     case SET_ADDRESS:

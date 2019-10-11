@@ -1,11 +1,11 @@
 // @flow
 import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
-import addressInfo from './addressInfo';
+import account from './account';
 
 export default function createRootReducer(history: History) {
   return combineReducers<{}, *>({
     router: connectRouter(history),
-    addressInfo
+    account
   });
 }

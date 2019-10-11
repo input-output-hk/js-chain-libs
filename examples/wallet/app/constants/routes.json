@@ -1,3 +1,5 @@
 {
-  "HOME": "/"
+  "INDEX": "/",
+  "HOME": "/home",
+  "INPUT_KEYS": "/input_keys"
 }
