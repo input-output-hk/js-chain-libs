@@ -12,13 +12,11 @@ const EpochInfo = ({ epoch }) => {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
   const { firstBlock, lastBlock } = epoch;
-
   const baseUrl = '/epoch/';
-  const { next, prev } = getNextPrev(epoch);
 
   return (
     <div className="entityInfoTable">
-      <NextPrev {...{ baseUrl, next, prev }} />
+      <NextPrev {...{ baseUrl, element: epoch, getNextPrev }} />
       <h2>Epoch</h2>
       <div className="keyValueTable">
         <Table striped bordered hover>

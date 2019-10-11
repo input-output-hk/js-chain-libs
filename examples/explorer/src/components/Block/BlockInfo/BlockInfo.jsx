@@ -9,11 +9,10 @@ import { getNextPrev } from '../../../helpers/blockHelper';
 
 const BlockInfo = ({ block }) => {
   const baseUrl = '/block/chainLength/';
-  const { next, prev } = getNextPrev(block);
 
   return (
     <div className="entityInfoTable">
-      <NextPrev {...{ baseUrl, next, prev }} />
+      <NextPrev {...{ baseUrl, element: block, getNextPrev }} />
       <h2>Block</h2>
       <div className="keyValueTable">
         <Table striped bordered hover responsive>
