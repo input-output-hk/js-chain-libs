@@ -1,14 +1,14 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import InputKeys from '../components/InputKeys';
-import { setAddress } from '../actions/account';
+import { setAccount } from '../actions/account';
 
 function mapStateToProps(state) {
-  return state.account;
+  return { privateKey: state.account.privateKey };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ setAddress }, dispatch);
+  return bindActionCreators({ setAccount }, dispatch);
 }
 
 export default connect(

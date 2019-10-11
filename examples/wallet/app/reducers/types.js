@@ -1,12 +1,14 @@
-import { Address, Balance } from '../models';
+import { Address, Balance, PrivateKey, Identifier } from '../models';
 
 export type AppState = {
-  account: AccountState
+  account: AccountState,
+  balance: Balance
 };
 
 export type AccountState = {
   address: Address,
-  balance: Balance
+  privateKey: PrivateKey,
+  identifier: Identifier
 };
 
 export type Action = {

@@ -36,6 +36,10 @@ To build an appimage package, first install the dependencies with
     - [ ] add output
     - [ ] add witness
   - [ ] broadcast transaction
+- [ ] make configurable via settings file:
+  - [ ] node address
+  - [ ] address prefix
+  - [ ] network discriminator
 - [ ] locally store the user's private key
   - [ ] define a password schema for unlocking the app (so the funds are secure if the user's device is used by someone else)
   - [ ] define a password schema for encrypting the private keys(so the funds are secure if the device's storage is compromised)
