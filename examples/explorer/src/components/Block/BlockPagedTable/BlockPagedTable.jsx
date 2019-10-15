@@ -1,57 +1,77 @@
-import React, { useState } from 'react';
-import Pagination from 'react-bootstrap/Pagination';
+import React from 'react';
+import { Table } from 'antd';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import BlockTable from '../BlockTable/BlockTable';
+import { BlockLink, EpochLink } from '../../Commons';
 import { TABLE_PAGE_SIZE } from '../../../helpers/constants';
-import { blocksFromBlockConnection } from '../../../helpers/blockHelper';
+import { getNodeList, getDescPageQuery, pageNumberDesc } from '../../../helpers/paginationHelper';
+import 'antd/dist/antd.css';
+
+const columns = [
+  {
+    title: 'Chain length',
+    id: 'chainLength',
+    sortOrder: 'descend',
+    sorter: (b1, b2) => Number(b1.chainLength) - Number(b2.chainLength),
+    render: block => <BlockLink chainLength={block.chainLength} />,
+    width: '15%'
+  },
+  {
+    title: 'Hash',
+    id: 'hash',
+    render: block => <BlockLink id={block.id} />,
+    ellipsis: true,
+    width: '40%'
+  },
+  {
+    title: 'Epoch',
+    id: 'epoch',
+    render: block => <EpochLink number={block.date.epoch.id} />,
+    width: '15%'
+  },
+  {
+    title: 'Slot',
+    dataIndex: 'date.slot',
+    width: '15%'
+  },
+  {
+    title: 'Tx count',
+    dataIndex: 'transactions.length',
+    width: '15%'
+  }
+];
 
 /**
  * This component receives a BlockConnection and a function to refetch data
  * and renders a paged table.
  */
 const BlockPagedTable = ({ blockConnection, handlePageChange }) => {
-  const [start, setStart] = useState();
-  const { pageInfo } = blockConnection;
-  const blocks = blocksFromBlockConnection(blockConnection);
+  const blocks = getNodeList(blockConnection);
+  const current = pageNumberDesc(blockConnection);
+  const total = Number.parseInt(blockConnection.totalCount, 10);
 
-  const openPreviousPage = () => {
-    handlePageChange({ before: pageInfo.startCursor, last: TABLE_PAGE_SIZE }, () =>
-      setStart(start - TABLE_PAGE_SIZE)
-    );
+  const handleTableChange = page => {
+    openSpecificPage(page.current);
   };
 
-  const openNextPage = () => {
-    handlePageChange({ after: pageInfo.endCursor, first: TABLE_PAGE_SIZE }, () =>
-      setStart(start + TABLE_PAGE_SIZE)
-    );
-  };
-
-  const openLastPage = () => {
-    handlePageChange({ last: TABLE_PAGE_SIZE }, () => setStart(start - TABLE_PAGE_SIZE));
-  };
-
-  const openFirstPage = () => {
-    handlePageChange({ first: TABLE_PAGE_SIZE }, () => setStart(0));
+  const openSpecificPage = page => {
+    const params = getDescPageQuery(page, total);
+    handlePageChange(params);
   };
 
   return (
-    <>
-      <BlockTable {...{ blocks }} />
-      <Pagination>
-        <Pagination.Item onClick={openLastPage} disabled={!pageInfo.hasNextPage}>
-          Last
-        </Pagination.Item>
-        <Pagination.Prev onClick={openNextPage} disabled={!pageInfo.hasNextPage} />
-        <Pagination.Ellipsis disabled />
-        <Pagination.Next onClick={openPreviousPage} disabled={!pageInfo.hasPreviousPage} />
-        <Pagination.Item onClick={openFirstPage} disabled={!pageInfo.hasPreviousPage}>
-          First
-        </Pagination.Item>
-      </Pagination>
-    </>
+    <Table
+      pagination={{
+        total,
+        current,
+        pageSize: TABLE_PAGE_SIZE
+      }}
+      columns={columns}
+      dataSource={blocks}
+      onChange={handleTableChange}
+    />
   );
 };
 
@@ -61,7 +81,17 @@ export default createFragmentContainer(BlockPagedTable, {
       edges {
         cursor
         node {
-          ...BlockTable_blocks
+          id
+          date {
+            epoch {
+              id
+            }
+            slot
+          }
+          chainLength
+          transactions {
+            id
+          }
         }
       }
       pageInfo {
