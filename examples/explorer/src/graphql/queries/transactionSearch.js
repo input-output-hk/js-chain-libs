@@ -5,6 +5,9 @@ const transactionQuery = graphql`
     transaction(id: $id) {
       ...FullTransactionInfo_transaction
     }
+    status {
+      ...TransactionInfo_status
+    }
   }
 `;
 

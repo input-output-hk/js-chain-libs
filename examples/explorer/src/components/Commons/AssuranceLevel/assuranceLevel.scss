@@ -1,0 +1,11 @@
+@import '../../../generalStyling.scss';
+
+.assuranceLevel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  * {
+    margin: 2px;
+  }
+}

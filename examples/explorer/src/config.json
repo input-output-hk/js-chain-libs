@@ -1,9 +1,10 @@
 {
   "explorerUrl": "http://localhost:8443/explorer/graphql",
-  "confirmations": {
-    "low": 10,
-    "medium": 25,
-    "high": 50
+  "assuranceLevels": {
+    "unconfirmed": 1,
+    "low": 3,
+    "medium": 7,
+    "high": 9
   },
   "currency": {
     "symbol": "ADA",

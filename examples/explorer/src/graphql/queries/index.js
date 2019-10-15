@@ -6,3 +6,4 @@ export { default as AllBlocksQuery } from './allBlocks';
 export { default as BlockByChainlengthSearchQuery } from './blockByChainlengthSearch';
 export { default as EpochSearchQuery } from './epochSearch';
 export { default as TransactionSearchQuery } from './transactionSearch';
+export { default as StatusQuery } from './status';
