@@ -7,3 +7,4 @@ export { default as ErrorResult } from './ErrorResult/ErrorResult';
 export { default as Amount } from './Amount/Amount';
 export { default as Loading } from './Loading/Loading';
 export { default as NextPrev } from './NextPrev/NextPrev';
+export { default as CopiableItem } from './CopiableItem/CopiableItem';

@@ -1,7 +1,7 @@
 import graphql from 'babel-plugin-relay/macro';
 
 const lastEpochQuery = graphql`
-  query LastEpochQuery {
+  query lastEpochQuery {
     status {
       latestBlock {
         date {

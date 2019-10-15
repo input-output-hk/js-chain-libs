@@ -1,7 +1,7 @@
 import graphql from 'babel-plugin-relay/macro';
 
 const lastBlockQuery = graphql`
-  query LastBlockQuery {
+  query lastBlockQuery {
     status {
       latestBlock {
         chainLength

@@ -5,7 +5,7 @@ import { createFragmentContainer } from 'react-relay';
 
 import Table from 'react-bootstrap/Table';
 
-import { BlockLink, TransactionLink } from '../../Commons';
+import { BlockLink, CopiableItem } from '../../Commons';
 
 const TransactionInfo = ({ transaction }) => (
   <div className="entityInfoTable">
@@ -16,7 +16,7 @@ const TransactionInfo = ({ transaction }) => (
           <tr>
             <td>Hash:</td>
             <td>
-              <TransactionLink id={transaction.id} />
+              <CopiableItem text={transaction.id} />
             </td>
           </tr>
           <tr>

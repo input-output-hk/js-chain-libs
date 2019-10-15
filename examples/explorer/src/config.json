@@ -1,5 +1,10 @@
 {
   "explorerUrl": "http://localhost:8443/explorer/graphql",
+  "confirmations": {
+    "low": 10,
+    "medium": 25,
+    "high": 50
+  },
   "currency": {
     "symbol": "ADA",
     "decimals": 6

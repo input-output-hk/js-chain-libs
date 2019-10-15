@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { BlockLink, EpochLink, NextPrev } from '../../Commons';
+import { CopiableItem, BlockLink, EpochLink, NextPrev } from '../../Commons';
 import { getNextPrev } from '../../../helpers/blockHelper';
 
 const BlockInfo = ({ block }) => {
@@ -20,7 +20,7 @@ const BlockInfo = ({ block }) => {
             <tr>
               <td>Hash:</td>
               <td>
-                <BlockLink id={block.id} />
+                <CopiableItem text={block.id} />
               </td>
             </tr>
             <tr>
