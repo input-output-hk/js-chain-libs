@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
-import Home from '../components/Home';
+import AccountInfo from '../components/AccountInfo';
 
 function mapStateToProps(state) {
   return { balance: state.balance, address: state.account.address };
 }
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(AccountInfo);

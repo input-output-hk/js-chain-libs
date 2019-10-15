@@ -1,16 +1,11 @@
 // @flow
 import React from 'react';
+import AccountInfo from '../containers/AccountInfo';
 
-type Props = {
-  balance: number,
-  address: string
-};
-
-export default ({ balance, address }: Props) => {
+export default () => {
   return (
     <div>
-      <p>Current Address: {address}</p>
-      <p>Balance: {balance}</p>
+      <AccountInfo />
     </div>
   );
 };
