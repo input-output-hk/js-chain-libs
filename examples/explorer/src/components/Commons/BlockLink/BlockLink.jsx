@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from '@reach/router';
 
-import '../../../generalStyling.scss';
-
 const BlockLink = ({ id, chainLength }) => {
   if (id) {
     return (
