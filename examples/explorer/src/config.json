@@ -1,7 +1,11 @@
 {
   "explorerUrl": "http://localhost:8443/explorer/graphql",
+  "networkSettings": {
+    "genesisTimestamp": 1569335341,
+    "slotsPerEpoch": 5000,
+    "slotDuration": 10
+  },
   "assuranceLevels": {
-    "unconfirmed": 1,
     "low": 3,
     "medium": 7,
     "high": 9

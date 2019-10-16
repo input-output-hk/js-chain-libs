@@ -9,7 +9,6 @@ import { Amount, TransactionLink, BlockLink } from '../../Commons';
 
 import './transactionTable.scss';
 
-// TODO: Review which values should be shown here
 const TransactionTable = ({ transactions, showBlocks = false }) => (
   <div className="transactionTable">
     <h3> Transactions </h3>
@@ -30,7 +29,7 @@ const TransactionTable = ({ transactions, showBlocks = false }) => (
             </td>
             {showBlocks && (
               <td>
-                <BlockLink id={tx.block.id} />
+                <BlockLink chainLength={tx.block.chainLength} />
               </td>
             )}
             <td>
@@ -58,7 +57,7 @@ export default createFragmentContainer(TransactionTable, {
         amount
       }
       block {
-        id
+        chainLength
       }
     }
   `

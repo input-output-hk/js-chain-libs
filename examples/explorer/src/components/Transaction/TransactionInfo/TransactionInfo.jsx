@@ -5,7 +5,7 @@ import { createFragmentContainer } from 'react-relay';
 
 import Table from 'react-bootstrap/Table';
 
-import { BlockLink, CopiableItem, AssuranceLevel } from '../../Commons';
+import { BlockLink, CopiableItem, AssuranceLevel, BlockDateTime } from '../../Commons';
 
 const TransactionInfo = ({ transaction, status }) => {
   return (
@@ -24,6 +24,12 @@ const TransactionInfo = ({ transaction, status }) => {
               <td>Block:</td>
               <td>
                 <BlockLink id={transaction.block.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Date:</td>
+              <td>
+                <BlockDateTime blockDate={transaction.block.date} />
               </td>
             </tr>
             <tr>
@@ -54,6 +60,9 @@ export default createFragmentContainer(TransactionInfo, {
       block {
         id
         chainLength
+        date {
+          ...BlockDateTime_blockDate
+        }
       }
       inputs {
         amount

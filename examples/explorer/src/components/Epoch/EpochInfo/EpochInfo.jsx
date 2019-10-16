@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { EmptyResult, BlockLink, CopiableItem, NextPrev } from '../../Commons';
+import { EmptyResult, BlockLink, CopiableItem, NextPrev, EpochDateTime } from '../../Commons';
 import { getNextPrev } from '../../../helpers/epochHelper';
 
 const EpochInfo = ({ epoch }) => {
@@ -25,6 +25,12 @@ const EpochInfo = ({ epoch }) => {
               <td>Epoch Number:</td>
               <td>
                 <CopiableItem text={epoch.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Date:</td>
+              <td>
+                <EpochDateTime {...{ epoch }} />
               </td>
             </tr>
             <tr>
@@ -63,6 +69,7 @@ export default createFragmentContainer(EpochInfo, {
         id
       }
       totalBlocks
+      ...EpochDateTime_epoch
     }
   `
 });

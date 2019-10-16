@@ -6,7 +6,8 @@ import { getConfirmations } from '../../../helpers/transactionHelper';
 import './assuranceLevel.scss';
 
 const assuranceVariant = {
-  low: 'warning',
+  unconfirmed: 'warning',
+  low: 'light',
   medium: 'primary',
   high: 'success'
 };

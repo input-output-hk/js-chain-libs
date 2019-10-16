@@ -1,0 +1,6 @@
+@import '../../../generalStyling.scss';
+
+.copiableItem {
+  @extend .disable-select;
+  cursor: pointer;
+}
