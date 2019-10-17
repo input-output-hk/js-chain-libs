@@ -1,48 +1,52 @@
 import React from 'react';
-import Table from 'react-bootstrap/Table';
+import { Table } from 'antd';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { inputsAmount, outputsAmount } from '../../../helpers/transactionHelper';
+import { inputsAmount, outputsAmount, feesAmount } from '../../../helpers/transactionHelper';
 import { Amount, TransactionLink, BlockLink } from '../../Commons';
 
 import './transactionTable.scss';
 
-const TransactionTable = ({ transactions, showBlocks = false }) => (
+const columns = [
+  {
+    title: 'Hash',
+    id: 'hash',
+    render: tx => <TransactionLink id={tx.id} />,
+    ellipsis: true,
+    width: '40%'
+  },
+  {
+    title: 'Block',
+    id: 'block',
+    render: tx => <BlockLink chainLength={tx.block.chainLength} />,
+    width: '15%'
+  },
+  {
+    title: 'Input amount',
+    id: 'inputAmount',
+    render: tx => <Amount decimalAmount={inputsAmount(tx)} />,
+    width: '15%'
+  },
+  {
+    title: 'Output amount',
+    id: 'outputAmount',
+    render: tx => <Amount decimalAmount={outputsAmount(tx)} />,
+    width: '15%'
+  },
+  {
+    title: 'Fees amount',
+    id: 'feesAmount',
+    render: tx => <Amount decimalAmount={feesAmount(tx)} />,
+    width: '15%'
+  }
+];
+
+const TransactionTable = ({ transactions }) => (
   <div className="transactionTable">
     <h3> Transactions </h3>
-    <Table striped bordered hover responsive>
-      <thead>
-        <tr>
-          <th>Hash</th>
-          {showBlocks && <th>Block</th>}
-          <th>Inputs amount</th>
-          <th>Outputs amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {transactions.map(tx => (
-          <tr>
-            <td>
-              <TransactionLink id={tx.id} />
-            </td>
-            {showBlocks && (
-              <td>
-                <BlockLink chainLength={tx.block.chainLength} />
-              </td>
-            )}
-            <td>
-              <Amount decimalAmount={inputsAmount(tx)} />
-            </td>
-
-            <td>
-              <Amount decimalAmount={outputsAmount(tx)} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <Table {...{ columns, pagination: false, dataSource: transactions }} />
   </div>
 );
 

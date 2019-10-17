@@ -3,24 +3,30 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
-import BlockPagedTable from '../BlockPagedTable/BlockPagedTable';
+import BlockTable from '../BlockTable/BlockTable';
+import { getDescPageQuery, pageNumberDesc } from '../../../helpers/paginationHelper';
+
+// Getting an OffsetBasedTable
+const OffsetTable = BlockTable({});
 
 const RecentBlocksTable = ({ data, relay }) => {
-  const blockConnection = data.blocks;
+  const connection = data.blocks;
+  const currentPage = pageNumberDesc(connection);
 
-  const handlePageChange = (vars, callback) => {
+  const handlePageChange = page => {
+    const params = getDescPageQuery(page.current, connection.totalCount);
+
     relay.refetch(
       {
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
+        first: params.first || null,
+        last: params.last || null,
+        after: params.after || null,
+        before: params.before || null
       },
       error => {
         if (error) {
           console.error(error); // eslint-disable-line no-console
         }
-        callback();
       }
     );
   };
@@ -28,7 +34,7 @@ const RecentBlocksTable = ({ data, relay }) => {
   return (
     <div className="entityInfoContainer">
       <h2> Recent blocks </h2>
-      <BlockPagedTable {...{ blockConnection, handlePageChange }} />
+      <OffsetTable {...{ currentPage, connection, handlePageChange }} />
     </div>
   );
 };
@@ -45,7 +51,29 @@ export default createRefetchContainer(
           before: { type: "BlockCursor" }
         ) {
         blocks: allBlocks(first: $first, last: $last, after: $after, before: $before) {
-          ...BlockPagedTable_blockConnection
+          edges {
+            cursor
+            node {
+              id
+              date {
+                epoch {
+                  id
+                }
+                slot
+              }
+              chainLength
+              transactions {
+                id
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+            startCursor
+          }
+          totalCount
         }
       }
     `

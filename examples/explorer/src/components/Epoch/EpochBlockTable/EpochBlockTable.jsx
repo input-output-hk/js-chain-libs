@@ -3,13 +3,22 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
-import { BlockPagedTable } from '../../Block';
+import { BlockTable } from '../../Block';
+import {
+  getNextPageQueryParam,
+  getPreviousPageQueryParam
+} from '../../../helpers/paginationHelper';
+
+// Getting a CursorBased Table
+const CursorTable = BlockTable({ cursorType: true });
 
 const EpochBlockTable = ({ epoch, relay }) => {
   if (!epoch.blocks) {
     return null;
   }
-  const blockConnection = epoch.blocks;
+
+  const connection = epoch.blocks;
+
   const handlePageChange = (vars, callback) => {
     relay.refetch(
       {
@@ -28,10 +37,18 @@ const EpochBlockTable = ({ epoch, relay }) => {
     );
   };
 
+  const onPreviousPage = () => {
+    handlePageChange(getPreviousPageQueryParam(connection));
+  };
+
+  const onNextPage = () => {
+    handlePageChange(getNextPageQueryParam(connection));
+  };
+
   return (
     <>
       <h2>Blocks</h2>
-      <BlockPagedTable {...{ handlePageChange, blockConnection }} />
+      <CursorTable {...{ connection, onNextPage, onPreviousPage }} />
     </>
   );
 };
@@ -49,7 +66,29 @@ export default createRefetchContainer(
         ) {
         id
         blocks(first: $first, last: $last, after: $after, before: $before) {
-          ...BlockPagedTable_blockConnection
+          edges {
+            cursor
+            node {
+              id
+              date {
+                epoch {
+                  id
+                }
+                slot
+              }
+              chainLength
+              transactions {
+                id
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+            startCursor
+          }
+          totalCount
         }
       }
     `

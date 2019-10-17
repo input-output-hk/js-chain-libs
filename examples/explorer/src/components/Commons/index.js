@@ -11,4 +11,5 @@ export { default as CopiableItem } from './CopiableItem/CopiableItem';
 export { default as AssuranceLevel } from './AssuranceLevel/AssuranceLevel';
 export { default as BlockDateTime } from './BlockDateTime/BlockDateTime';
 export { default as EpochDateTime } from './EpochDateTime/EpochDateTime';
-export { default as PageInput } from './PageInput/PageInput';
+export { default as CursorBasedTable } from './CursorBasedTable/CursorBasedTable';
+export { default as OffsetBasedTable } from './OffsetBasedTable/OffsetBasedTable';
