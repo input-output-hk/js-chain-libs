@@ -5,7 +5,8 @@ import { createFragmentContainer } from 'react-relay';
 
 import Table from 'react-bootstrap/Table';
 
-import { BlockLink, CopiableItem, AssuranceLevel, BlockDateTime } from '../../Commons';
+import { BlockLink, CopiableItem, AssuranceLevel, BlockDateTime, Amount } from '../../Commons';
+import { feesAmount } from '../../../helpers/transactionHelper';
 
 const TransactionInfo = ({ transaction, status }) => {
   return (
@@ -36,6 +37,12 @@ const TransactionInfo = ({ transaction, status }) => {
               <td>Assurance level:</td>
               <td>
                 <AssuranceLevel {...{ transaction, status }} />
+              </td>
+            </tr>
+            <tr>
+              <td>Total fees:</td>
+              <td>
+                <Amount decimalAmount={feesAmount(transaction)} />
               </td>
             </tr>
             <tr>
