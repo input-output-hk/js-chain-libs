@@ -8,6 +8,8 @@ A simple Explorer using Reactjs, React-bootstrap and Relay to use with Jorgunman
 - Block search by hash.
 - Block search by chain length.
 - Epoch search by Epoch number.
+- Stake pool search by Pool id.
+- Address search by Address.
 - Block table showing all blocks ordered from more recents to older.
 
 # What does this explorer not have (and should have)?

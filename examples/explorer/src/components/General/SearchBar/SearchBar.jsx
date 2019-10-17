@@ -8,6 +8,12 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import './searchBar.scss';
 import { isBlockNumber } from '../../../helpers/blockHelper';
 
+const onStakePoolSearchClick = searchValue => {
+  const baseUrl = 'pool';
+
+  navigate(`/${baseUrl}/${searchValue}`);
+};
+
 const onEpochSearchClick = searchValue => {
   const baseUrl = 'epoch';
 
@@ -45,7 +51,7 @@ const Search = () => {
           <Form.Control
             type="text"
             onChange={event => setSearchValue(event.target.value)}
-            placeholder="Search by epoch number, block hash, chain length, transaction hash or address..."
+            placeholder="Search by epoch number, block hash, chain length, stake pool id, transaction hash or address..."
           />
           <DropdownButton id="dropdown-basic-button" title="Search">
             <Dropdown.Item variant="primary" onClick={() => onEpochSearchClick(searchValue)}>
@@ -59,6 +65,9 @@ const Search = () => {
             </Dropdown.Item>
             <Dropdown.Item variant="primary" onClick={() => onAddressSearchClick(searchValue)}>
               Address
+            </Dropdown.Item>
+            <Dropdown.Item variant="primary" onClick={() => onStakePoolSearchClick(searchValue)}>
+              Stake pool
             </Dropdown.Item>
           </DropdownButton>
         </div>
