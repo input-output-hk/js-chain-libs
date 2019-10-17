@@ -1,13 +1,15 @@
 // @flow
-import { Address } from '../models';
-import { NodeSettings } from '../reducers/types';
+import { Identifier } from '../models';
+import { BalanceAndCounter, NodeSettings } from '../reducers/types';
 
 const BASE_URL = 'http://localhost:8443/api/v0';
 
-export function getBalance(address: Address): Promise<number> {
-  return fetch(`${BASE_URL}/account/${address}`)
+export function getBalanceAndCounter(
+  identifier: Identifier
+): Promise<BalanceAndCounter> {
+  return fetch(`${BASE_URL}/account/${identifier}`)
     .then(response => response.json())
-    .then(json => json.value);
+    .then(({ value, counter }) => ({ balance: value, counter }));
 }
 
 export function getNodeSettings(): Promise<NodeSettings> {

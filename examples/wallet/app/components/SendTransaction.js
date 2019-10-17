@@ -1,17 +1,16 @@
 // @flow
 import React, { useState } from 'react';
-import typeof { updateBalance as UpdateBalance } from '../actions/balance';
+import typeof { sendTransaction as SendTransaction } from '../actions/account';
 
 type Props = {
-  updateBalance: UpdateBalance
+  sendTransaction: SendTransaction
 };
 
-// FIXME: this has no error handling, neither while parsing the address
-// nor when fetching the balance.
-export default ({ updateBalance }: Props) => {
+export default ({ sendTransaction }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    return updateBalance();
+    sendTransaction(destinationAddress, amount);
+    console.log('submitted');
   };
   const [destinationAddress, setDestinationAddress] = useState('');
   const [amount, setAmount] = useState();

@@ -2,7 +2,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import InputKeys from '../components/InputKeys';
 import { setAccount } from '../actions/account';
-import { updateBalance } from '../actions/balance';
 import { updateNodeSettings } from '../actions/nodeSettings';
 
 function mapStateToProps(state) {
@@ -11,7 +10,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
-    { setAccount, updateBalance, updateNodeSettings },
+    { setAccount, updateNodeSettings },
     dispatch
   );
 }
