@@ -818,6 +818,41 @@ impl AuthenticatedTransaction {
             }
         }
     }
+
+    pub fn witnesses(&self) -> Witnesses {
+        match &self.0 {
+            AuthenticatedTransactionType::NoCertificate(auth_tx) => auth_tx
+                .witnesses
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into(),
+            AuthenticatedTransactionType::PoolRegistration(auth_tx) => auth_tx
+                .witnesses
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into(),
+            AuthenticatedTransactionType::PoolManagement(auth_tx) => auth_tx
+                .witnesses
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into(),
+            AuthenticatedTransactionType::StakeDelegation(auth_tx) => auth_tx
+                .witnesses
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into(),
+            AuthenticatedTransactionType::OwnerStakeDelegation(auth_tx) => auth_tx
+                .witnesses
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into(),
+        }
+    }
 }
 
 /// Type for representing the hash of a Transaction, necessary for signing it
@@ -1408,7 +1443,14 @@ pub enum FeeVariant {
 /// It's important that witness works with opaque structures
 /// and may not know the contents of the internal transaction.
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct Witness(tx::Witness);
+
+impl From<tx::Witness> for Witness {
+    fn from(witness: tx::Witness) -> Witness {
+        Witness(witness)
+    }
+}
 
 #[wasm_bindgen]
 impl Witness {
@@ -1453,6 +1495,8 @@ impl Witness {
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
 }
+
+impl_collection!(Witnesses, Witness);
 
 #[wasm_bindgen]
 pub struct SpendingCounter(account::SpendingCounter);
