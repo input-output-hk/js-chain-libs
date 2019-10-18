@@ -10,7 +10,6 @@ export default ({ sendTransaction }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     sendTransaction(destinationAddress, amount);
-    console.log('submitted');
   };
   const [destinationAddress, setDestinationAddress] = useState('');
   const [amount, setAmount] = useState();

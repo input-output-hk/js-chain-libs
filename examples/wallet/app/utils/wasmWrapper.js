@@ -34,7 +34,7 @@ export async function buildTransaction(
   secret: string,
   accountCounter: number,
   nodeSettings: NodeSettings
-): Promise<Uint8Array> {
+): Promise<{ id: string, transaction: Uint8Array }> {
   const {
     OutputPolicy,
     TransactionBuilder,
@@ -50,7 +50,9 @@ export async function buildTransaction(
     Witness,
     SpendingCounter,
     Hash,
-    Account
+    Account,
+    // eslint-disable-next-line camelcase
+    uint8array_to_hex
   } = await wasmBindings;
   const privateKey: PrivateKey = PrivateKey.from_bech32(secret);
   const sourcePublicKey: PublicKey = privateKey.to_public();
@@ -94,5 +96,8 @@ export async function buildTransaction(
   finalizer.set_witness(0, witness);
   const signedTx = finalizer.finalize();
   const message: Fragment = Fragment.from_authenticated_transaction(signedTx);
-  return message.as_bytes();
+  return {
+    transaction: message.as_bytes(),
+    id: uint8array_to_hex(message.id().as_bytes())
+  };
 }

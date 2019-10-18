@@ -12,7 +12,10 @@ import {
   getAccountFromPrivateKey,
   buildTransaction
 } from '../utils/wasmWrapper';
-import { getBalanceAndCounter } from '../utils/nodeConnection';
+import {
+  getBalanceAndCounter,
+  broadcastTransaction
+} from '../utils/nodeConnection';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
@@ -73,8 +76,11 @@ export function sendTransaction(
       state.account.privateKey,
       state.account.counter,
       state.nodeSettings
-    ).then((transaction: Uint8Array) =>
-      console.log('TODO: broadcast the tx: ', transaction.toString())
-    );
+    ).then(({ id, transaction }) => {
+      // TODO: dispatch an action which adds the transaction to the
+      // transaction list
+      console.log(id);
+      return broadcastTransaction(transaction);
+    });
   };
 }
