@@ -1,3 +1,4 @@
+// @flow
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import InputKeys from '../components/InputKeys';
@@ -9,10 +10,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(
-    { setAccount, updateNodeSettings },
-    dispatch
-  );
+  return bindActionCreators({ setAccount, updateNodeSettings }, dispatch);
 }
 
 export default connect(

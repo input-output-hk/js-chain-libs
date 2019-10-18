@@ -1,13 +1,11 @@
 // @flow
-import {
+import type {
   AppState,
-  Dispatch,
-  GetState,
   Thunk,
   AccountKeys,
   BalanceAndCounter
 } from '../reducers/types';
-import { Amount, Address } from '../models';
+import type { Amount, Address } from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction
@@ -20,11 +18,7 @@ import {
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
 
-export function setAccount(
-  privateKey: string
-): (
-  dispatch: Dispatch<SetKeysAction | Thunk<SetBalanceAndCounterAction>>
-) => Promise<SetKeysAction> {
+export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
     return getAccountFromPrivateKey(privateKey)
       .then((keys: AccountKeys) =>
@@ -42,10 +36,7 @@ export type SetBalanceAndCounterAction = {
 } & BalanceAndCounter;
 export const SET_BALANCE_AND_COUNTER = 'SET_BALANCE_AND_COUNTER';
 
-export function updateBalanceAndCounter(): (
-  dispatch: Dispatch<Thunk<SetBalanceAndCounterAction>>,
-  getState: GetState
-) => Promise<SetBalanceAndCounterAction> {
+export function updateBalanceAndCounter(): Thunk<SetBalanceAndCounterAction> {
   return function updateBalanceThunk(dispatch, getState) {
     return getBalanceAndCounter(getState().account.identifier).then(
       ({ balance, counter }: BalanceAndCounter) =>

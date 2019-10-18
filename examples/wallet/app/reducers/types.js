@@ -1,14 +1,21 @@
+// @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
-import { Address, Balance, Counter, PrivateKey, Identifier } from '../models';
+import type {
+  Address,
+  Balance,
+  Counter,
+  PrivateKey,
+  Identifier
+} from '../models';
 
 export type Action = {
   type: string
 };
 
-export type Store = ReduxStore<State, Action>;
+export type Store = ReduxStore<AppState, Action>;
 export type GetState = () => AppState;
 export type Dispatch = ReduxDispatch<Action> & Thunk<Action>;
-export type Thunk<A> = ((Dispatch, GetState) => Promise<void> | void) => A;
+export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
 
 export type AppState = {
   account: AccountState,

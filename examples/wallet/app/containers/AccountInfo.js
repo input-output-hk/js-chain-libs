@@ -1,3 +1,4 @@
+// @flow
 import { connect } from 'react-redux';
 import AccountInfo from '../components/AccountInfo';
 

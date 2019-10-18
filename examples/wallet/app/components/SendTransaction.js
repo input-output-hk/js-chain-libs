@@ -11,8 +11,8 @@ export default ({ sendTransaction }: Props) => {
     event.preventDefault();
     sendTransaction(destinationAddress, Number(amount));
   };
-  const [destinationAddress, setDestinationAddress] = useState('');
-  const [amount, setAmount] = useState();
+  const [destinationAddress, setDestinationAddress] = useState<string>('');
+  const [amount, setAmount] = useState<?number>();
 
   return (
     <form onSubmit={handleSubmit}>

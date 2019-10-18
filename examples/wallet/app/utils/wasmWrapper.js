@@ -1,9 +1,10 @@
 // @flow
-import { AccountKeys, NodeSettings } from '../reducers/types';
-import {} from '../models';
+import type { AccountKeys, NodeSettings } from '../reducers/types';
 
 const wasmBindings = import('js-chain-libs/js_chain_libs');
-export async function getAccountFromPrivateKey(secret: string): AccountKeys {
+export async function getAccountFromPrivateKey(
+  secret: string
+): Promise<AccountKeys> {
   const {
     PrivateKey,
     PublicKey,

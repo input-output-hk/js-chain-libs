@@ -1,8 +1,8 @@
 // @flow
 import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
-import { Identifier } from '../models';
-import { BalanceAndCounter, NodeSettings } from '../reducers/types';
+import type { Identifier } from '../models';
+import type { BalanceAndCounter, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
 const BASE_URL = 'http://localhost:8443/api/v0';
