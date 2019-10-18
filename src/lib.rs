@@ -79,8 +79,7 @@ impl PrivateKey {
         crypto::SecretKey::from_binary(bytes)
             .map(key::EitherEd25519SecretKey::Extended)
             .or_else(|_| {
-                crypto::SecretKey::from_binary(bytes)
-                    .map(key::EitherEd25519SecretKey::Normal)
+                crypto::SecretKey::from_binary(bytes).map(key::EitherEd25519SecretKey::Normal)
             })
             .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid secret key"))
