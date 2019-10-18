@@ -75,14 +75,18 @@ impl PrivateKey {
         }
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> Result<PrivateKey, JsValue> {
+    pub fn from_extended_bytes(bytes: &[u8]) -> Result<PrivateKey, JsValue> {
         crypto::SecretKey::from_binary(bytes)
             .map(key::EitherEd25519SecretKey::Extended)
-            .or_else(|_| {
-                crypto::SecretKey::from_binary(bytes).map(key::EitherEd25519SecretKey::Normal)
-            })
             .map(PrivateKey)
-            .map_err(|_| JsValue::from_str("Invalid secret key"))
+            .map_err(|_| JsValue::from_str("Invalid extended secret key"))
+    }
+
+    pub fn from_normal_bytes(bytes: &[u8]) -> Result<PrivateKey, JsValue> {
+        crypto::SecretKey::from_binary(bytes)
+            .map(key::EitherEd25519SecretKey::Normal)
+            .map(PrivateKey)
+            .map_err(|_| JsValue::from_str("Invalid normal secret key"))
     }
 }
 
