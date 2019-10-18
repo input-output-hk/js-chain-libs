@@ -74,6 +74,20 @@ impl PrivateKey {
             key::EitherEd25519SecretKey::Extended(ref secret) => secret.to_bech32_str(),
         }
     }
+
+    pub fn from_extended_bytes(bytes: &[u8]) -> Result<PrivateKey, JsValue> {
+        crypto::SecretKey::from_binary(bytes)
+            .map(key::EitherEd25519SecretKey::Extended)
+            .map(PrivateKey)
+            .map_err(|_| JsValue::from_str("Invalid extended secret key"))
+    }
+
+    pub fn from_normal_bytes(bytes: &[u8]) -> Result<PrivateKey, JsValue> {
+        crypto::SecretKey::from_binary(bytes)
+            .map(key::EitherEd25519SecretKey::Normal)
+            .map(PrivateKey)
+            .map_err(|_| JsValue::from_str("Invalid normal secret key"))
+    }
 }
 
 /// ED25519 key used as public key
@@ -102,6 +116,12 @@ impl PublicKey {
 
     pub fn as_bytes(&self) -> Vec<u8> {
         self.0.as_ref().to_vec()
+    }
+
+    pub fn from_bytes(bytes: &[u8]) -> Result<PublicKey, JsValue> {
+        crypto::PublicKey::from_binary(bytes)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(PublicKey)
     }
 }
 
