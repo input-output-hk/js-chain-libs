@@ -4,7 +4,14 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { CopiableItem, BlockLink, EpochLink, NextPrev, BlockDateTime } from '../../Commons';
+import {
+  CopiableItem,
+  BlockLink,
+  EpochLink,
+  NextPrev,
+  BlockDateTime,
+  StakePoolLink
+} from '../../Commons';
 import { getNextPrev } from '../../../helpers/blockHelper';
 
 const BlockInfo = ({ block }) => {
@@ -46,10 +53,8 @@ const BlockInfo = ({ block }) => {
               </td>
             </tr>
             <tr>
-              <td>Previous block:</td>
-              <td>
-                <BlockLink id={block.previousBlock.id} />
-              </td>
+              <td>Leader:</td>
+              <td>{block.leader && <StakePoolLink id={block.leader.id} />}</td>
             </tr>
           </tbody>
         </Table>
@@ -75,6 +80,11 @@ export default createFragmentContainer(BlockInfo, {
       }
       transactions {
         ...TransactionTable_transactions
+      }
+      leader {
+        ... on Pool {
+          id
+        }
       }
     }
   `
