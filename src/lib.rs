@@ -88,6 +88,10 @@ impl PrivateKey {
             .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid normal secret key"))
     }
+
+    pub fn sign(&self, message: &[u8]) -> Vec<u8> {
+        self.0.sign(&message).to_bytes()
+    }
 }
 
 /// ED25519 key used as public key
