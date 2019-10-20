@@ -134,9 +134,7 @@ impl PrivateKey {
     }
 
     pub fn sign(&self, message: &[u8]) -> Result<Ed25519Signature, JsValue> {
-        Ed25519Signature::from_bytes(
-            &self.0.sign(&message).to_bytes()
-        )
+        Ed25519Signature::from_bytes(&self.0.sign(&message).to_bytes())
     }
 }
 
