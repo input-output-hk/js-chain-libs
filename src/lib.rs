@@ -1478,9 +1478,7 @@ impl Witness {
     }
 
     // Witness for a utxo-based transaction generated externally (such as hardware wallets)
-    pub fn for_external_utxo(
-        witness: &UtxoWitness
-    ) -> Witness {
+    pub fn for_external_utxo(witness: &UtxoWitness) -> Witness {
         Witness(tx::Witness::Utxo(witness.0.clone()))
     }
 
@@ -1501,9 +1499,7 @@ impl Witness {
     }
 
     // Witness for a account-based transaction generated externally (such as hardware wallets)
-    pub fn for_external_account(
-        witness: &AccountWitness
-    ) -> Witness {
+    pub fn for_external_account(witness: &AccountWitness) -> Witness {
         Witness(tx::Witness::Account(witness.0.clone()))
     }
 
