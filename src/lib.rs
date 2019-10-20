@@ -18,9 +18,9 @@ use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
 macro_rules! impl_signature {
-    ($name:ident, $size:expr, $verifier_type:ty) => {
+    ($name:ident, $signee_type:ty, $verifier_type:ty) => {
         #[wasm_bindgen]
-        pub struct $name(crypto::Signature<[u8; $size], $verifier_type>);
+        pub struct $name(crypto::Signature<$signee_type, $verifier_type>);
 
         #[wasm_bindgen]
         impl $name {
@@ -37,9 +37,7 @@ macro_rules! impl_signature {
             }
 
             pub fn from_bytes(bytes: &[u8]) -> Result<$name, JsValue> {
-                let mut v = [0u8; $size];
-                v.copy_from_slice(bytes);
-                crypto::Signature::from_binary(&v)
+                crypto::Signature::from_binary(bytes)
                     .map($name)
                     .map_err(|e| JsValue::from_str(&format!("{}", e)))
             }
@@ -59,7 +57,7 @@ macro_rules! impl_signature {
     };
 }
 
-impl_signature!(Ed25519Signature, 64, crypto::Ed25519);
+impl_signature!(Ed25519Signature, Vec<u8>, crypto::Ed25519);
 
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
