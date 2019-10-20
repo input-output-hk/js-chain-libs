@@ -17,6 +17,50 @@ use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
+macro_rules! impl_signature {
+    ($name:ident, $size:expr, $verifier_type:ty) => {
+        #[wasm_bindgen]
+        pub struct $name(crypto::Signature<[u8; $size], $verifier_type>);
+
+        #[wasm_bindgen]
+        impl $name {
+            pub fn to_bytes(&self) -> Vec<u8> {
+                self.0.to_bytes()
+            }
+
+            pub fn to_bech32(&self) -> String {
+                self.0.to_bech32_str()
+            }
+
+            pub fn to_hex(&self) -> String {
+                hex::encode(&self.0.as_ref())
+            }
+
+            pub fn from_bytes(bytes: &[u8]) -> Result<$name, JsValue> {
+                let mut v = [0u8; $size];
+                v.copy_from_slice(bytes);
+                crypto::Signature::from_binary(&v)
+                    .map($name)
+                    .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            }
+
+            pub fn from_bech32(bech32_str: &str) -> Result<$name, JsValue> {
+                crypto::Signature::try_from_bech32_str(&bech32_str)
+                    .map($name)
+                    .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            }
+
+            pub fn from_hex(input: &str) -> Result<$name, JsValue> {
+                crypto::Signature::from_str(input)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+                    .map($name)
+            }
+        }
+    };
+}
+
+impl_signature!(Ed25519Signature, 64, crypto::Ed25519);
+
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
@@ -89,8 +133,10 @@ impl PrivateKey {
             .map_err(|_| JsValue::from_str("Invalid normal secret key"))
     }
 
-    pub fn sign(&self, message: &[u8]) -> Vec<u8> {
-        self.0.sign(&message).to_bytes()
+    pub fn sign(&self, message: &[u8]) -> Result<Ed25519Signature, JsValue> {
+        Ed25519Signature::from_bytes(
+            &self.0.sign(&message).to_bytes()
+        )
     }
 }
 
