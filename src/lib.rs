@@ -58,6 +58,8 @@ macro_rules! impl_signature {
 }
 
 impl_signature!(Ed25519Signature, Vec<u8>, crypto::Ed25519);
+impl_signature!(AccountWitness, tx::WitnessAccountData, crypto::Ed25519);
+impl_signature!(UtxoWitness, tx::WitnessUtxoData, crypto::Ed25519);
 
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
@@ -1475,6 +1477,13 @@ impl Witness {
         ))
     }
 
+    // Witness for a utxo-based transaction generated externally (such as hardware wallets)
+    pub fn for_external_utxo(
+        witness: &UtxoWitness
+    ) -> Witness {
+        Witness(tx::Witness::Utxo(witness.0.clone()))
+    }
+
     /// Generate Witness for an account based transaction Input
     /// the account-spending-counter should be incremented on each transaction from this account
     pub fn for_account(
@@ -1489,6 +1498,13 @@ impl Witness {
             &account_spending_counter.0,
             &secret_key.0,
         ))
+    }
+
+    // Witness for a account-based transaction generated externally (such as hardware wallets)
+    pub fn for_external_account(
+        witness: &AccountWitness
+    ) -> Witness {
+        Witness(tx::Witness::Account(witness.0.clone()))
     }
 
     /// Get string representation
