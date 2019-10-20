@@ -171,6 +171,10 @@ impl PublicKey {
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
             .map(PublicKey)
     }
+
+    pub fn verify(&self, data: &[u8], signature: &Ed25519Signature) -> bool {
+        signature.0.verify_slice(&self.0, data) == crypto::Verification::Success
+    }
 }
 
 #[wasm_bindgen]
