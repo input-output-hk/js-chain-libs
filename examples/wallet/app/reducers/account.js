@@ -1,5 +1,9 @@
 // @flow
-import { SET_KEYS, SET_BALANCE_AND_COUNTER } from '../actions/account';
+import {
+  SET_KEYS,
+  SET_BALANCE_AND_COUNTER,
+  SEND_TRANSACTION
+} from '../actions/account';
 import type {
   SetKeysAction,
   SetBalanceAndCounterAction
@@ -24,6 +28,10 @@ export default function account(
       return Object.assign({}, state, {
         balance: action.balance,
         counter: action.counter
+      });
+    case SEND_TRANSACTION:
+      return Object.assign({}, state, {
+        counter: action.newCounter
       });
     default:
       return state;

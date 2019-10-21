@@ -50,7 +50,8 @@ export function updateBalanceAndCounter(): Thunk<SetBalanceAndCounterAction> {
 }
 
 export type SendTransactionAction = {
-  type: 'SEND_TRANSACTION'
+  type: 'SEND_TRANSACTION',
+  newCounter: number
 };
 export const SEND_TRANSACTION = 'SEND_TRANSACTION';
 
@@ -67,11 +68,18 @@ export function sendTransaction(
       state.account.privateKey,
       state.account.counter,
       state.nodeSettings
-    ).then(({ id, transaction }) => {
-      // TODO: dispatch an action which adds the transaction to the
-      // transaction list
-      console.log(id);
-      return broadcastTransaction(transaction);
-    });
+    )
+      .then(({ id, transaction }) => {
+        // TODO: dispatch an action which adds the transaction to the
+        // transaction list
+        console.log(id);
+        return broadcastTransaction(transaction);
+      })
+      .then(() =>
+        dispatch({
+          type: SEND_TRANSACTION,
+          newCounter: state.account.counter + 1
+        })
+      );
   };
 }

@@ -28,10 +28,10 @@ To build an appimage package, first install the dependencies with
 - [ x ] let the user use its private key.
   - [ x ] prompt the user for its private key, ideally locking parts of the app until a valid one is inserted
   - [ ] bip39?
-- [ ] send account-based transactions
+- [ x ] send account-based transactions
   - [ x ] UI
   - [ x ] verify validity of the recipient's address
-  - [ ] update sender's account counter
+  - [ x ] update sender's account counter
   - [ x ] generate transaction
     - [ x ] add output
     - [ x ] add witness
