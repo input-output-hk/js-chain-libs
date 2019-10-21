@@ -28,7 +28,7 @@ const RecentBlocksTable = ({ data, relay }) => {
   return (
     <div className="entityInfoContainer">
       <h2> Recent blocks </h2>
-      <BlockPagedTable {...{ blockConnection, handlePageChange }} />;
+      <BlockPagedTable {...{ blockConnection, handlePageChange }} />
     </div>
   );
 };

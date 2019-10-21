@@ -8,14 +8,14 @@ import TransactionInputsOutputs from '../TransactionInputsOutputs/TransactionInp
 import TransactionInfo from '../TransactionInfo/TransactionInfo';
 import { CertificateInfo } from '../../Certificate';
 
-const FullTransactionInfo = ({ transaction }) => {
+const FullTransactionInfo = ({ transaction, status }) => {
   if (!transaction) {
     return <EmptyResult {...{ entityName: 'Transaction' }} />;
   }
   const { inputs, outputs, certificate } = transaction;
   return (
     <div className="entityInfoContainer">
-      <TransactionInfo {...{ transaction }} />
+      <TransactionInfo {...{ transaction, status }} />
       <TransactionInputsOutputs {...{ inputs, outputs }} />
       <CertificateInfo {...{ certificate }} />
     </div>

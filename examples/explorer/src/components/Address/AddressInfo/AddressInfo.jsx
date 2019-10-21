@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { EmptyResult, AddressLink } from '../../Commons';
+import { EmptyResult, CopiableItem } from '../../Commons';
 
 const AddressInfo = ({ address }) => {
   if (!address) {
@@ -20,7 +20,7 @@ const AddressInfo = ({ address }) => {
             <tr>
               <td>Id:</td>
               <td>
-                <AddressLink id={address.id} />
+                <CopiableItem text={address.id} />
               </td>
             </tr>
           </tbody>

@@ -35,6 +35,14 @@ A simple Explorer using Reactjs, React-bootstrap and Relay to use with Jorgunman
   - `currency`: In this key there are configuration about the used currency.
     - `symbol`: Symbol of the currency. It will be displayed next to every value amount in the app.
     - `decimals`: Currency decimals. For Cardano, the value is 6.
+  - `networkSettings`: Configurations of the network that are necesary for the explorer to work.
+    - `genesisTimestamp`: Genesis block timestamp. Used to calculate block dates.
+    - `slotsPerEpoch`: Amount of blocks in each epoch. Used to calculate block dates.
+    - `slotDuration`: Duration of slots in seconds. Used to calculate block dates.
+  - `assuranceLevels`: Defines the amount of confirmations needed for a transaction to meet a specific level. Any transaction with a level of confirmation below `low`, will be considered unconfirmed. There are three configurable levels:
+    - `low`
+    - `medium`
+    - `high`
 
 # Build
 

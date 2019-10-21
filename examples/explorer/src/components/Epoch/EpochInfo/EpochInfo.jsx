@@ -4,25 +4,33 @@ import Table from 'react-bootstrap/Table';
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
 
-import { EmptyResult, BlockLink, EpochLink } from '../../Commons';
+import { EmptyResult, BlockLink, CopiableItem, NextPrev, EpochDateTime } from '../../Commons';
+import { getNextPrev } from '../../../helpers/epochHelper';
 
 const EpochInfo = ({ epoch }) => {
   if (!epoch) {
     return <EmptyResult {...{ entityName: 'Epoch' }} />;
   }
   const { firstBlock, lastBlock } = epoch;
+  const baseUrl = '/epoch/';
 
   return (
     <div className="entityInfoTable">
+      <NextPrev {...{ baseUrl, element: epoch, getNextPrev }} />
       <h2>Epoch</h2>
-
       <div className="keyValueTable">
         <Table striped bordered hover>
           <tbody>
             <tr>
               <td>Epoch Number:</td>
               <td>
-                <EpochLink number={epoch.id} />
+                <CopiableItem text={epoch.id} />
+              </td>
+            </tr>
+            <tr>
+              <td>Date:</td>
+              <td>
+                <EpochDateTime {...{ epoch }} />
               </td>
             </tr>
             <tr>
@@ -61,6 +69,7 @@ export default createFragmentContainer(EpochInfo, {
         id
       }
       totalBlocks
+      ...EpochDateTime_epoch
     }
   `
 });

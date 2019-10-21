@@ -8,6 +8,14 @@ $darker-grey: #212529;
 $medium-grey: #c5d0de;
 $light-grey: #f3f6f8;
 
+.disable-select {
+  user-select: none; /* supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
 #router {
   display: flex;
   flex-direction: column;

@@ -1,16 +1,8 @@
-import graphql from 'babel-plugin-relay/macro';
+import { StatusQuery } from '../../../graphql/queries';
 
 import StatusInfo from '../StatusInfo/StatusInfo';
 import { QueryWrapper } from '../../QueryWrapper';
 
-const statusQuery = graphql`
-  query StatusBarQuery {
-    status {
-      ...StatusInfo_status
-    }
-  }
-`;
-
-const StatusBar = QueryWrapper(StatusInfo, statusQuery);
+const StatusBar = QueryWrapper(StatusInfo, StatusQuery);
 
 export default StatusBar;
