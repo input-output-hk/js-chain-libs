@@ -13,6 +13,11 @@ const RecentBlocksTable = ({ data, relay }) => {
   const connection = data.blocks;
   const currentPage = pageNumberDesc(connection);
 
+  /* HACK: Offset-based pagination is emulated by using the cursor as an incremental
+   * and continous value, to calculate pages this assumption not always apply, and
+   * we should not rely on that. Replace this when Backend supports this type of
+   * pagination
+   */
   const handlePageChange = page => {
     const params = getDescPageQuery(page.current, connection.totalCount);
 

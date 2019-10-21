@@ -6,7 +6,15 @@ import { getNodeList } from '../../../helpers/paginationHelper';
 import 'antd/dist/antd.css';
 
 /**
- * This component receives a set of columns, a sorter function and return an OffsetBase
+ * This component receives a set of columns, a sorter function and return an OffsetBasedTable.
+ * @param columns An array of Ant Table column objects.
+ * @param sorter Sorter function is used to avoid using Ant table's sort because it
+ * cause some problems with pagination.
+ *
+ * An Offset based table is able to move and show data from specific pages.
+ * @param currentPage Number of the current page.
+ * @param connection A GraphQL connection object.
+ * @param handlePageChange A function to handle page changes and obtain more data.
  */
 const OffsetBasedTable = ({ columns, sorter }) => ({
   currentPage,

@@ -8,7 +8,15 @@ import 'antd/dist/antd.css';
 import './cursorBasedTable.scss';
 
 /**
- * This component receives a set of columns, a sorter function and return a CursorBasedTable
+ * This component receives a set of columns, a sorter function and return a CursorBasedTable.
+ * @param columns An array of Ant Table column objects.
+ * @param sorter Sorter function is used to avoid using Ant table's sort because it
+ * cause some problems with pagination.
+ *
+ * A CursorBasedTable can only move one page at a time.
+ * @param connection A GraphQL connection object.
+ * @param onNextPage A function that handles the transition to next page.
+ * @param onPreviousPage A function that handles the transition to previous page.
  */
 const CursorBasedTable = ({ columns, sorter }) => ({ connection, onNextPage, onPreviousPage }) => {
   const nodes = getNodeList(connection);
