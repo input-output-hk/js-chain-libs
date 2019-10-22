@@ -1,19 +1,16 @@
 // @flow
-import React, { Component } from 'react';
-import AddressInfoContainer from '../containers/AddressInfoContainer';
-import styles from './Home.css';
+import React from 'react';
 
-type Props = {};
+type Props = {
+  balance: number,
+  address: string
+};
 
-export default class Home extends Component<Props> {
-  props: Props;
-
-  render() {
-    return (
-      <div className={styles.container} data-tid="container">
-        <h2>Example walllet</h2>
-        <AddressInfoContainer />
-      </div>
-    );
-  }
-}
+export default ({ balance, address }: Props) => {
+  return (
+    <div>
+      <p>Current Address: {address}</p>
+      <p>Balance: {balance}</p>
+    </div>
+  );
+};
