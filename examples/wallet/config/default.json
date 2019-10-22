@@ -1,4 +1,5 @@
 {
+  "pollingInterval": 10000,
   "networkDiscrimination": "testnet",
   "addressPrefix": "ca",
   "nodeUrl": "http://localhost:8443",
