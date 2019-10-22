@@ -1,11 +1,12 @@
 // @flow
 import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
+import config from 'config';
 import type { Identifier } from '../models';
 import type { BalanceAndCounter, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
-const BASE_URL = 'http://localhost:8443/api/v0';
+const BASE_URL = config.get('nodeUrl') + config.get('APIBase');
 
 export function getBalanceAndCounter(
   identifier: Identifier
