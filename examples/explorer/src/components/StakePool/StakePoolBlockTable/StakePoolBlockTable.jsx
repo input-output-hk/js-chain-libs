@@ -77,7 +77,7 @@ export default createRefetchContainer(
               }
               chainLength
               transactions {
-                id
+                totalCount
               }
             }
           }

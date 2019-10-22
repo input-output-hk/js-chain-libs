@@ -30,7 +30,7 @@ const columns = [
   },
   {
     title: 'Tx count',
-    dataIndex: 'transactions.length',
+    dataIndex: 'transactions.totalCount',
     width: '15%'
   }
 ];

@@ -3,26 +3,23 @@ import React from 'react';
 import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
-import { BlockTable } from '../../Block';
+import TransactionTable from '../TransactionTable/TransactionTable';
 import {
   getNextPageQueryParam,
   getPreviousPageQueryParam
 } from '../../../helpers/paginationHelper';
 
-// Getting a CursorBased Table
-const CursorTable = BlockTable({ cursorType: true });
-
-const EpochBlockTable = ({ epoch, relay }) => {
-  if (!epoch.blocks) {
+const AddressTransactionTable = ({ address, relay }) => {
+  if (!address.transactions) {
     return null;
   }
 
-  const connection = epoch.blocks;
+  const connection = address.transactions;
 
   const handlePageChange = (vars, callback) => {
     relay.refetch(
       {
-        epochId: epoch.id,
+        address: address.id,
         first: vars.first || null,
         last: vars.last || null,
         after: vars.after || null,
@@ -47,38 +44,37 @@ const EpochBlockTable = ({ epoch, relay }) => {
 
   return (
     <>
-      <h2>Blocks</h2>
-      <CursorTable {...{ connection, onNextPage, onPreviousPage }} />
+      <h2>Transactions</h2>
+      <TransactionTable {...{ connection, onNextPage, onPreviousPage }} />
     </>
   );
 };
 
 export default createRefetchContainer(
-  EpochBlockTable,
+  AddressTransactionTable,
   {
-    epoch: graphql`
-      fragment EpochBlockTable_epoch on Epoch
+    address: graphql`
+      fragment AddressTransactionTable_address on Address
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
-          after: { type: "BlockCursor" }
-          before: { type: "BlockCursor" }
+          after: { type: "TransactionCursor" }
+          before: { type: "TransactionCursor" }
         ) {
         id
-        blocks(first: $first, last: $last, after: $after, before: $before) {
+        transactions(first: $first, last: $last, after: $after, before: $before) {
           edges {
             cursor
             node {
               id
-              date {
-                epoch {
-                  id
-                }
-                slot
+              inputs {
+                amount
               }
-              chainLength
-              transactions {
-                totalCount
+              outputs {
+                amount
+              }
+              block {
+                chainLength
               }
             }
           }
@@ -94,15 +90,15 @@ export default createRefetchContainer(
     `
   },
   graphql`
-    query EpochBlockTableRefetchQuery(
-      $epochId: EpochNumber!
+    query AddressTransactionTableRefetchQuery(
+      $address: String!
       $first: Int
       $last: Int
       $after: BlockCursor
       $before: BlockCursor
     ) {
-      epoch(id: $epochId) {
-        ...EpochBlockTable_epoch
+      address(bech32: $address) {
+        ...AddressTransactionTable_address
           @arguments(first: $first, last: $last, after: $after, before: $before)
       }
     }

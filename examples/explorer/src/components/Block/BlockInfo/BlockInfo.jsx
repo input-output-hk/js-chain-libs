@@ -78,9 +78,6 @@ export default createFragmentContainer(BlockInfo, {
       previousBlock {
         id
       }
-      transactions {
-        ...TransactionTable_transactions
-      }
       leader {
         ... on Pool {
           id

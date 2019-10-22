@@ -1,11 +1,7 @@
 import React from 'react';
-import { Table } from 'antd';
-
-import graphql from 'babel-plugin-relay/macro';
-import { createFragmentContainer } from 'react-relay';
 
 import { inputsAmount, outputsAmount, feesAmount } from '../../../helpers/transactionHelper';
-import { Amount, TransactionLink, BlockLink } from '../../Commons';
+import { Amount, TransactionLink, BlockLink, CursorBasedTable } from '../../Commons';
 
 import './transactionTable.scss';
 
@@ -43,26 +39,7 @@ const columns = [
   }
 ];
 
-const TransactionTable = ({ transactions }) => (
-  <div className="transactionTable">
-    <h3> Transactions </h3>
-    <Table {...{ columns, pagination: false, dataSource: transactions }} />
-  </div>
-);
+// Necesary because there is a problem with sort and paging with Antd table
+const sorter = (b1, b2) => Number(b2.chainLength) - Number(b1.chainLength);
 
-export default createFragmentContainer(TransactionTable, {
-  transactions: graphql`
-    fragment TransactionTable_transactions on Transaction @relay(plural: true) {
-      id
-      inputs {
-        amount
-      }
-      outputs {
-        amount
-      }
-      block {
-        chainLength
-      }
-    }
-  `
-});
+export default CursorBasedTable({ columns, sorter });

@@ -11,7 +11,12 @@ type Address {
   """
   id: String!
   delegation: Pool!
-  transactions: [Transaction!]!
+  transactions(
+    first: Int
+    last: Int
+    before: TransactionCursor
+    after: TransactionCursor
+  ): TransactionConnection
 }
 
 type BftLeader {
@@ -35,7 +40,12 @@ type Block {
   """
   The transactions contained in the block
   """
-  transactions: [Transaction!]!
+  transactions(
+    first: Int
+    last: Int
+    before: TransactionCursor
+    after: TransactionCursor
+  ): TransactionConnection
   previousBlock: Block!
   chainLength: ChainLength!
   leader: Leader
@@ -51,12 +61,24 @@ type BlockConnection {
   totalCount: BlockCount!
 }
 
+type TransactionConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionEdge!]!
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  """
+  totalCount: TransactionCount!
+}
+
 scalar BlockCount
+scalar TransactionCount
 
 """
 Opaque cursor to use in block pagination, a client should not rely in its representation
 """
 scalar BlockCursor
+scalar TransactionCursor
 
 """
 Block's date, composed of an Epoch and a Slot
@@ -73,6 +95,15 @@ type BlockEdge {
   A cursor for use in pagination
   """
   cursor: BlockCursor!
+}
+
+type TransactionEdge {
+  node: Transaction!
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: TransactionCursor!
 }
 
 union Certificate = StakeDelegation | OwnerStakeDelegation | PoolRegistration
