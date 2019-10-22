@@ -1,0 +1,12 @@
+@import '../../../generalStyling.scss';
+
+.cursorPagination {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  .ant-pagination-item,
+  .ant-pagination-jump-next,
+  .ant-pagination-jump-prev {
+    display: none;
+  }
+}

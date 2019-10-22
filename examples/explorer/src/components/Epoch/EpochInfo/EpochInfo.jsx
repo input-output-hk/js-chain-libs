@@ -54,13 +54,7 @@ const EpochInfo = ({ epoch }) => {
 
 export default createFragmentContainer(EpochInfo, {
   epoch: graphql`
-    fragment EpochInfo_epoch on Epoch
-      @argumentDefinitions(
-        first: { type: "Int" }
-        last: { type: "Int" }
-        after: { type: "BlockCursor" }
-        before: { type: "BlockCursor" }
-      ) {
+    fragment EpochInfo_epoch on Epoch {
       id
       firstBlock {
         id

@@ -4,6 +4,7 @@ Workaround needed due to relay issue https://github.com/facebook/relay/issues/18
 type Node {
   id: ID
 }
+
 type Address {
   """
   The base32 representation of an address
@@ -11,6 +12,10 @@ type Address {
   id: String!
   delegation: Pool!
   transactions: [Transaction!]!
+}
+
+type BftLeader {
+  id: String!
 }
 
 """
@@ -33,18 +38,23 @@ type Block {
   transactions: [Transaction!]!
   previousBlock: Block!
   chainLength: ChainLength!
+  leader: Leader
 }
 
 type BlockConnection {
   pageInfo: PageInfo!
   edges: [BlockEdge!]!
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  """
   totalCount: BlockCount!
 }
 
 scalar BlockCount
 
 """
-Opaque cursor to use in block pagination
+Opaque cursor to use in block pagination, a client should not rely in its representation
 """
 scalar BlockCursor
 
@@ -58,6 +68,10 @@ type BlockDate {
 
 type BlockEdge {
   node: Block!
+
+  """
+  A cursor for use in pagination
+  """
   cursor: BlockCursor!
 }
 
@@ -90,6 +104,8 @@ type FeeSettings {
   certificate: Value!
 }
 
+union Leader = Pool | BftLeader
+
 type OwnerStakeDelegation {
   pool: Pool!
 }
@@ -103,6 +119,7 @@ type PageInfo {
 
 type Pool {
   id: PoolId!
+  blocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection!
 }
 
 scalar PoolId

@@ -12,17 +12,16 @@ import {
 // Getting a CursorBased Table
 const CursorTable = BlockTable({ cursorType: true });
 
-const EpochBlockTable = ({ epoch, relay }) => {
-  if (!epoch.blocks) {
+const StakePoolBlockTable = ({ stakePool, relay }) => {
+  if (!stakePool.blocks) {
     return null;
   }
 
-  const connection = epoch.blocks;
-
+  const connection = stakePool.blocks;
   const handlePageChange = (vars, callback) => {
     relay.refetch(
       {
-        epochId: epoch.id,
+        poolId: stakePool.id,
         first: vars.first || null,
         last: vars.last || null,
         after: vars.after || null,
@@ -54,10 +53,10 @@ const EpochBlockTable = ({ epoch, relay }) => {
 };
 
 export default createRefetchContainer(
-  EpochBlockTable,
+  StakePoolBlockTable,
   {
-    epoch: graphql`
-      fragment EpochBlockTable_epoch on Epoch
+    stakePool: graphql`
+      fragment StakePoolBlockTable_stakePool on Pool
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
@@ -94,15 +93,15 @@ export default createRefetchContainer(
     `
   },
   graphql`
-    query EpochBlockTableRefetchQuery(
-      $epochId: EpochNumber!
+    query StakePoolBlockTableRefetchQuery(
+      $poolId: PoolId!
       $first: Int
       $last: Int
       $after: BlockCursor
       $before: BlockCursor
     ) {
-      epoch(id: $epochId) {
-        ...EpochBlockTable_epoch
+      stakePool(id: $poolId) {
+        ...StakePoolBlockTable_stakePool
           @arguments(first: $first, last: $last, after: $after, before: $before)
       }
     }

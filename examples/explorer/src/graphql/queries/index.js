@@ -7,3 +7,4 @@ export { default as BlockByChainlengthSearchQuery } from './blockByChainlengthSe
 export { default as EpochSearchQuery } from './epochSearch';
 export { default as TransactionSearchQuery } from './transactionSearch';
 export { default as StatusQuery } from './status';
+export { default as StakePoolSearchQuery } from './stakePoolSearch';

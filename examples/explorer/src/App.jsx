@@ -9,7 +9,8 @@ import {
   BlockSearchResult,
   EpochSearchResult,
   BlockByLengthSearchResult,
-  AddressSearchResult
+  AddressSearchResult,
+  StakePoolSearchResult
 } from './components/MainSection';
 
 import './generalStyling.scss';
@@ -24,6 +25,7 @@ const App = () => (
         <Router id="router">
           <EmptyResult default />
           <EpochSearchResult path="epoch/:id" />
+          <StakePoolSearchResult path="pool/:id" />
           <AddressSearchResult path="address/:bech32" />
           <TransactionSearchResult path="tx/:id" />
           <BlockSearchResult path="block/:id" />

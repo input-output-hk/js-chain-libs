@@ -7,10 +7,6 @@ export const isBlockNumber = searchValue => {
   return /^\d+$/.test(searchValue);
 };
 
-export const blocksFromBlockConnection = connection => {
-  return connection.edges.map(edge => edge.node);
-};
-
 // This function will only return the chainLengths
 // not the full block objects
 export const getNextPrev = async block => {
