@@ -133,8 +133,8 @@ impl PrivateKey {
             .map_err(|_| JsValue::from_str("Invalid normal secret key"))
     }
 
-    pub fn sign(&self, message: &[u8]) -> Result<Ed25519Signature, JsValue> {
-        Ed25519Signature::from_bytes(&self.0.sign(&message).to_bytes())
+    pub fn sign(&self, message: &[u8]) -> Ed25519Signature {
+        Ed25519Signature(self.0.sign(&message.to_vec()))
     }
 }
 
@@ -1478,7 +1478,7 @@ impl Witness {
     }
 
     // Witness for a utxo-based transaction generated externally (such as hardware wallets)
-    pub fn for_external_utxo(witness: &UtxoWitness) -> Witness {
+    pub fn from_external_utxo(witness: &UtxoWitness) -> Witness {
         Witness(tx::Witness::Utxo(witness.0.clone()))
     }
 
@@ -1499,7 +1499,7 @@ impl Witness {
     }
 
     // Witness for a account-based transaction generated externally (such as hardware wallets)
-    pub fn for_external_account(witness: &AccountWitness) -> Witness {
+    pub fn from_external_account(witness: &AccountWitness) -> Witness {
         Witness(tx::Witness::Account(witness.0.clone()))
     }
 
