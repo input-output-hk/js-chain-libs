@@ -25,17 +25,17 @@ To build an appimage package, first install the dependencies with
 - [ ] verify the validity of an address before making a request to the a node (js bindings will be added here, ideally, before tackling any more complex issues such as creating transactione)
   - [ x ] add js-chain-libs bindings
   - [ ] handle errors in address format
-- [ ] let the user use its private key.
-  - [ ] prompt the user for its private key, ideally locking parts of the app until a valid one is inserted
+- [ x ] let the user use its private key.
+  - [ x ] prompt the user for its private key, ideally locking parts of the app until a valid one is inserted
   - [ ] bip39?
-- [ ] send account-based transactions
-  - [ ] UI
-  - [ ] verify validity of the recipient's address
-  - [ ] update sender's account counter
-  - [ ] generate transaction
-    - [ ] add output
-    - [ ] add witness
-  - [ ] broadcast transaction
+- [ x ] send account-based transactions
+  - [ x ] UI
+  - [ x ] verify validity of the recipient's address
+  - [ x ] update sender's account counter
+  - [ x ] generate transaction
+    - [ x ] add output
+    - [ x ] add witness
+  - [ x ] broadcast transaction
 - [ ] make configurable via settings file:
   - [ ] node address
   - [ ] address prefix

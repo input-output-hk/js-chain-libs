@@ -1,16 +1,16 @@
 // @flow
 import React from 'react';
+import AccountInfo from '../containers/AccountInfo';
+import SendTransaction from '../containers/SendTransaction';
 
-type Props = {
-  balance: number,
-  address: string
-};
-
-export default ({ balance, address }: Props) => {
+export default () => {
   return (
     <div>
-      <p>Current Address: {address}</p>
-      <p>Balance: {balance}</p>
+      <h2> Account Info</h2>
+      <AccountInfo />
+      <hr />
+      <h2> Send funds</h2>
+      <SendTransaction />
     </div>
   );
 };

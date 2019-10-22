@@ -3,23 +3,20 @@ import React, { useState } from 'react';
 import { Redirect } from 'react-router';
 import routes from '../constants/routes.json';
 import typeof { setAccount as SetAccount } from '../actions/account';
-import typeof { updateBalance as UpdateBalance } from '../actions/balance';
-import getAccountFromPrivateKey from '../utils/wasmWrapper';
+import typeof { updateNodeSettings as UpdateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
   setAccount: SetAccount,
-  updateBalance: UpdateBalance,
+  updateNodeSettings: UpdateNodeSettings,
   privateKey: string
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({ updateBalance, setAccount, privateKey }: Props) => {
+export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    return getAccountFromPrivateKey(newPrivateKey)
-      .then(setAccount)
-      .then(updateBalance);
+    return Promise.all([setAccount(newPrivateKey), updateNodeSettings()]);
   };
 
   if (privateKey) {

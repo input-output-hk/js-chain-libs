@@ -1,19 +1,18 @@
 // @flow
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import InputKeys from '../components/InputKeys';
-import { setAccount } from '../actions/account';
-import { updateNodeSettings } from '../actions/nodeSettings';
+import SendTransaction from '../components/SendTransaction';
+import { sendTransaction } from '../actions/account';
 
 function mapStateToProps(state) {
   return { privateKey: state.account.privateKey };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ setAccount, updateNodeSettings }, dispatch);
+  return bindActionCreators({ sendTransaction }, dispatch);
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(InputKeys);
+)(SendTransaction);
