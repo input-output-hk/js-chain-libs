@@ -1703,10 +1703,10 @@ impl Block {
 }
 
 #[wasm_bindgen]
-pub struct BlockId(chain::block::BlockId);
+pub struct BlockId(key::Hash);
 
-impl From<chain::block::BlockId> for BlockId {
-    fn from(block_id: chain::block::BlockId) -> BlockId {
+impl From<key::Hash> for BlockId {
+    fn from(block_id: key::Hash) -> BlockId {
         BlockId(block_id)
     }
 }
