@@ -3,17 +3,22 @@ import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
 import config from 'config';
 import type { Identifier } from '../models';
-import type { BalanceAndCounter, NodeSettings } from '../reducers/types';
+import type { AccountState, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
 const BASE_URL = config.get('nodeUrl') + config.get('APIBase');
 
-export function getBalanceAndCounter(
-  identifier: Identifier
-): Promise<BalanceAndCounter> {
+export function getAccountState(identifier: Identifier): Promise<AccountState> {
   return axios
     .get(`${BASE_URL}/account/${identifier}`)
-    .then(({ data: { value, counter } }) => ({ balance: value, counter }));
+    .then(({ data: { value, counter, delegation } }) => ({
+      balance: value,
+      counter,
+      delegation: delegation.pools.map(([poolId, amount]) => ({
+        poolId,
+        amount
+      }))
+    }));
 }
 
 export function getNodeSettings(): Promise<NodeSettings> {

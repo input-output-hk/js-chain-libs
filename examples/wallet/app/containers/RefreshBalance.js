@@ -2,14 +2,14 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import RefreshBalance from '../components/RefreshBalance';
-import { updateBalanceAndCounter } from '../actions/account';
+import { updateAccountState } from '../actions/account';
 
 function mapStateToProps() {
   return {};
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ updateBalanceAndCounter }, dispatch);
+  return bindActionCreators({ updateAccountState }, dispatch);
 }
 
 export default connect(
