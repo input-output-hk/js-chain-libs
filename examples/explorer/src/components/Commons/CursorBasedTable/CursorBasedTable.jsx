@@ -24,6 +24,8 @@ const CursorBasedTable = ({ columns, sorter }) => ({ connection, onNextPage, onP
 
   const total = Number.parseInt(connection.totalCount, 10);
 
+  // CursorPagination component is necessary to emulate Cursor-based pagination
+  // with Antd table
   return (
     <div className="cursorBasedTable">
       <Table pagination={false} columns={columns} dataSource={data} />

@@ -69,7 +69,7 @@ This explorer is a Frontend ReactJS application that utilizes a GraphQL backend 
 - `components/general`: This directory contains the three more general components in the app page.
 - `components/mainSection`: MainSection directory contains all the components that will be shown in the MainSection part of the page. This includes all search results and RecentBlocks components
 - `Address`, `Block`, `Certificate`, `Epoch`, `StakePool`, `Status` and `Transaction` directories contains components that shows information of each entity. For example, each directory contains an Info component that contains the basic entity information, and a FullEntityInfo components that contains more complex info.
-- `commons`: This directory holds multiple components usefull for all sections of the application.
+- `commons`: This directory holds multiple components useful for all sections of the application.
 - `helpers`: Self-described.
 
 # QueryWrapper

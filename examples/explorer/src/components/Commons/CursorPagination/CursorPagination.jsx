@@ -3,7 +3,11 @@ import { Pagination } from 'antd';
 import { TABLE_PAGE_SIZE } from '../../../helpers/constants';
 import './cursorPagination.scss';
 
-// Workaround to make Cursor based pagination work with Ant Table
+/**
+ * This component is useful to emulate cursor-based pagination with Antd,
+ * which is not meant to manage this type of pagination.
+ * It maintains current page and can go forward and backward through pages.
+ */
 const CursorPagination = ({ onNextPage, onPreviousPage, total, startAtEnd = false }) => {
   const initialPage = startAtEnd ? Math.ceil(total / TABLE_PAGE_SIZE) : 1;
   const [current, setCurrent] = useState(initialPage);
