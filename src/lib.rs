@@ -157,6 +157,80 @@ impl PublicKeys {
 //----------Address------------//
 //-----------------------------//
 
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SingleAddress(
+    chain_addr::Discrimination,
+    crypto::PublicKey<crypto::Ed25519>,
+);
+
+#[wasm_bindgen]
+impl SingleAddress {
+    pub fn get_spending_key(&self) -> PublicKey {
+        PublicKey::from(self.1.clone())
+    }
+
+    pub fn to_base_address(&self) -> Address {
+        Address::single_from_public_key(&self.get_spending_key(), self.0.into())
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GroupAddress(
+    chain_addr::Discrimination,
+    crypto::PublicKey<crypto::Ed25519>,
+    crypto::PublicKey<crypto::Ed25519>,
+);
+
+#[wasm_bindgen]
+impl GroupAddress {
+    pub fn get_spending_key(&self) -> PublicKey {
+        PublicKey::from(self.1.clone())
+    }
+    pub fn get_account_key(&self) -> PublicKey {
+        PublicKey::from(self.2.clone())
+    }
+    pub fn to_base_address(&self) -> Address {
+        Address::delegation_from_public_key(
+            &self.get_spending_key(),
+            &self.get_account_key(),
+            self.0.into(),
+        )
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AccountAddress(
+    chain_addr::Discrimination,
+    crypto::PublicKey<crypto::Ed25519>,
+);
+
+#[wasm_bindgen]
+impl AccountAddress {
+    pub fn get_account_key(&self) -> PublicKey {
+        PublicKey::from(self.1.clone())
+    }
+    pub fn to_base_address(&self) -> Address {
+        Address::account_from_public_key(&self.get_account_key(), self.0.into())
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MultisigAddress(chain_addr::Discrimination, [u8; 32]);
+
+#[wasm_bindgen]
+impl MultisigAddress {
+    pub fn get_merkle_root(&self) -> Vec<u8> {
+        self.1.to_vec()
+    }
+    pub fn to_base_address(&self) -> Result<Address, JsValue> {
+        Address::multisig_from_merkle_root(self.get_merkle_root().as_slice(), self.0.into())
+    }
+}
+
 /// An address of any type, this can be one of
 /// * A utxo-based address without delegation (single)
 /// * A utxo-based address with delegation (group)
@@ -167,6 +241,18 @@ pub struct Address(chain_addr::Address);
 
 #[wasm_bindgen]
 impl Address {
+    pub fn from_bytes(bytes: Uint8Array) -> Result<Address, JsValue> {
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
+        bytes.copy_to(&mut *slice);
+        chain_addr::Address::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(Address)
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.serialize_as_vec().unwrap()
+    }
+
     //XXX: Maybe this should be from_bech32?
     /// Construct Address from its bech32 representation
     /// Example
@@ -204,31 +290,104 @@ impl Address {
     /// let address = Address.single_from_public_key(public_key, AddressDiscrimination.Test);
     /// ```
     pub fn single_from_public_key(
-        key: PublicKey,
-        discrimination: AddressDiscrimination,
-    ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0)).into()
-    }
-
-    /// Construct a non-account address from a pair of public keys, delegating founds from the first to the second
-    pub fn delegation_from_public_key(
-        key: PublicKey,
-        delegation: PublicKey,
+        key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
         chain_addr::Address(
             discrimination.into(),
-            chain_addr::Kind::Group(key.0, delegation.0),
+            chain_addr::Kind::Single(key.0.clone()),
+        )
+        .into()
+    }
+
+    /// Construct a non-account address from a pair of public keys, delegating founds from the first to the second
+    pub fn delegation_from_public_key(
+        key: &PublicKey,
+        delegation: &PublicKey,
+        discrimination: AddressDiscrimination,
+    ) -> Address {
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Group(key.0.clone(), delegation.0.clone()),
         )
         .into()
     }
 
     /// Construct address of account type from a public key
     pub fn account_from_public_key(
-        key: PublicKey,
+        key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0)).into()
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Account(key.0.clone()),
+        )
+        .into()
+    }
+
+    pub fn multisig_from_merkle_root(
+        merkle_root: &[u8],
+        discrimination: AddressDiscrimination,
+    ) -> Result<Address, JsValue> {
+        match merkle_root.len() {
+            32 => {
+                let mut sized_root = [0; 32];
+                sized_root.copy_from_slice(&merkle_root);
+                Ok(chain_addr::Address(
+                    discrimination.into(),
+                    chain_addr::Kind::Multisig(sized_root),
+                )
+                .into())
+            }
+            _ => Err(JsValue::from_str("Invalid merkle root size")),
+        }
+    }
+
+    pub fn get_discrimination(&self) -> AddressDiscrimination {
+        AddressDiscrimination::from(self.0.discrimination())
+    }
+
+    pub fn get_kind(&self) -> AddressKind {
+        AddressKind::from(self.0.to_kind_type())
+    }
+
+    pub fn to_single_address(&self) -> Option<SingleAddress> {
+        match self.0.kind() {
+            chain_addr::Kind::Single(ref spending_key) => {
+                Some(SingleAddress(self.0.discrimination(), spending_key.clone()))
+            }
+            _ => None,
+        }
+    }
+
+    pub fn to_group_address(&self) -> Option<GroupAddress> {
+        match self.0.kind() {
+            chain_addr::Kind::Group(ref spending_key, ref account_key) => Some(GroupAddress(
+                self.0.discrimination(),
+                spending_key.clone(),
+                account_key.clone(),
+            )),
+            _ => None,
+        }
+    }
+
+    pub fn to_account_address(&self) -> Option<AccountAddress> {
+        match self.0.kind() {
+            chain_addr::Kind::Account(ref account_key) => {
+                Some(AccountAddress(self.0.discrimination(), account_key.clone()))
+            }
+            _ => None,
+        }
+    }
+
+    pub fn to_multisig_address(&self) -> Option<MultisigAddress> {
+        match self.0.kind() {
+            chain_addr::Kind::Multisig(ref merkle_root) => Some(MultisigAddress(
+                self.0.discrimination(),
+                merkle_root.clone(),
+            )),
+            _ => None,
+        }
     }
 }
 
@@ -257,6 +416,43 @@ impl Into<chain_addr::Discrimination> for AddressDiscrimination {
         match self {
             AddressDiscrimination::Production => chain_addr::Discrimination::Production,
             AddressDiscrimination::Test => chain_addr::Discrimination::Test,
+        }
+    }
+}
+impl From<chain_addr::Discrimination> for AddressDiscrimination {
+    fn from(discrimination: chain_addr::Discrimination) -> Self {
+        match discrimination {
+            chain_addr::Discrimination::Production => AddressDiscrimination::Production,
+            chain_addr::Discrimination::Test => AddressDiscrimination::Test,
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub enum AddressKind {
+    Single,
+    Group,
+    Account,
+    Multisig,
+}
+
+impl Into<chain_addr::KindType> for AddressKind {
+    fn into(self) -> chain_addr::KindType {
+        match self {
+            AddressKind::Single => chain_addr::KindType::Single,
+            AddressKind::Group => chain_addr::KindType::Group,
+            AddressKind::Account => chain_addr::KindType::Account,
+            AddressKind::Multisig => chain_addr::KindType::Multisig,
+        }
+    }
+}
+impl From<chain_addr::KindType> for AddressKind {
+    fn from(kind: chain_addr::KindType) -> Self {
+        match kind {
+            chain_addr::KindType::Single => AddressKind::Single,
+            chain_addr::KindType::Group => AddressKind::Group,
+            chain_addr::KindType::Account => AddressKind::Account,
+            chain_addr::KindType::Multisig => AddressKind::Multisig,
         }
     }
 }
