@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BlockLink, EpochLink, OffsetBasedTable, CursorBasedTable } from '../../Commons';
+import { BlockLink, EpochLink, OffsetBasedTable } from '../../Commons';
 import 'antd/dist/antd.css';
 
 const columns = [
@@ -38,20 +38,4 @@ const columns = [
 // Necesary because there is a problem with sort and paging with Antd table
 const sorter = (b1, b2) => Number(b2.chainLength) - Number(b1.chainLength);
 
-/**
- * This function receives a boolean indicating if the table should be a
- * CursorBasedTable. If not, it will return an OffsetBasedTable
- * @param cursorType A boolean defining if the table should be a Cursor-based
- * or an Offset-based pagination table.
- */
-const BlockTable = ({ cursorType }) => {
-  // PENDING: This is used currently because not all queries
-  // support a way to handle Offset-based pagination.
-  if (cursorType) {
-    return CursorBasedTable({ columns, sorter });
-  }
-
-  return OffsetBasedTable({ columns, sorter });
-};
-
-export default BlockTable;
+export default OffsetBasedTable({ columns, sorter });

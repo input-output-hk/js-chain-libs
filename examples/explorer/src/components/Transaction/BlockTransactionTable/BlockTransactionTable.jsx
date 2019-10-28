@@ -58,8 +58,8 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
-          after: { type: "TransactionCursor" }
-          before: { type: "TransactionCursor" }
+          after: { type: "IndexCursor" }
+          before: { type: "IndexCursor" }
         ) {
         id
         transactions(first: $first, last: $last, after: $after, before: $before) {
@@ -94,8 +94,8 @@ export default createRefetchContainer(
       $blockId: String!
       $first: Int
       $last: Int
-      $after: BlockCursor
-      $before: BlockCursor
+      $after: IndexCursor
+      $before: IndexCursor
     ) {
       block(id: $blockId) {
         ...BlockTransactionTable_block

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { inputsAmount, outputsAmount, feesAmount } from '../../../helpers/transactionHelper';
-import { Amount, TransactionLink, BlockLink, CursorBasedTable } from '../../Commons';
+import { Amount, TransactionLink, BlockLink, OffsetBasedTable } from '../../Commons';
 
 import './transactionTable.scss';
 
@@ -42,4 +42,4 @@ const columns = [
 // Necesary because there is a problem with sort and paging with Antd table
 const sorter = (b1, b2) => Number(b2.chainLength) - Number(b1.chainLength);
 
-export default CursorBasedTable({ columns, sorter });
+export default OffsetBasedTable({ columns, sorter });

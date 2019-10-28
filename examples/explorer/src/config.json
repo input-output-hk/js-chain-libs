@@ -1,5 +1,5 @@
 {
-  "explorerUrl": "http://localhost:4000",
+  "explorerUrl": "http://localhost:8443/explorer/graphql",
   "networkSettings": {
     "genesisTimestamp": 1569335341,
     "slotsPerEpoch": 5000,

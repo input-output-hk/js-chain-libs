@@ -6,18 +6,10 @@ import { createRefetchContainer } from 'react-relay';
 import BlockTable from '../BlockTable/BlockTable';
 import { getDescPageQuery, pageNumberDesc } from '../../../helpers/paginationHelper';
 
-// Getting an OffsetBasedTable
-const OffsetTable = BlockTable({});
-
 const RecentBlocksTable = ({ data, relay }) => {
   const connection = data.blocks;
   const currentPage = pageNumberDesc(connection);
 
-  /* HACK: Offset-based pagination is emulated by using the cursor as an incremental
-   * and continous value, to calculate pages this assumption not always apply, and
-   * we should not rely on that. Replace this when Backend supports this type of
-   * pagination
-   */
   const handlePageChange = page => {
     const params = getDescPageQuery(page.current, connection.totalCount);
 
@@ -39,7 +31,7 @@ const RecentBlocksTable = ({ data, relay }) => {
   return (
     <div className="entityInfoContainer">
       <h2> Recent blocks </h2>
-      <OffsetTable {...{ currentPage, connection, handlePageChange }} />
+      <BlockTable {...{ currentPage, connection, handlePageChange }} />
     </div>
   );
 };
@@ -52,8 +44,8 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int", defaultValue: 10 }
-          after: { type: "BlockCursor" }
-          before: { type: "BlockCursor" }
+          after: { type: "IndexCursor" }
+          before: { type: "IndexCursor" }
         ) {
         blocks: allBlocks(first: $first, last: $last, after: $after, before: $before) {
           edges {
@@ -87,8 +79,8 @@ export default createRefetchContainer(
     query RecentBlocksTableRefetchQuery(
       $first: Int
       $last: Int
-      $after: BlockCursor
-      $before: BlockCursor
+      $after: IndexCursor
+      $before: IndexCursor
     ) {
       ...RecentBlocksTable_data
         @arguments(first: $first, last: $last, after: $after, before: $before)

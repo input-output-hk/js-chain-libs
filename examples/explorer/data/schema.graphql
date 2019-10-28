@@ -4,7 +4,6 @@ Workaround needed due to relay issue https://github.com/facebook/relay/issues/18
 type Node {
   id: ID
 }
-
 type Address {
   """
   The base32 representation of an address
@@ -14,9 +13,9 @@ type Address {
   transactions(
     first: Int
     last: Int
-    before: TransactionCursor
-    after: TransactionCursor
-  ): TransactionConnection
+    before: IndexCursor
+    after: IndexCursor
+  ): TransactionConnection!
 }
 
 type BftLeader {
@@ -43,9 +42,9 @@ type Block {
   transactions(
     first: Int
     last: Int
-    before: TransactionCursor
-    after: TransactionCursor
-  ): TransactionConnection
+    before: IndexCursor
+    after: IndexCursor
+  ): TransactionConnection!
   previousBlock: Block!
   chainLength: ChainLength!
   leader: Leader
@@ -61,24 +60,7 @@ type BlockConnection {
   totalCount: BlockCount!
 }
 
-type TransactionConnection {
-  pageInfo: PageInfo!
-  edges: [TransactionEdge!]!
-
-  """
-  A count of the total number of objects in this connection, ignoring pagination.
-  """
-  totalCount: TransactionCount!
-}
-
 scalar BlockCount
-scalar TransactionCount
-
-"""
-Opaque cursor to use in block pagination, a client should not rely in its representation
-"""
-scalar BlockCursor
-scalar TransactionCursor
 
 """
 Block's date, composed of an Epoch and a Slot
@@ -94,16 +76,7 @@ type BlockEdge {
   """
   A cursor for use in pagination
   """
-  cursor: BlockCursor!
-}
-
-type TransactionEdge {
-  node: Transaction!
-
-  """
-  A cursor for use in pagination
-  """
-  cursor: TransactionCursor!
+  cursor: IndexCursor!
 }
 
 union Certificate = StakeDelegation | OwnerStakeDelegation | PoolRegistration
@@ -121,7 +94,7 @@ type Epoch {
   """
   Get a paginated view of all the blocks in this epoch
   """
-  blocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection
+  blocks(first: Int, last: Int, before: IndexCursor, after: IndexCursor): BlockConnection
   firstBlock: Block
   lastBlock: Block
   totalBlocks: BlockCount!
@@ -135,6 +108,8 @@ type FeeSettings {
   certificate: Value!
 }
 
+scalar IndexCursor
+
 union Leader = Pool | BftLeader
 
 type OwnerStakeDelegation {
@@ -144,13 +119,13 @@ type OwnerStakeDelegation {
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
-  startCursor: BlockCursor!
-  endCursor: BlockCursor!
+  startCursor: IndexCursor
+  endCursor: IndexCursor
 }
 
 type Pool {
   id: PoolId!
-  blocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection!
+  blocks(first: Int, last: Int, before: IndexCursor, after: IndexCursor): BlockConnection!
 }
 
 scalar PoolId
@@ -195,7 +170,7 @@ type Query {
   """
   query all the blocks in a paginated view
   """
-  allBlocks(first: Int, last: Int, before: BlockCursor, after: BlockCursor): BlockConnection!
+  allBlocks(first: Int, last: Int, before: IndexCursor, after: IndexCursor): BlockConnection!
   transaction(id: String!): Transaction!
   epoch(id: EpochNumber!): Epoch!
   address(bech32: String!): Address!
@@ -240,6 +215,27 @@ type Transaction {
   inputs: [TransactionInput!]!
   outputs: [TransactionOutput!]!
   certificate: Certificate
+}
+
+type TransactionConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionEdge!]!
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  """
+  totalCount: TransactionCount!
+}
+
+scalar TransactionCount
+
+type TransactionEdge {
+  node: Transaction!
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: IndexCursor!
 }
 
 type TransactionInput {

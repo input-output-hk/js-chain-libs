@@ -4,13 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
 import { BlockTable } from '../../Block';
-import {
-  getNextPageQueryParam,
-  getPreviousPageQueryParam
-} from '../../../helpers/paginationHelper';
-
-// Getting a CursorBased Table
-const CursorTable = BlockTable({ cursorType: true });
+import { pageNumberDesc, getDescPageQuery } from '../../../helpers/paginationHelper';
 
 const StakePoolBlockTable = ({ stakePool, relay }) => {
   if (!stakePool.blocks) {
@@ -18,36 +12,31 @@ const StakePoolBlockTable = ({ stakePool, relay }) => {
   }
 
   const connection = stakePool.blocks;
-  const handlePageChange = (vars, callback) => {
+  const currentPage = pageNumberDesc(connection);
+
+  const handlePageChange = page => {
+    const params = getDescPageQuery(page.current, connection.totalCount);
+
     relay.refetch(
       {
         poolId: stakePool.id,
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
+        first: params.first || null,
+        last: params.last || null,
+        after: params.after || null,
+        before: params.before || null
       },
       error => {
         if (error) {
           console.error(error); // eslint-disable-line no-console
         }
-        callback();
       }
     );
-  };
-
-  const onPreviousPage = () => {
-    handlePageChange(getPreviousPageQueryParam(connection));
-  };
-
-  const onNextPage = () => {
-    handlePageChange(getNextPageQueryParam(connection));
   };
 
   return (
     <>
       <h2>Blocks</h2>
-      <CursorTable {...{ connection, onNextPage, onPreviousPage }} />
+      <BlockTable {...{ currentPage, connection, handlePageChange }} />
     </>
   );
 };
@@ -60,8 +49,8 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
-          after: { type: "BlockCursor" }
-          before: { type: "BlockCursor" }
+          after: { type: "IndexCursor" }
+          before: { type: "IndexCursor" }
         ) {
         id
         blocks(first: $first, last: $last, after: $after, before: $before) {
@@ -97,8 +86,8 @@ export default createRefetchContainer(
       $poolId: PoolId!
       $first: Int
       $last: Int
-      $after: BlockCursor
-      $before: BlockCursor
+      $after: IndexCursor
+      $before: IndexCursor
     ) {
       stakePool(id: $poolId) {
         ...StakePoolBlockTable_stakePool

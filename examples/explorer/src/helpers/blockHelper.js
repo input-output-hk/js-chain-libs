@@ -10,8 +10,8 @@ export const isBlockNumber = searchValue => {
 // This function will only return the chainLengths
 // not the full block objects
 export const getNextPrev = async block => {
-  const prev = havePrevious(block) && Number(block.chainLength) - 1;
-  const next = (await haveNext(block)) && Number(block.chainLength) + 1;
+  const prev = havePrevious(block) ? Number(block.chainLength) - 1 : null;
+  const next = (await haveNext(block)) ? Number(block.chainLength) + 1 : null;
 
   return { prev, next };
 };

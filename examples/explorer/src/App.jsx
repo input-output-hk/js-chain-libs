@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router } from '@reach/router';
 import { MainSection, MainNavbar, SearchBar } from './components/General';
-import { EmptyResult } from './components/Commons';
+import { NotFound } from './components/Commons';
 
 import {
   RecentBlocks,
@@ -23,7 +23,7 @@ const App = () => (
       <SearchBar />
       <MainSection>
         <Router id="router">
-          <EmptyResult default />
+          <NotFound default />
           <EpochSearchResult path="epoch/:id" />
           <StakePoolSearchResult path="pool/:id" />
           <AddressSearchResult path="address/:bech32" />

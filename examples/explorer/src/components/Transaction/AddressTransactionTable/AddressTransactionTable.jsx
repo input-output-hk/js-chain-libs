@@ -4,10 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
 import TransactionTable from '../TransactionTable/TransactionTable';
-import {
-  getNextPageQueryParam,
-  getPreviousPageQueryParam
-} from '../../../helpers/paginationHelper';
+import { pageNumberDesc, getDescPageQuery } from '../../../helpers/paginationHelper';
 
 const AddressTransactionTable = ({ address, relay }) => {
   if (!address.transactions) {
@@ -15,37 +12,31 @@ const AddressTransactionTable = ({ address, relay }) => {
   }
 
   const connection = address.transactions;
+  const currentPage = pageNumberDesc(connection);
 
-  const handlePageChange = (vars, callback) => {
+  const handlePageChange = page => {
+    const params = getDescPageQuery(page.current, connection.totalCount);
+
     relay.refetch(
       {
         address: address.id,
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
+        first: params.first || null,
+        last: params.last || null,
+        after: params.after || null,
+        before: params.before || null
       },
       error => {
         if (error) {
           console.error(error); // eslint-disable-line no-console
         }
-        callback();
       }
     );
-  };
-
-  const onPreviousPage = () => {
-    handlePageChange(getPreviousPageQueryParam(connection));
-  };
-
-  const onNextPage = () => {
-    handlePageChange(getNextPageQueryParam(connection));
   };
 
   return (
     <>
       <h2>Transactions</h2>
-      <TransactionTable {...{ connection, onNextPage, onPreviousPage }} />
+      <TransactionTable {...{ currentPage, connection, handlePageChange }} />
     </>
   );
 };
@@ -58,8 +49,8 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
-          after: { type: "TransactionCursor" }
-          before: { type: "TransactionCursor" }
+          after: { type: "IndexCursor" }
+          before: { type: "IndexCursor" }
         ) {
         id
         transactions(first: $first, last: $last, after: $after, before: $before) {
@@ -94,8 +85,8 @@ export default createRefetchContainer(
       $address: String!
       $first: Int
       $last: Int
-      $after: BlockCursor
-      $before: BlockCursor
+      $after: IndexCursor
+      $before: IndexCursor
     ) {
       address(bech32: $address) {
         ...AddressTransactionTable_address

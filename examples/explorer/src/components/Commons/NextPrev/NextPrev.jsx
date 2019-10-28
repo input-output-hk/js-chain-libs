@@ -1,33 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { navigate } from '@reach/router';
 import Button from 'react-bootstrap/Button';
 
 import './nextPrev.scss';
 
-const NextPrev = ({ baseUrl, element, getNextPrev }) => {
-  const [{ next, prev }, setNextPrev] = useState({});
+class NextPrev extends React.Component {
+  constructor() {
+    super();
+    this.state = { next: undefined, prev: undefined };
+  }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await getNextPrev(element);
-      setNextPrev(result);
-    };
-    fetchData();
-  });
+  async componentDidMount() {
+    const { getNextPrev, element } = this.props;
+    const { next, prev } = await getNextPrev(element);
+    this.setState({ next, prev });
+  }
 
-  const previousUrl = baseUrl + prev;
-  const nextUrl = baseUrl + next;
+  render() {
+    const { next, prev } = this.state;
+    const { baseUrl } = this.props;
 
-  return (
-    <div className="nextPrevContainer">
-      <Button variant="outline-primary" disabled={!prev} onClick={() => navigate(previousUrl)}>
-        Previous
-      </Button>
-      <Button variant="outline-primary" disabled={!next} onClick={() => navigate(nextUrl)}>
-        Next
-      </Button>
-    </div>
-  );
-};
+    const previousUrl = baseUrl + prev;
+    const nextUrl = baseUrl + next;
+    const isFirst = prev === null;
+
+    return (
+      <div className="nextPrevContainer">
+        <Button variant="outline-primary" disabled={isFirst} onClick={() => navigate(previousUrl)}>
+          Previous
+        </Button>
+        <Button variant="outline-primary" disabled={!next} onClick={() => navigate(nextUrl)}>
+          Next
+        </Button>
+      </div>
+    );
+  }
+}
 
 export default NextPrev;
