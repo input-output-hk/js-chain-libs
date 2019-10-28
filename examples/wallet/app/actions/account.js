@@ -3,17 +3,14 @@ import type {
   AppState,
   Thunk,
   AccountKeys,
-  BalanceAndCounter
+  AccountState
 } from '../reducers/types';
 import type { Amount, Address } from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction
 } from '../utils/wasmWrapper';
-import {
-  getBalanceAndCounter,
-  broadcastTransaction
-} from '../utils/nodeConnection';
+import { getAccountState, broadcastTransaction } from '../utils/nodeConnection';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
@@ -27,23 +24,24 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
           ...keys
         })
       )
-      .then(() => dispatch(updateBalanceAndCounter()));
+      .then(() => dispatch(updateAccountState()));
   };
 }
 
-export type SetBalanceAndCounterAction = {
-  type: 'SET_BALANCE_AND_COUNTER'
-} & BalanceAndCounter;
-export const SET_BALANCE_AND_COUNTER = 'SET_BALANCE_AND_COUNTER';
+export type SetAccountStateAction = {
+  type: 'SET_ACCOUNT_STATE'
+} & AccountState;
+export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateBalanceAndCounter(): Thunk<SetBalanceAndCounterAction> {
-  return function updateBalanceThunk(dispatch, getState) {
-    return getBalanceAndCounter(getState().account.identifier).then(
-      ({ balance, counter }: BalanceAndCounter) =>
+export function updateAccountState(): Thunk<SetAccountState> {
+  return function updateAccountStateThunk(dispatch, getState) {
+    return getAccountState(getState().account.identifier).then(
+      ({ balance, counter, delegation }: AccountState) =>
         dispatch({
-          type: SET_BALANCE_AND_COUNTER,
+          type: SET_ACCOUNT_STATE,
           balance,
-          counter
+          counter,
+          delegation
         })
     );
   };

@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
-import typeof { updateBalanceAndCounter as UpdateBalanceAndCounter } from '../actions/account';
+import typeof { updateAccountState as UpdateAccountState } from '../actions/account';
 
 type Props = {
-  updateBalanceAndCounter: UpdateBalanceAndCounter
+  updateAccountState: UpdateAccountState
 };
 
-export default ({ updateBalanceAndCounter }: Props) => {
+export default ({ updateAccountState }: Props) => {
   return (
-    <button type="button" onClick={updateBalanceAndCounter}>
+    <button type="button" onClick={updateAccountState}>
       Refresh balance{' '}
     </button>
   );

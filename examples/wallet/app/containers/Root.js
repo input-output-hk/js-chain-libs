@@ -6,7 +6,7 @@ import { hot } from 'react-hot-loader/root';
 import config from 'config';
 import type { Store } from '../reducers/types';
 import Routes from '../Routes';
-import { updateBalanceAndCounter } from '../actions/account';
+import { updateAccountState } from '../actions/account';
 
 type Props = {
   store: Store,
@@ -20,7 +20,7 @@ const Root = ({ store, history }: Props) => {
   // connections, but in the near future we should subscribe to the gRPC gossip and
   // no longer require polling.
   setInterval(
-    () => store.dispatch(updateBalanceAndCounter()),
+    () => store.dispatch(updateAccountState()),
     config.get('pollingInterval')
   );
   return (

@@ -5,6 +5,7 @@ import type {
   Balance,
   Counter,
   PrivateKey,
+  Delegation,
   Identifier
 } from '../models';
 
@@ -18,11 +19,11 @@ export type Dispatch = ReduxDispatch<Action> & Thunk<Action>;
 export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
 
 export type AppState = {
-  account: AccountState,
+  account: Account,
   nodeSettings: NodeSettings
 };
 
-export type AccountState = AccountKeys & BalanceAndCounter;
+export type Account = AccountKeys & AccountState;
 
 export type AccountKeys = {
   address: Address,
@@ -30,9 +31,10 @@ export type AccountKeys = {
   identifier: Identifier
 };
 
-export type BalanceAndCounter = {
+export type AccountState = {
   balance: Balance,
-  counter: Counter
+  counter: Counter,
+  delegation: Delegation
 };
 
 export type NodeSettings = {

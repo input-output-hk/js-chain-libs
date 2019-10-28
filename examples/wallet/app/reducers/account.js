@@ -1,19 +1,20 @@
 // @flow
 import {
   SET_KEYS,
-  SET_BALANCE_AND_COUNTER,
+  SET_ACCOUNT_STATE,
   SEND_TRANSACTION
 } from '../actions/account';
 import type {
   SetKeysAction,
-  SetBalanceAndCounterAction
+  SendTransactionAction,
+  SetAccountStateAction
 } from '../actions/account';
-import type { AccountState } from './types';
+import type { Account } from './types';
 
 export default function account(
-  state: AccountState,
-  action: SetKeysAction | SetBalanceAndCounterAction
-): AccountState {
+  state: Account,
+  action: SetKeysAction | SetAccountStateAction | SendTransactionAction
+): Account {
   if (typeof state === 'undefined') {
     return {};
   }
@@ -24,10 +25,11 @@ export default function account(
         privateKey: action.privateKey,
         identifier: action.identifier
       });
-    case SET_BALANCE_AND_COUNTER:
+    case SET_ACCOUNT_STATE:
       return Object.assign({}, state, {
         balance: action.balance,
-        counter: action.counter
+        counter: action.counter,
+        delegation: action.delegation
       });
     case SEND_TRANSACTION:
       return Object.assign({}, state, {
