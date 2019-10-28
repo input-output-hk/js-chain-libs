@@ -3,7 +3,7 @@ import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
-import { StakePoolLink } from '../../Commons';
+import { StakePoolLink, DateTime } from '../../Commons';
 
 const PoolRegistration = ({ certificate }) => (
   <div className="keyValueTable">
@@ -25,7 +25,9 @@ const PoolRegistration = ({ certificate }) => (
         </tr>
         <tr>
           <td>Start validity:</td>
-          <td>{certificate.startValidity}</td>
+          <td>
+            <DateTime timestamp={certificate.startValidity} relative />
+          </td>
         </tr>
         <tr>
           <td>Management threshold:</td>
@@ -36,21 +38,17 @@ const PoolRegistration = ({ certificate }) => (
   </div>
 );
 
-export default createFragmentContainer(
-  PoolRegistration,
-
-  {
-    certificate: graphql`
-      fragment PoolRegistration_certificate on PoolRegistration {
-        __typename
-        pool {
-          id
-        }
-        serial
-        startValidity
-        managementThreshold
-        owners
+export default createFragmentContainer(PoolRegistration, {
+  certificate: graphql`
+    fragment PoolRegistration_certificate on PoolRegistration {
+      __typename
+      pool {
+        id
       }
-    `
-  }
-);
+      serial
+      startValidity
+      managementThreshold
+      owners
+    }
+  `
+});

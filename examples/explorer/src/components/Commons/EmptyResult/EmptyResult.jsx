@@ -3,11 +3,9 @@ import React from 'react';
 import './emptyResult.scss';
 
 // TODO: improve this component
-const EmptyResult = ({ entityName, id }) => (
+const EmptyResult = ({ entityName }) => (
   <div className="emptyResult">
-    <h4>
-      We couldn&apos;t find the {entityName} {id} you are looking for :(
-    </h4>
+    <h4>We couldn&apos;t find the {entityName} you are looking for :(</h4>
   </div>
 );
 

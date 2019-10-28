@@ -33,3 +33,14 @@ export const timestampFromBlockDate = blockDate => {
  * @param epoch Object that contains only an id
  */
 export const timestampFromEpoch = epoch => timestampFromBlockDate({ epoch, slot: 0 });
+
+/**
+ * This functions receives a timestamp relative to genesis block
+ * and returns an absolute timestamp
+ * @param relative Timestamp relative to genesis Block
+ */
+export const relativeToAbsolute = relative => {
+  const offset = Number.parseInt(relative, 10);
+
+  return genesisTimestamp + offset;
+};
