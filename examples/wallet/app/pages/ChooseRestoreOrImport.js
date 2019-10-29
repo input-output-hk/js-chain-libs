@@ -3,7 +3,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styles from './ChooseRestoreOrImport.scss';
 import routes from '../constants/routes.json';
-import BigSquareButton from './BigSquareButton';
+import BigSquareButton from '../components/BigSquareButton';
 import restoreIcon from '../assets/images/restore-ic.inline.svg';
 import importIcon from '../assets/images/import-ic.inline.svg';
 

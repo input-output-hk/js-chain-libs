@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import Index from '../components/Index';
+import Index from '../pages/Index';
 
 function mapStateToProps(state) {
   return state.account;
