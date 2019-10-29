@@ -5,10 +5,11 @@ import type {
   AccountKeys,
   AccountState
 } from '../reducers/types';
-import type { Amount, Address } from '../models';
+import type { Amount, Address, PoolId } from '../models';
 import {
   getAccountFromPrivateKey,
-  buildTransaction
+  buildTransaction,
+  buildDelegateTransaction
 } from '../utils/wasmWrapper';
 import { getAccountState, broadcastTransaction } from '../utils/nodeConnection';
 
@@ -51,6 +52,7 @@ export type SendTransactionAction = {
   type: 'SEND_TRANSACTION',
   newCounter: number
 };
+
 export const SEND_TRANSACTION = 'SEND_TRANSACTION';
 
 export function sendTransaction(
@@ -76,6 +78,40 @@ export function sendTransaction(
       .then(() =>
         dispatch({
           type: SEND_TRANSACTION,
+          newCounter: state.account.counter + 1
+        })
+      );
+  };
+}
+
+export type SendStakeDelegation = {
+  type: 'SEND_STAKE_DELEGATION',
+  newCounter: number
+};
+
+export const SEND_STAKE_DELEGATION = 'SEND_STAKE_DELEGATION';
+
+export function sendStakeDelegation(
+  poolId: PoolId
+): Thunk<SendStakeDelegation> {
+  // Assume balance and counter are up to date
+  return function sendStakeDelegationThunk(dispatch, getState) {
+    const state: AppState = getState();
+    return buildDelegateTransaction(
+      poolId,
+      state.account.privateKey,
+      state.account.counter,
+      state.nodeSettings
+    )
+      .then(({ id, transaction }) => {
+        // TODO: dispatch an action which adds the transaction to the
+        // transaction list
+        console.log(id);
+        return broadcastTransaction(transaction);
+      })
+      .then(() =>
+        dispatch({
+          type: SEND_STAKE_DELEGATION,
           newCounter: state.account.counter + 1
         })
       );

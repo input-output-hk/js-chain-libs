@@ -6,7 +6,8 @@ import type {
   Counter,
   PrivateKey,
   Delegation,
-  Identifier
+  Identifier,
+  PoolId
 } from '../models';
 
 export type Action = {
@@ -44,4 +45,7 @@ export type NodeSettings = {
     coefficient: number,
     constant: number
   }
+};
+export type StakePools = {
+  availablePools: Array<PoolId>
 };

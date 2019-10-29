@@ -2,18 +2,25 @@
 import {
   SET_KEYS,
   SET_ACCOUNT_STATE,
-  SEND_TRANSACTION
+  SEND_TRANSACTION,
+  SEND_STAKE_DELEGATION
 } from '../actions/account';
 import type {
   SetKeysAction,
   SendTransactionAction,
-  SetAccountStateAction
+  SetAccountStateAction,
+  SendStakeDelegation
 } from '../actions/account';
 import type { Account } from './types';
 
 export default function account(
   state: Account,
-  action: SetKeysAction | SetAccountStateAction | SendTransactionAction
+  // eslint-disable-next-line flowtype/space-after-type-colon
+  action:
+    | SetKeysAction
+    | SetAccountStateAction
+    | SendTransactionAction
+    | SendStakeDelegation
 ): Account {
   if (typeof state === 'undefined') {
     return {};
@@ -32,6 +39,10 @@ export default function account(
         delegation: action.delegation
       });
     case SEND_TRANSACTION:
+      return Object.assign({}, state, {
+        counter: action.newCounter
+      });
+    case SEND_STAKE_DELEGATION:
       return Object.assign({}, state, {
         counter: action.newCounter
       });
