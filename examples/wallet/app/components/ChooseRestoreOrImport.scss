@@ -1,0 +1,15 @@
+.component {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  overflow-y: overlay;
+  padding: 20px 0;
+}
+
+.buttonRow {
+  margin: auto;
+  max-width: 640px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}

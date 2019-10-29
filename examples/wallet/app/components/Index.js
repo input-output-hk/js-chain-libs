@@ -6,7 +6,7 @@ import routes from '../constants/routes.json';
 
 export default (account: Account) => {
   if (!account.address) {
-    return <Redirect push to={routes.INPUT_KEYS} />;
+    return <Redirect push to={routes.CHOOSE_RESTORE_OR_IMPORT} />;
   }
   return <Redirect push to={routes.HOME} />;
 };
