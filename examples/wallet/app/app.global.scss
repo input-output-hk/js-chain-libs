@@ -14,6 +14,11 @@ body {
   height: 100%;
   width: 100%;
 }
+:root {
+  // from the current bootstrap theme, it doesn't seem to have a variable defined
+  --text-color: #d3d3d3;
+  --sidebar-background: #222426;
+}
 
 // ====== GLOBAL SCROLLBAR STYLE ======
 
