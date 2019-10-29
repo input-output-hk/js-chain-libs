@@ -307,6 +307,13 @@ impl EitherTransaction {
         }
         .to_vec()
     }
+
+    fn clone(&self) -> EitherTransaction {
+        match &self {
+            EitherTransaction::NoCertificate(tx) => EitherTransaction::NoCertificate(tx.clone()),
+            EitherTransaction::Certificate(tx) => EitherTransaction::Certificate(tx.clone()),
+        }
+    }
 }
 
 impl From<tx::Transaction<chain_addr::Address, tx::NoExtra>> for Transaction {
@@ -374,6 +381,10 @@ impl Transaction {
             .map(|output| Output(output.clone()))
             .collect::<Vec<Output>>()
             .into()
+    }
+
+    pub fn clone(&self) -> Transaction {
+        Transaction(self.0.clone())
     }
 }
 
