@@ -32,7 +32,7 @@ export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
   const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
 
   return (
-    <Tabs defaultActiveKey="keyString" className="justify-content-center">
+    <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
       <Tab eventKey="keyString" title="Use key string">
         <Container>
           <Form onSubmit={handleSubmit}>
