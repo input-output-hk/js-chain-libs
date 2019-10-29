@@ -1440,7 +1440,7 @@ impl Fee {
     pub fn calculate(&self, tx: &Transaction) -> Option<Value> {
         use EitherTransaction::Certificate;
         use EitherTransaction::NoCertificate;
-        match (&self.0, tx.0.clone()) {
+        match (&self.0, &tx.0) {
             (FeeVariant::Linear(algorithm), Certificate(ref tx)) => algorithm.calculate(tx),
             (FeeVariant::Linear(algorithm), NoCertificate(ref tx)) => algorithm.calculate(tx),
         }
@@ -1581,7 +1581,7 @@ impl Fragment {
     }
 
     /// Get a Transaction if the Fragment represents one
-    pub fn get_transaction(self) -> Result<AuthenticatedTransaction, JsValue> {
+    pub fn get_transaction(&self) -> Result<AuthenticatedTransaction, JsValue> {
         match self.0.clone() {
             chain::fragment::Fragment::Transaction(auth) => {
                 Ok(AuthenticatedTransactionType::NoCertificate(auth))
