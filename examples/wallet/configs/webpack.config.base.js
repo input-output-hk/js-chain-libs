@@ -20,6 +20,26 @@ export default {
             cacheDirectory: true
           }
         }
+      },
+      {
+        test: /\.inline\.svg$/,
+        use: 'svg-inline-loader'
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf|png|jpe?g|gif|svg)(\?.*)?$/,
+        exclude: /\.inline\.svg$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: 'assets/'
+          }
+        }
+      },
+      // Common Image Formats
+      {
+        test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
+        use: 'url-loader'
       }
     ]
   },
