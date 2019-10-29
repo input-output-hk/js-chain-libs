@@ -202,7 +202,11 @@ impl Address {
         key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0.clone())).into()
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Single(key.0.clone()),
+        )
+        .into()
     }
 
     /// Construct a non-account address from a pair of public keys, delegating founds from the first to the second
@@ -223,7 +227,11 @@ impl Address {
         key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0.clone())).into()
+        chain_addr::Address(
+            discrimination.into(),
+            chain_addr::Kind::Account(key.0.clone()),
+        )
+        .into()
     }
 }
 
@@ -1042,7 +1050,9 @@ impl Account {
     }
 
     pub fn from_public_key(key: &PublicKey) -> Account {
-        Account(tx::AccountIdentifier::from_single_account(key.0.clone().into()))
+        Account(tx::AccountIdentifier::from_single_account(
+            key.0.clone().into(),
+        ))
     }
 
     pub fn to_identifier(&self) -> AccountIdentifier {
