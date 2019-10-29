@@ -3,8 +3,8 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import App from './containers/App';
-import Home from './components/Home';
-import ChooseRestoreOrImport from './components/ChooseRestoreOrImport';
+import Home from './pages/Home';
+import ChooseRestoreOrImport from './pages/ChooseRestoreOrImport';
 import Index from './containers/Index';
 import InputKeys from './containers/InputKeys';
 
