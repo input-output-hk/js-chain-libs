@@ -143,8 +143,8 @@ impl PublicKeys {
         self.0[index].clone()
     }
 
-    pub fn add(&mut self, key: PublicKey) {
-        self.0.push(key);
+    pub fn add(&mut self, key: &PublicKey) {
+        self.0.push(key.clone());
     }
 }
 
@@ -199,31 +199,31 @@ impl Address {
     /// let address = Address.single_from_public_key(public_key, AddressDiscrimination.Test);
     /// ```
     pub fn single_from_public_key(
-        key: PublicKey,
+        key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0)).into()
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Single(key.0.clone())).into()
     }
 
     /// Construct a non-account address from a pair of public keys, delegating founds from the first to the second
     pub fn delegation_from_public_key(
-        key: PublicKey,
-        delegation: PublicKey,
+        key: &PublicKey,
+        delegation: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
         chain_addr::Address(
             discrimination.into(),
-            chain_addr::Kind::Group(key.0, delegation.0),
+            chain_addr::Kind::Group(key.0.clone(), delegation.0.clone()),
         )
         .into()
     }
 
     /// Construct address of account type from a public key
     pub fn account_from_public_key(
-        key: PublicKey,
+        key: &PublicKey,
         discrimination: AddressDiscrimination,
     ) -> Address {
-        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0)).into()
+        chain_addr::Address(discrimination.into(), chain_addr::Kind::Account(key.0.clone())).into()
     }
 }
 
@@ -264,6 +264,7 @@ impl Into<chain_addr::Discrimination> for AddressDiscrimination {
 #[wasm_bindgen]
 pub struct Transaction(EitherTransaction);
 
+#[derive(Clone)]
 enum EitherTransaction {
     NoCertificate(tx::Transaction<chain_addr::Address, tx::NoExtra>),
     Certificate(tx::Transaction<chain_addr::Address, certificate::Certificate>),
@@ -306,13 +307,6 @@ impl EitherTransaction {
             EitherTransaction::Certificate(ref tx) => tx.outputs.clone(),
         }
         .to_vec()
-    }
-
-    fn clone(&self) -> EitherTransaction {
-        match &self {
-            EitherTransaction::NoCertificate(tx) => EitherTransaction::NoCertificate(tx.clone()),
-            EitherTransaction::Certificate(tx) => EitherTransaction::Certificate(tx.clone()),
-        }
     }
 }
 
@@ -461,13 +455,13 @@ impl TransactionBuilder {
     }
 
     /// Create a TransactionBuilder for a transaction with certificate
-    pub fn new_payload(cert: Certificate) -> Self {
-        txbuilder::TransactionBuilder::new_payload(cert.0).into()
+    pub fn new_payload(cert: &Certificate) -> Self {
+        txbuilder::TransactionBuilder::new_payload(cert.0.clone()).into()
     }
 
     /// Add input to the transaction
     #[wasm_bindgen]
-    pub fn add_input(&mut self, input: Input) {
+    pub fn add_input(&mut self, input: &Input) {
         match &mut self.0 {
             EitherTransactionBuilder::TransactionBuilderNoExtra(ref mut builder) => {
                 builder.add_input(&input.0)
@@ -480,13 +474,13 @@ impl TransactionBuilder {
 
     /// Add output to the transaction
     #[wasm_bindgen]
-    pub fn add_output(&mut self, address: Address, value: Value) {
+    pub fn add_output(&mut self, address: &Address, value: &Value) {
         match &mut self.0 {
             EitherTransactionBuilder::TransactionBuilderNoExtra(ref mut builder) => {
-                builder.add_output(address.0, value.0)
+                builder.add_output(address.0.clone(), value.0)
             }
             EitherTransactionBuilder::TransactionBuilderCertificate(ref mut builder) => {
-                builder.add_output(address.0, value.0)
+                builder.add_output(address.0.clone(), value.0)
             }
         }
     }
@@ -569,7 +563,7 @@ impl TransactionBuilder {
     pub fn seal_with_output_policy(
         self,
         fee: &Fee,
-        output_policy: OutputPolicy,
+        output_policy: &OutputPolicy,
     ) -> Result<Transaction, JsValue> {
         let fee_algorithm = match fee.0 {
             FeeVariant::Linear(fee_algorithm) => fee_algorithm,
@@ -577,18 +571,18 @@ impl TransactionBuilder {
 
         match self.0 {
             EitherTransactionBuilder::TransactionBuilderNoExtra(builder) => builder
-                .seal_with_output_policy(fee_algorithm, output_policy.0)
+                .seal_with_output_policy(fee_algorithm, output_policy.0.clone())
                 .map(|(_, tx)| tx.into()),
             EitherTransactionBuilder::TransactionBuilderCertificate(builder) => builder
-                .seal_with_output_policy(fee_algorithm, output_policy.0)
+                .seal_with_output_policy(fee_algorithm, output_policy.0.clone())
                 .map(|(_, tx)| tx.into()),
         }
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
     /// Deprecated: use `seal_with_output_policy` instead
-    pub fn finalize(self, fee: &Fee, output_policy: OutputPolicy) -> Result<Transaction, JsValue> {
-        self.seal_with_output_policy(fee, output_policy)
+    pub fn finalize(self, fee: &Fee, output_policy: &OutputPolicy) -> Result<Transaction, JsValue> {
+        self.seal_with_output_policy(fee, output_policy.clone())
     }
 
     /*     /// Get the current Transaction id, this will change when adding input, outputs and certificates
@@ -625,8 +619,8 @@ impl OutputPolicy {
     }
 
     /// use the given address as the only change address
-    pub fn one(address: Address) -> OutputPolicy {
-        txbuilder::OutputPolicy::One(address.0).into()
+    pub fn one(address: &Address) -> OutputPolicy {
+        txbuilder::OutputPolicy::One(address.0.clone()).into()
     }
 }
 
@@ -660,8 +654,8 @@ impl From<txbuilder::TransactionFinalizer> for TransactionFinalizer {
 #[wasm_bindgen]
 impl TransactionFinalizer {
     #[wasm_bindgen(constructor)]
-    pub fn new(transaction: Transaction) -> Self {
-        match transaction.0 {
+    pub fn new(transaction: &Transaction) -> Self {
+        match transaction.0.clone() {
             EitherTransaction::Certificate(tx) => {
                 txbuilder::TransactionFinalizer::new(tx::Transaction {
                     inputs: tx.inputs,
@@ -682,9 +676,9 @@ impl TransactionFinalizer {
     }
 
     /// Set the witness for the corresponding index, the index corresponds to the order in which the inputs were added to the transaction
-    pub fn set_witness(&mut self, index: usize, witness: Witness) -> Result<(), JsValue> {
+    pub fn set_witness(&mut self, index: usize, witness: &Witness) -> Result<(), JsValue> {
         self.0
-            .set_witness(index, witness.0)
+            .set_witness(index, witness.0.clone())
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
     }
 
@@ -726,6 +720,7 @@ pub struct AuthenticatedTransaction(AuthenticatedTransactionType);
 // This allows to circumvent the lack of generics when exposing the type to js
 // I find this simpler as it requires only one level of pattern matching and but it
 // also leads to more boilerplate
+#[derive(Clone)]
 enum AuthenticatedTransactionType {
     NoCertificate(tx::AuthenticatedTransaction<chain_addr::Address, tx::NoExtra>),
     PoolRegistration(
@@ -942,7 +937,7 @@ impl Input {
         Input(tx::Input::from_utxo(utxo_pointer.0))
     }
 
-    pub fn from_account(account: &Account, v: Value) -> Self {
+    pub fn from_account(account: &Account, v: &Value) -> Self {
         Input(tx::Input::from_account(account.0.clone(), v.0))
     }
 
@@ -1006,9 +1001,9 @@ impl From<tx::UtxoPointer> for UtxoPointer {
 
 #[wasm_bindgen]
 impl UtxoPointer {
-    pub fn new(fragment_id: FragmentId, output_index: u8, value: Value) -> UtxoPointer {
+    pub fn new(fragment_id: &FragmentId, output_index: u8, value: &Value) -> UtxoPointer {
         UtxoPointer(tx::UtxoPointer {
-            transaction_id: fragment_id.0,
+            transaction_id: fragment_id.0.clone(),
             output_index,
             value: value.0,
         })
@@ -1046,8 +1041,8 @@ impl Account {
         chain_addr::Address(discriminant.into(), kind).into()
     }
 
-    pub fn from_public_key(key: PublicKey) -> Account {
-        Account(tx::AccountIdentifier::from_single_account(key.0.into()))
+    pub fn from_public_key(key: &PublicKey) -> Account {
+        Account(tx::AccountIdentifier::from_single_account(key.0.clone().into()))
     }
 
     pub fn to_identifier(&self) -> AccountIdentifier {
@@ -1221,10 +1216,10 @@ impl From<chain::certificate::StakeDelegation> for StakeDelegation {
 #[wasm_bindgen]
 impl StakeDelegation {
     /// Create a stake delegation object from account (stake key) to pool_id
-    pub fn new(pool_id: PoolId, account: PublicKey) -> StakeDelegation {
+    pub fn new(pool_id: &PoolId, account: &PublicKey) -> StakeDelegation {
         certificate::StakeDelegation {
-            account_id: tx::AccountIdentifier::from_single_account(account.0.into()),
-            pool_id: pool_id.0,
+            account_id: tx::AccountIdentifier::from_single_account(account.0.clone().into()),
+            pool_id: pool_id.0.clone(),
         }
         .into()
     }
@@ -1233,18 +1228,18 @@ impl StakeDelegation {
 #[wasm_bindgen]
 impl Certificate {
     /// Create a Certificate for StakeDelegation
-    pub fn stake_delegation(stake_delegation: StakeDelegation) -> Certificate {
-        certificate::Certificate::StakeDelegation(stake_delegation.0).into()
+    pub fn stake_delegation(stake_delegation: &StakeDelegation) -> Certificate {
+        certificate::Certificate::StakeDelegation(stake_delegation.0.clone()).into()
     }
 
     /// Create a Certificate for PoolRegistration
-    pub fn stake_pool_registration(pool_registration: PoolRegistration) -> Certificate {
-        certificate::Certificate::PoolRegistration(pool_registration.0).into()
+    pub fn stake_pool_registration(pool_registration: &PoolRegistration) -> Certificate {
+        certificate::Certificate::PoolRegistration(pool_registration.0.clone()).into()
     }
 
     // Prevent the warning on private_key, as I don't want an underscore in the js signature
     #[allow(unused_variables)]
-    pub fn sign(&mut self, private_key: PrivateKey) {
+    pub fn sign(&mut self, private_key: &PrivateKey) {
         // FIXME: NOP
         // This is what the JCLI does, so I'll keep it just in case
         ()
@@ -1255,23 +1250,23 @@ impl Certificate {
 impl PoolRegistration {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        serial: U128,
-        owners: PublicKeys,
+        serial: &U128,
+        owners: &PublicKeys,
         management_threshold: u16,
-        start_validity: TimeOffsetSeconds,
-        kes_public_key: KesPublicKey,
-        vrf_public_key: VrfPublicKey,
+        start_validity: &TimeOffsetSeconds,
+        kes_public_key: &KesPublicKey,
+        vrf_public_key: &VrfPublicKey,
     ) -> PoolRegistration {
         chain::certificate::PoolRegistration {
-            serial: serial.0,
-            owners: owners.0.into_iter().map(|key| key.0).collect(),
+            serial: serial.0.clone(),
+            owners: owners.0.clone().into_iter().map(|key| key.0).collect(),
             management_threshold,
-            start_validity: start_validity.0,
+            start_validity: start_validity.0.clone(),
             // TODO: Hardcoded parameter
             rewards: chain::rewards::TaxType::zero(),
             keys: chain::leadership::genesis::GenesisPraosLeader {
-                kes_public_key: kes_public_key.0,
-                vrf_public_key: vrf_public_key.0,
+                kes_public_key: kes_public_key.0.clone(),
+                vrf_public_key: vrf_public_key.0.clone(),
             },
         }
         .into()
@@ -1423,7 +1418,7 @@ use fee::FeeAlgorithm;
 #[wasm_bindgen]
 impl Fee {
     /// Linear algorithm, this is formed by: `coefficient * (#inputs + #outputs) + constant + certificate * #certificate
-    pub fn linear_fee(constant: Value, coefficient: Value, certificate: Value) -> Fee {
+    pub fn linear_fee(constant: &Value, coefficient: &Value, certificate: &Value) -> Fee {
         Fee(FeeVariant::Linear(fee::LinearFee::new(
             *constant.0.as_ref(),
             *coefficient.0.as_ref(),
@@ -1432,10 +1427,10 @@ impl Fee {
     }
 
     /// Compute the fee if possible (it can fail in case the values are out of range)
-    pub fn calculate(&self, tx: Transaction) -> Option<Value> {
+    pub fn calculate(&self, tx: &Transaction) -> Option<Value> {
         use EitherTransaction::Certificate;
         use EitherTransaction::NoCertificate;
-        match (&self.0, tx.0) {
+        match (&self.0, tx.0.clone()) {
             (FeeVariant::Linear(algorithm), Certificate(ref tx)) => algorithm.calculate(tx),
             (FeeVariant::Linear(algorithm), NoCertificate(ref tx)) => algorithm.calculate(tx),
         }
@@ -1467,9 +1462,9 @@ impl From<tx::Witness> for Witness {
 impl Witness {
     /// Generate Witness for an utxo-based transaction Input
     pub fn for_utxo(
-        genesis_hash: Hash,
-        transaction_id: TransactionSignDataHash,
-        secret_key: PrivateKey,
+        genesis_hash: &Hash,
+        transaction_id: &TransactionSignDataHash,
+        secret_key: &PrivateKey,
     ) -> Witness {
         Witness(tx::Witness::new_utxo(
             &genesis_hash.0,
@@ -1481,10 +1476,10 @@ impl Witness {
     /// Generate Witness for an account based transaction Input
     /// the account-spending-counter should be incremented on each transaction from this account
     pub fn for_account(
-        genesis_hash: Hash,
-        transaction_id: TransactionSignDataHash,
-        secret_key: PrivateKey,
-        account_spending_counter: SpendingCounter,
+        genesis_hash: &Hash,
+        transaction_id: &TransactionSignDataHash,
+        secret_key: &PrivateKey,
+        account_spending_counter: &SpendingCounter,
     ) -> Witness {
         Witness(tx::Witness::new_account(
             &genesis_hash.0,
@@ -1548,9 +1543,9 @@ impl From<chain::fragment::Fragment> for Fragment {
 
 #[wasm_bindgen]
 impl Fragment {
-    pub fn from_authenticated_transaction(tx: AuthenticatedTransaction) -> Fragment {
+    pub fn from_authenticated_transaction(tx: &AuthenticatedTransaction) -> Fragment {
         use chain::fragment;
-        match tx.0 {
+        match tx.0.clone() {
             AuthenticatedTransactionType::NoCertificate(auth_tx) => {
                 fragment::Fragment::Transaction(auth_tx)
             }
@@ -1571,13 +1566,13 @@ impl Fragment {
     }
 
     /// Deprecated: Use `from_authenticated_transaction` instead
-    pub fn from_generated_transaction(tx: AuthenticatedTransaction) -> Self {
+    pub fn from_generated_transaction(tx: &AuthenticatedTransaction) -> Self {
         Self::from_authenticated_transaction(tx)
     }
 
     /// Get a Transaction if the Fragment represents one
     pub fn get_transaction(self) -> Result<AuthenticatedTransaction, JsValue> {
-        match self.0 {
+        match self.0.clone() {
             chain::fragment::Fragment::Transaction(auth) => {
                 Ok(AuthenticatedTransactionType::NoCertificate(auth))
             }
