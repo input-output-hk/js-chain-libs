@@ -10,6 +10,7 @@ import ChooseRestoreOrImport from './pages/ChooseRestoreOrImport';
 import Index from './containers/Index';
 import SidebarLayout from './layouts/SidebarLayout';
 import InputKeys from './containers/InputKeys';
+import StakeDelegation from './containers/StakeDelegation';
 
 export default () => (
   <App>
@@ -20,7 +21,7 @@ export default () => (
         path={routes.STAKING}
         component={() => (
           <SidebarLayout>
-            <h1>please imagine a cute staking screen</h1>
+            <StakeDelegation />
           </SidebarLayout>
         )}
       />
