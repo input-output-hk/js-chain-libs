@@ -43,7 +43,7 @@ export default createRefetchContainer(
       fragment RecentBlocksTable_data on Query
         @argumentDefinitions(
           first: { type: "Int" }
-          last: { type: "Int", defaultValue: 10 }
+          last: { type: "Int" }
           after: { type: "IndexCursor" }
           before: { type: "IndexCursor" }
         ) {

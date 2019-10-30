@@ -4,10 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
 import TransactionTable from '../TransactionTable/TransactionTable';
-import {
-  getNextPageQueryParam,
-  getPreviousPageQueryParam
-} from '../../../helpers/paginationHelper';
+import { pageNumberDesc, getDescPageQuery } from '../../../helpers/paginationHelper';
 
 const BlockTransactionTable = ({ block, relay }) => {
   if (!block.transactions) {
@@ -15,37 +12,31 @@ const BlockTransactionTable = ({ block, relay }) => {
   }
 
   const connection = block.transactions;
+  const currentPage = pageNumberDesc(connection);
 
-  const handlePageChange = (vars, callback) => {
+  const handlePageChange = page => {
+    const params = getDescPageQuery(page.current, connection.totalCount);
+
     relay.refetch(
       {
         blockId: block.id,
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
+        first: params.first || null,
+        last: params.last || null,
+        after: params.after || null,
+        before: params.before || null
       },
       error => {
         if (error) {
           console.error(error); // eslint-disable-line no-console
         }
-        callback();
       }
     );
-  };
-
-  const onPreviousPage = () => {
-    handlePageChange(getPreviousPageQueryParam(connection));
-  };
-
-  const onNextPage = () => {
-    handlePageChange(getNextPageQueryParam(connection));
   };
 
   return (
     <>
       <h2>Transactions</h2>
-      <TransactionTable {...{ connection, onNextPage, onPreviousPage }} />
+      <TransactionTable {...{ currentPage, connection, handlePageChange }} />
     </>
   );
 };
