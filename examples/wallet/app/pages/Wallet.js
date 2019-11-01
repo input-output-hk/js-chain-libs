@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import AccountInfo from '../containers/AccountInfo';
-import SendTransaction from '../containers/SendTransaction';
 import SidebarLayout from '../layouts/SidebarLayout';
 
 export default () => {
@@ -9,9 +8,6 @@ export default () => {
     <SidebarLayout>
       <h2> Account Info</h2>
       <AccountInfo />
-      <hr />
-      <h2> Send funds</h2>
-      <SendTransaction />
     </SidebarLayout>
   );
 };

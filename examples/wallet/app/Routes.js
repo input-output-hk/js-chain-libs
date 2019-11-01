@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import App from './containers/App';
 import Wallet from './pages/Wallet';
+import Send from './pages/Send';
 import Settings from './pages/Settings';
 import ChooseRestoreOrImport from './pages/ChooseRestoreOrImport';
 import Index from './containers/Index';
@@ -14,14 +15,7 @@ export default () => (
   <App>
     <Switch>
       <Route path={routes.WALLET} component={Wallet} />
-      <Route
-        path={routes.SEND}
-        component={() => (
-          <SidebarLayout>
-            <h1>please imagine a cute send funds screen</h1>
-          </SidebarLayout>
-        )}
-      />
+      <Route path={routes.SEND} component={Send} />
       <Route
         path={routes.STAKING}
         component={() => (
