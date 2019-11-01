@@ -265,6 +265,7 @@
     "axios": "0.19.0",
     "bootstrap": "4.3.1",
     "classnames": "2.2.6",
+    "clickable-box": "1.0.0",
     "config": "3.2.3",
     "connected-react-router": "6.3.2",
     "core-js": "2",
