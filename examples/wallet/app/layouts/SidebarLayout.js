@@ -56,9 +56,14 @@ type SidebarItemProps = {
 
 const ResponsiveSidebarItem = ({ icon, text, route }: SidebarItemProps) => {
   const history = useHistory();
+  // FIXME: i don't think this is the most accesible solution
   return (
     <ClickableBox onClick={() => history.push(route)}>
-      <Nav.Item className={styles.sidebarItem}>
+      <Nav.Item
+        className={`${styles.sidebarItem} ${
+          route === history.location.pathname ? styles.activeNav : ''
+        }`}
+      >
         <div className={styles.icon}>
           <SVGInline svg={icon} className="icon" />
         </div>

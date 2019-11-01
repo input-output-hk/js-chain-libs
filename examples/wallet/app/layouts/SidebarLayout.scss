@@ -3,6 +3,11 @@
   display: flex;
 }
 
+.activeNav {
+  background-color: var(--sidebar-background-active);
+  border-left: 8px solid var(--primary);
+}
+
 .nav {
   background-color: var(--sidebar-background);
   box-shadow: 3px 0 3px black;
@@ -10,8 +15,8 @@
 }
 
 .sidebarItem {
-  height: 2em;
-  margin: 0.5rem;
+  height: 3em;
+  padding: 1rem;
   display: flex;
   flex-direction: row;
   align-items: center;
