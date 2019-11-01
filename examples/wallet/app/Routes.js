@@ -3,7 +3,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import App from './containers/App';
-import Home from './pages/Home';
+import Wallet from './pages/Wallet';
 import ChooseRestoreOrImport from './pages/ChooseRestoreOrImport';
 import Index from './containers/Index';
 import SidebarLayout from './layouts/SidebarLayout';
@@ -12,7 +12,7 @@ import InputKeys from './containers/InputKeys';
 export default () => (
   <App>
     <Switch>
-      <Route path={routes.HOME} component={Home} />
+      <Route path={routes.WALLET} component={Wallet} />
       <Route
         path={routes.SEND}
         component={() => (

@@ -29,7 +29,7 @@ const SidebarContent = () => (
   <Nav className={`flex-column justify-content-between ${styles.nav}`}>
     <div>
       <ResponsiveSidebarItem
-        route={routes.HOME}
+        route={routes.WALLET}
         icon={walletIcon}
         text="wallet"
       />

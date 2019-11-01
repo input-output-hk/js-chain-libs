@@ -8,5 +8,5 @@ export default (account: Account) => {
   if (!account.address) {
     return <Redirect push to={routes.CHOOSE_RESTORE_OR_IMPORT} />;
   }
-  return <Redirect push to={routes.HOME} />;
+  return <Redirect push to={routes.WALLET} />;
 };
