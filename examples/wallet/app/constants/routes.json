@@ -2,5 +2,8 @@
   "INDEX": "/",
   "HOME": "/home",
   "CHOOSE_RESTORE_OR_IMPORT": "/choose_restore_or_import",
-  "INPUT_KEYS": "/input_keys"
+  "INPUT_KEYS": "/input_keys",
+  "SEND": "/send",
+  "STAKING": "/staking",
+  "SETTINGS": "/settings"
 }
