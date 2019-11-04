@@ -20,7 +20,7 @@ export default ({ sendStakeDelegation }: Props) => {
     <div>
       <h2>Stake Delegation</h2>
       <StakePoolList onSelection={setPoolId} />
-      <h3>Delegate to an specific pool</h3>
+      <h3>Delegate to a specific pool</h3>
       <form onSubmit={handleSubmit}>
         <label htmlFor="poolId">
           Pool id:

@@ -4,10 +4,11 @@ import type { PoolId } from '../models';
 
 type Props = {
   stakePools: Array<PoolId>,
+  currentDelegation: PoolId,
   onSelection: (poolId: PoolId) => void
 };
 
-export default ({ stakePools, onSelection }: Props) => {
+export default ({ stakePools, onSelection, currentDelegation }: Props) => {
   return (
     <div>
       <h3>Pools available</h3>
@@ -23,9 +24,13 @@ export default ({ stakePools, onSelection }: Props) => {
               <tr key={poolId}>
                 <td>{poolId}</td>
                 <td>
-                  <button type="button" onClick={() => onSelection(poolId)}>
-                    select
-                  </button>
+                  {poolId !== currentDelegation ? (
+                    <button type="button" onClick={() => onSelection(poolId)}>
+                      select
+                    </button>
+                  ) : (
+                    'current delegation'
+                  )}
                 </td>
               </tr>
             ))}

@@ -21,7 +21,8 @@ export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
 
 export type AppState = {
   account: Account,
-  nodeSettings: NodeSettings
+  nodeSettings: NodeSettings,
+  stakePools: StakePools
 };
 
 export type Account = AccountKeys & AccountState;
