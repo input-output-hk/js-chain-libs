@@ -1,7 +1,7 @@
 // @flow
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import InputKeys from '../components/InputKeys';
+import InputKeys from '../pages/InputKeys';
 import { setAccount } from '../actions/account';
 import { updateNodeSettings } from '../actions/nodeSettings';
 

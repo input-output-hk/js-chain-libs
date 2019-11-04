@@ -1,0 +1,27 @@
+.component {
+  height: 100%;
+  display: flex;
+}
+
+.nav {
+  background-color: var(--sidebar-background);
+  box-shadow: 3px 0 3px black;
+  margin-right: 1.5rem;
+}
+
+.sidebarItem {
+  height: 2em;
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.icon {
+  height: 2rem;
+  width: 2rem;
+}
+
+.text {
+  font-size: 1.5rem;
+  margin-left: 1rem;
+}

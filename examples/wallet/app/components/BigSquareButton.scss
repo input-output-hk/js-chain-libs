@@ -2,7 +2,7 @@
   align-items: center;
   background-color: var(--primary);
   border: solid 1px var(--primary);
-  color: var(--gray-dark);
+  color: var(--text-color);
   font-weight: 500;
   border-radius: 10px;
   cursor: pointer;
@@ -24,7 +24,7 @@
   & > svg {
     height: 48px;
     path {
-      fill: var(--gray-dark);
+      fill: var(--text-color);
     }
   }
 }
