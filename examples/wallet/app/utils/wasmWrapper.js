@@ -23,9 +23,6 @@ export async function getAccountFromPrivateKey(
   const publicKey: PublicKey = privateKey.to_public();
   const account: Account = Account.from_public_key(publicKey);
   const identifier: AccountIdentifier = account.to_identifier();
-  // FIXME: make the discrimination configurable
-  // FIXME somebody please tell me how do we determine the prefix
-  // and if it needs to be configurable
   const networkDiscrimination: AddressDiscrimination =
     config.get('networkDiscrimination') === 'testnet'
       ? AddressDiscrimination.Test
