@@ -1,5 +1,6 @@
 {
   "INDEX": "/",
   "HOME": "/home",
+  "CHOOSE_RESTORE_OR_IMPORT": "/choose_restore_or_import",
   "INPUT_KEYS": "/input_keys"
 }

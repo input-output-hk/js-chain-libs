@@ -1,0 +1,42 @@
+.component {
+  align-items: center;
+  background-color: var(--primary);
+  border: solid 1px var(--primary);
+  color: var(--gray-dark);
+  font-weight: 500;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 200px;
+  justify-content: center;
+  margin: 10px;
+  padding: 30px;
+}
+
+.disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.icon {
+  & > svg {
+    height: 48px;
+    path {
+      fill: var(--gray-dark);
+    }
+  }
+}
+
+.label {
+  font-size: 19px;
+  line-height: 1.37;
+  margin-top: 20px;
+}
+
+.description {
+  font-size: 14px;
+  height: 19px;
+  line-height: 1.36;
+}
