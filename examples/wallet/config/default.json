@@ -1,5 +1,6 @@
 {
-  "pollingInterval": 10000,
+  "accountPollingInterval": 20000,
+  "stakePoolsPollingInterval": 40000,
   "networkDiscrimination": "testnet",
   "addressPrefix": "ca",
   "nodeUrl": "http://localhost:8443",
