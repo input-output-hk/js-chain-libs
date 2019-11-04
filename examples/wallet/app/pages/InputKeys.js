@@ -26,7 +26,7 @@ export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
   };
 
   if (privateKey) {
-    return <Redirect push to={routes.HOME} />;
+    return <Redirect push to={routes.WALLET} />;
   }
 
   const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
