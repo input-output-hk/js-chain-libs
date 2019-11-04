@@ -6,7 +6,8 @@ import type {
   Counter,
   PrivateKey,
   Delegation,
-  Identifier
+  Identifier,
+  PoolId
 } from '../models';
 
 export type Action = {
@@ -20,7 +21,8 @@ export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
 
 export type AppState = {
   account: Account,
-  nodeSettings: NodeSettings
+  nodeSettings: NodeSettings,
+  stakePools: StakePools
 };
 
 export type Account = AccountKeys & AccountState;
@@ -44,4 +46,7 @@ export type NodeSettings = {
     coefficient: number,
     constant: number
   }
+};
+export type StakePools = {
+  availablePools: Array<PoolId>
 };

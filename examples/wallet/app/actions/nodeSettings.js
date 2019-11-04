@@ -1,6 +1,6 @@
 // @flow
 import type { Dispatch } from 'redux';
-import { NodeSettings } from '../reducers/types';
+import type { NodeSettings } from '../reducers/types';
 import { getNodeSettings } from '../utils/nodeConnection';
 
 export const UPDATE_NODE_SETTINGS = 'UPDATE_NODE_SETTINGS';

@@ -2,7 +2,7 @@
 import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
 import config from 'config';
-import type { Identifier } from '../models';
+import type { Identifier, PoolId } from '../models';
 import type { AccountState, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
@@ -25,6 +25,10 @@ export function getNodeSettings(): Promise<NodeSettings> {
   return axios
     .get(`${BASE_URL}/settings`)
     .then(({ data: { block0Hash, fees } }) => ({ block0Hash, fees }));
+}
+
+export function getStakePools(): Promise<Array<PoolId>> {
+  return axios.get(`${BASE_URL}/stake_pools`).then(({ data }) => data);
 }
 
 export function broadcastTransaction(tx: Uint8Array): Promise<void> {

@@ -11,23 +11,6 @@ export default ({ account }: Props) => {
     <div>
       <p>Current Address: {account.address}</p>
       <p>Balance: {account.balance}</p>
-      <table>
-        <thead>
-          <tr>
-            <th> pool id </th>
-            <th> amount </th>
-          </tr>
-        </thead>
-        <tbody>
-          {account.delegation &&
-            account.delegation.map(({ amount, poolId }) => (
-              <tr key={poolId}>
-                <td>{poolId}</td>
-                <td>{amount}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
     </div>
   );
 };
