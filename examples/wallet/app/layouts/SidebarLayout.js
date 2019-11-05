@@ -20,7 +20,7 @@ export default ({ children }: Props) => {
   return (
     <div className={styles.component}>
       <SidebarContent />
-      <div>{children}</div>
+      <div className={styles.contentWrapper}>{children}</div>
     </div>
   );
 };

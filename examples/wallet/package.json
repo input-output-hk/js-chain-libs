@@ -276,6 +276,7 @@
     "history": "4.9.0",
     "jquery": "3.4.1",
     "js-chain-libs": "0.1.2",
+    "qrcode.react": "0.9.3",
     "react": "16.8.6",
     "react-bootstrap": "1.0.0-beta.14",
     "react-dom": "16.8.6",

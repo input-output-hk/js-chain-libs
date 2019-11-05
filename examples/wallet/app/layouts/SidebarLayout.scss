@@ -3,6 +3,10 @@
   display: flex;
 }
 
+.contentWrapper {
+  width: 100%;
+}
+
 .activeNav {
   background-color: var(--sidebar-background-active);
   border-left: 8px solid var(--primary);
@@ -21,6 +25,7 @@
   flex-direction: row;
   align-items: center;
 }
+
 .icon {
   height: 2rem;
   width: 2rem;
