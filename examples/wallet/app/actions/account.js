@@ -5,7 +5,13 @@ import type {
   AccountKeys,
   AccountState
 } from '../reducers/types';
-import type { Amount, Address, PoolId, Identifier } from '../models';
+import type {
+  Amount,
+  Address,
+  PoolId,
+  Identifier,
+  TransactionHash
+} from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction,
@@ -59,7 +65,11 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
 
 export type SendTransactionAction = {
   type: 'SEND_TRANSACTION',
-  newCounter: number
+  newCounter: number,
+  id: TransactionHash,
+  destination: Address,
+  amount: Amount,
+  fee: Amount
 };
 
 export const SEND_TRANSACTION = 'SEND_TRANSACTION';
@@ -78,16 +88,17 @@ export function sendTransaction(
       state.account.counter,
       state.nodeSettings
     )
-      .then(({ id, transaction }) => {
-        // TODO: dispatch an action which adds the transaction to the
-        // transaction list
-        console.log(id);
-        return broadcastTransaction(transaction);
+      .then(({ id, transaction, fee }) => {
+        return broadcastTransaction(transaction).then(() => ({ id, fee }));
       })
-      .then(() =>
+      .then(({ id, fee }) =>
         dispatch({
           type: SEND_TRANSACTION,
-          newCounter: state.account.counter + 1
+          newCounter: state.account.counter + 1,
+          id,
+          destination,
+          amount,
+          fee
         })
       );
   };

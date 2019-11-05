@@ -12,6 +12,7 @@ import type {
   SendStakeDelegation
 } from '../actions/account';
 import type { Account } from './types';
+import type { Transaction } from '../models';
 
 export default function account(
   state: Account,
@@ -23,7 +24,7 @@ export default function account(
     | SendStakeDelegation
 ): Account {
   if (typeof state === 'undefined') {
-    return {};
+    return { transactions: [] };
   }
   switch (action.type) {
     case SET_KEYS:
@@ -38,10 +39,32 @@ export default function account(
         counter: action.counter,
         delegation: action.delegation
       });
-    case SEND_TRANSACTION:
+    case SEND_TRANSACTION: {
+      const newTransaction: Transaction = {
+        id: action.id,
+        outputs: [{ address: action.destination, amount: action.amount }],
+        inputs: [
+          { address: state.address, amount: action.amount + action.fee }
+        ],
+        confirmations: 0
+      };
+      const oldTransaction = state.transactions.find(it => it.id === action.id);
+      let newTransactionArray;
+      if (!oldTransaction) {
+        newTransactionArray = [newTransaction, ...state.transactions];
+      } else {
+        console.log(
+          `An older transaction with the same hash was found while inserting: ${
+            action.id
+          }`
+        );
+        newTransactionArray = [...state.transactions];
+      }
       return Object.assign({}, state, {
-        counter: action.newCounter
+        counter: action.newCounter,
+        transactions: newTransactionArray
       });
+    }
     case SEND_STAKE_DELEGATION:
       return Object.assign({}, state, {
         counter: action.newCounter
