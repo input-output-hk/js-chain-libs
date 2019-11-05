@@ -5,7 +5,7 @@ import type {
   AccountKeys,
   AccountState
 } from '../reducers/types';
-import type { Amount, Address, PoolId } from '../models';
+import type { Amount, Address, PoolId, Identifier } from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction,
@@ -34,16 +34,25 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk<SetAccountState> {
+export function updateAccountState(): Thunk<SetAccountStateAction> {
   return function updateAccountStateThunk(dispatch, getState) {
-    return getAccountState(getState().account.identifier).then(
-      ({ balance, counter, delegation }: AccountState) =>
-        dispatch({
-          type: SET_ACCOUNT_STATE,
-          balance,
-          counter,
-          delegation
-        })
+    const { identifier }: { identifier: Identifier } = getState().account;
+    if (!identifier) {
+      console.log('not fetching account because wallet is not initialized yet');
+      return;
+    }
+    return (
+      getAccountState(identifier)
+        .then(({ balance, counter, delegation }: AccountState) =>
+          dispatch({
+            type: SET_ACCOUNT_STATE,
+            balance,
+            counter,
+            delegation
+          })
+        )
+        // TODO: display a notification or something
+        .catch(() => console.error('there was an error fetching account info'))
     );
   };
 }
