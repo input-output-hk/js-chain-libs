@@ -10,11 +10,11 @@ export type Identifier = string;
 export type Delegation = Array<{ poolId: string, amount: number }>;
 export type PoolId = string;
 export type TransactionHash = string;
-export type CertificateType = 'StakeDelegation';
+export type CertificateType = 'STAKE_DELEGATION';
 export type Certificate = {
   type: CertificateType
 };
-export type DelegationCertificate = CertificateType & {
+export type DelegationCertificate = Certificate & {
   pool: PoolId
 };
 

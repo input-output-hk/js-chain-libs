@@ -42,7 +42,7 @@ export async function buildDelegateTransaction(
   secret: InternalPrivateKey,
   accountCounter: Counter,
   nodeSettings: NodeSettings
-): Promise<{ id: string, transaction: Uint8Array }> {
+): Promise<{ id: string, transaction: Uint8Array, fee: number }> {
   const {
     OutputPolicy,
     PoolId,
@@ -115,7 +115,8 @@ export async function buildDelegateTransaction(
 
   return {
     transaction: message.as_bytes(),
-    id: uint8array_to_hex(message.id().as_bytes())
+    id: uint8array_to_hex(message.id().as_bytes()),
+    fee: computedFee
   };
 }
 

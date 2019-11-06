@@ -106,33 +106,34 @@ export function sendTransaction(
 
 export type SendStakeDelegation = {
   type: 'SEND_STAKE_DELEGATION',
-  newCounter: number
+  newCounter: number,
+  id: TransactionHash,
+  pool: PoolId,
+  fee: Amount
 };
 
 export const SEND_STAKE_DELEGATION = 'SEND_STAKE_DELEGATION';
 
-export function sendStakeDelegation(
-  poolId: PoolId
-): Thunk<SendStakeDelegation> {
+export function sendStakeDelegation(pool: PoolId): Thunk<SendStakeDelegation> {
   // Assume balance and counter are up to date
   return function sendStakeDelegationThunk(dispatch, getState) {
     const state: AppState = getState();
     return buildDelegateTransaction(
-      poolId,
+      pool,
       state.account.privateKey,
       state.account.counter,
       state.nodeSettings
     )
-      .then(({ id, transaction }) => {
-        // TODO: dispatch an action which adds the transaction to the
-        // transaction list
-        console.log(id);
-        return broadcastTransaction(transaction);
-      })
-      .then(() =>
+      .then(({ id, transaction, fee }) =>
+        broadcastTransaction(transaction).then(() => ({ id, fee }))
+      )
+      .then(({ id, fee }) =>
         dispatch({
           type: SEND_STAKE_DELEGATION,
-          newCounter: state.account.counter + 1
+          newCounter: state.account.counter + 1,
+          id,
+          pool,
+          fee
         })
       );
   };

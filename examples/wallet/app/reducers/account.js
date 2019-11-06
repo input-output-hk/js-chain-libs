@@ -45,28 +45,36 @@ export default function account(
         outputs: [{ address: action.destination, amount: action.amount }],
         inputs: [{ address: state.address, amount: action.amount + action.fee }]
       };
-      const oldTransaction = state.transactions.find(it => it.id === action.id);
-      let newTransactionArray;
-      if (!oldTransaction) {
-        newTransactionArray = [newTransaction, ...state.transactions];
-      } else {
-        console.log(
-          `An older transaction with the same hash was found while inserting: ${
-            action.id
-          }`
-        );
-        newTransactionArray = [...state.transactions];
-      }
       return Object.assign({}, state, {
         counter: action.newCounter,
-        transactions: newTransactionArray
+        transactions: addTransactionToArray(state.transactions, newTransaction)
       });
     }
-    case SEND_STAKE_DELEGATION:
+    case SEND_STAKE_DELEGATION: {
+      const newTransaction: Transaction = {
+        id: action.id,
+        inputs: [{ address: state.address, amount: action.fee }],
+        certificate: { type: 'STAKE_DELEGATION', pool: action.pool }
+      };
       return Object.assign({}, state, {
-        counter: action.newCounter
+        counter: action.newCounter,
+        transactions: addTransactionToArray(state.transactions, newTransaction)
       });
+    }
     default:
       return state;
   }
 }
+
+const addTransactionToArray = (array, tx) => {
+  const oldTransaction = array.find(it => it.id === tx.id);
+  if (!oldTransaction) {
+    return [tx, ...array];
+  }
+  console.log(
+    `An older transaction with the same hash was found while inserting: ${
+      tx.id
+    }`
+  );
+  return [...array];
+};
