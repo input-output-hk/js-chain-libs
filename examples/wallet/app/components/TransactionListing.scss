@@ -1,0 +1,28 @@
+.address {
+  overflow-wrap: break-word;
+}
+
+.row {
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7em;
+  margin: 0.7em;
+  border-radius: 5px;
+  background-color: var(--transaction-row-background);
+}
+
+.transactionType {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.transactionStatus {
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 5px;
+  background-color: grey;
+}
+
+.amount {
+  text-align: center;
+}

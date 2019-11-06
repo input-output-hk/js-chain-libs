@@ -43,10 +43,7 @@ export default function account(
       const newTransaction: Transaction = {
         id: action.id,
         outputs: [{ address: action.destination, amount: action.amount }],
-        inputs: [
-          { address: state.address, amount: action.amount + action.fee }
-        ],
-        confirmations: 0
+        inputs: [{ address: state.address, amount: action.amount + action.fee }]
       };
       const oldTransaction = state.transactions.find(it => it.id === action.id);
       let newTransactionArray;
