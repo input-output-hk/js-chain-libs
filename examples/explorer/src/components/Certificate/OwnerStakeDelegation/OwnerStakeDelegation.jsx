@@ -3,6 +3,7 @@ import Table from 'react-bootstrap/Table';
 
 import graphql from 'babel-plugin-relay/macro';
 import { createFragmentContainer } from 'react-relay';
+import { StakePoolLink } from '../../Commons';
 
 const OwnerStakeDelegation = ({ certificate }) => (
   <div className="keyValueTable">
@@ -14,7 +15,9 @@ const OwnerStakeDelegation = ({ certificate }) => (
         </tr>
         <tr>
           <td>Pool Id:</td>
-          <td>{certificate.pool.id}</td>
+          <td>
+            <StakePoolLink id={certificate.pool.id} />
+          </td>
         </tr>
       </tbody>
     </Table>

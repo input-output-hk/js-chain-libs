@@ -4,13 +4,7 @@ import graphql from 'babel-plugin-relay/macro';
 import { createRefetchContainer } from 'react-relay';
 
 import { BlockTable } from '../../Block';
-import {
-  getNextPageQueryParam,
-  getPreviousPageQueryParam
-} from '../../../helpers/paginationHelper';
-
-// Getting a CursorBased Table
-const CursorTable = BlockTable({ cursorType: true });
+import { getDescPageQuery, pageNumberDesc } from '../../../helpers/paginationHelper';
 
 const EpochBlockTable = ({ epoch, relay }) => {
   if (!epoch.blocks) {
@@ -18,37 +12,31 @@ const EpochBlockTable = ({ epoch, relay }) => {
   }
 
   const connection = epoch.blocks;
+  const currentPage = pageNumberDesc(connection);
 
-  const handlePageChange = (vars, callback) => {
+  const handlePageChange = page => {
+    const params = getDescPageQuery(page.current, connection.totalCount);
+
     relay.refetch(
       {
         epochId: epoch.id,
-        first: vars.first || null,
-        last: vars.last || null,
-        after: vars.after || null,
-        before: vars.before || null
+        first: params.first || null,
+        last: params.last || null,
+        after: params.after || null,
+        before: params.before || null
       },
       error => {
         if (error) {
           console.error(error); // eslint-disable-line no-console
         }
-        callback();
       }
     );
-  };
-
-  const onPreviousPage = () => {
-    handlePageChange(getPreviousPageQueryParam(connection));
-  };
-
-  const onNextPage = () => {
-    handlePageChange(getNextPageQueryParam(connection));
   };
 
   return (
     <>
       <h2>Blocks</h2>
-      <CursorTable {...{ connection, onNextPage, onPreviousPage }} />
+      <BlockTable {...{ currentPage, connection, handlePageChange }} />
     </>
   );
 };
@@ -61,8 +49,8 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           last: { type: "Int" }
-          after: { type: "BlockCursor" }
-          before: { type: "BlockCursor" }
+          after: { type: "IndexCursor" }
+          before: { type: "IndexCursor" }
         ) {
         id
         blocks(first: $first, last: $last, after: $after, before: $before) {
@@ -78,7 +66,7 @@ export default createRefetchContainer(
               }
               chainLength
               transactions {
-                id
+                totalCount
               }
             }
           }
@@ -98,8 +86,8 @@ export default createRefetchContainer(
       $epochId: EpochNumber!
       $first: Int
       $last: Int
-      $after: BlockCursor
-      $before: BlockCursor
+      $after: IndexCursor
+      $before: IndexCursor
     ) {
       epoch(id: $epochId) {
         ...EpochBlockTable_epoch
