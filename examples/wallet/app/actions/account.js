@@ -10,14 +10,19 @@ import type {
   Address,
   PoolId,
   Identifier,
-  TransactionHash
+  TransactionHash,
+  Transaction
 } from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
-import { getAccountState, broadcastTransaction } from '../utils/nodeConnection';
+import {
+  getAccountState,
+  broadcastTransaction,
+  getTransactions
+} from '../utils/nodeConnection';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
@@ -59,6 +64,35 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
         )
         // TODO: display a notification or something
         .catch(() => console.error('there was an error fetching account info'))
+    );
+  };
+}
+
+export type SetTransactionsAction = {
+  type: 'SET_TRANSACTIONS',
+  transactions: Array<Transaction>
+};
+export const SET_TRANSACTIONS = 'SET_TRANSACTIONS';
+
+export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
+  return function updateAccountTransactionsThunk(dispatch, getState) {
+    const { address }: { address: Address } = getState().account;
+    if (!address) {
+      console.log(
+        'not fetching transactions because wallet is not initialized yet'
+      );
+      return;
+    }
+    return (
+      getTransactions(address)
+        .then(({ transactions }: { transactions: Array<Transaction> }) =>
+          dispatch({
+            type: SET_TRANSACTIONS,
+            transactions
+          })
+        )
+        // TODO: display a notification or something
+        .catch(() => console.error('there was an error fetching transactions'))
     );
   };
 }

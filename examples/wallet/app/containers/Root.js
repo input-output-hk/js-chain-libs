@@ -6,7 +6,10 @@ import { hot } from 'react-hot-loader/root';
 import config from 'config';
 import type { Store } from '../reducers/types';
 import Routes from '../Routes';
-import { updateAccountState } from '../actions/account';
+import {
+  updateAccountState,
+  updateAccountTransactions
+} from '../actions/account';
 import { setStakePools } from '../actions/stakePools';
 import { updateNodeSettings } from '../actions/nodeSettings';
 
@@ -35,6 +38,11 @@ const Root = ({ store, history }: Props) => {
     () => store.dispatch(updateNodeSettings()),
     config.get('nodeSettingsPollingInterval'),
     'nodeSettingsPolling'
+  );
+  runInmmediatelyAndSetInterval(
+    () => store.dispatch(updateAccountTransactions()),
+    config.get('transactionPollingInterval'),
+    'transactionPolling'
   );
   return (
     <Provider store={store}>

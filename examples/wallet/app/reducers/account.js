@@ -3,12 +3,14 @@ import {
   SET_KEYS,
   SET_ACCOUNT_STATE,
   SEND_TRANSACTION,
-  SEND_STAKE_DELEGATION
+  SEND_STAKE_DELEGATION,
+  SET_TRANSACTIONS
 } from '../actions/account';
 import type {
   SetKeysAction,
   SendTransactionAction,
   SetAccountStateAction,
+  SetTransactionsAction,
   SendStakeDelegation
 } from '../actions/account';
 import type { Account } from './types';
@@ -22,6 +24,7 @@ export default function account(
     | SetAccountStateAction
     | SendTransactionAction
     | SendStakeDelegation
+    | SetTransactionsAction
 ): Account {
   if (typeof state === 'undefined') {
     return { transactions: [] };
@@ -61,10 +64,24 @@ export default function account(
         transactions: addTransactionToArray(state.transactions, newTransaction)
       });
     }
+    case SET_TRANSACTIONS: {
+      // transactions from the node always overwrite transactions already in the state
+      const mergedTransactionList = Object.assign(
+        {},
+        transactionListAsObject(state.transactions),
+        transactionListAsObject(action.transactions)
+      );
+      return Object.assign({}, state, {
+        transactions: Object.values(mergedTransactionList)
+      });
+    }
     default:
       return state;
   }
 }
+
+const transactionListAsObject = arr =>
+  arr.reduce((acc, it) => Object.assign({}, acc, { [it.id]: it }), {});
 
 const addTransactionToArray = (array, tx) => {
   const oldTransaction = array.find(it => it.id === tx.id);

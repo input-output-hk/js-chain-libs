@@ -8,6 +8,7 @@
     }
   },
   "rules": {
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "no-multi-str": "off"
   }
 }

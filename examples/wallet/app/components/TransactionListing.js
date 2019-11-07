@@ -59,7 +59,7 @@ const transactionToRow = (
     return null;
   }
   return (
-    <Row className={styles.row}>
+    <Row key={id} className={styles.row}>
       <Col className={styles.transactionType} xs={1}>
         {transactionType}
       </Col>

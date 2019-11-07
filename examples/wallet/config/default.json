@@ -2,8 +2,9 @@
   "accountPollingInterval": 20000,
   "stakePoolsPollingInterval": 40000,
   "nodeSettingsPollingInterval": 90000,
+  "transactionPollingInterval": 25000,
   "networkDiscrimination": "testnet",
-  "addressPrefix": "ca",
+  "addressPrefix": "addr",
   "nodeUrl": "http://localhost:8443",
   "APIBase": "/api/v0"
 }
