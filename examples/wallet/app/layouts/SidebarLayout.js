@@ -67,7 +67,7 @@ const ResponsiveSidebarItem = ({ icon, text, route }: SidebarItemProps) => {
         <div className={styles.icon}>
           <SVGInline svg={icon} className="icon" />
         </div>
-        <div className={`${styles.text} d-sm-none d-md-block`}>{text}</div>
+        <div className={`${styles.text} d-none d-lg-block`}>{text}</div>
       </Nav.Item>
     </ClickableBox>
   );
