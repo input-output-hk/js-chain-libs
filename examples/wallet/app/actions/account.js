@@ -46,6 +46,20 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   };
 }
 
+export function setAccountFromMnemonic(
+  privateKey: string
+): Thunk<SetKeysAction> {
+  return function setAccountThunk(dispatch) {
+    return getAccountFromPrivateKey(privateKey)
+      .then((keys: AccountKeys) =>
+        dispatch({
+          type: SET_KEYS,
+          ...keys
+        })
+      )
+      .then(() => dispatch(updateAccountState()));
+  };
+}
 export type SetAccountStateAction = {
   type: 'SET_ACCOUNT_STATE'
 } & AccountState;

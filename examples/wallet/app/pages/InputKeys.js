@@ -8,28 +8,52 @@ import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import routes from '../constants/routes.json';
-import typeof { setAccount as SetAccount } from '../actions/account';
+import typeof {
+  setAccountFromMnemonic as SetAccountFromMnemonic,
+  setAccount as SetAccount
+} from '../actions/account';
 import typeof { updateNodeSettings as UpdateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
   setAccount: SetAccount,
+  setAccountFromMnemonic: SetAccountFromMnemonic,
   updateNodeSettings: UpdateNodeSettings,
-  privateKey: string
+  privateKey: string,
+  mnemonicPhrase: string
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
+export default ({
+  updateNodeSettings,
+  setAccount,
+  setAccountFromMnemonic,
+  privateKey,
+  mnemonicPhrase
+}: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     return Promise.all([setAccount(newPrivateKey), updateNodeSettings()]);
   };
 
-  if (privateKey) {
+  const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
+    event.preventDefault();
+    return Promise.all([
+      setAccountFromMnemonic(newMnemonicPhrase),
+      updateNodeSettings()
+    ]);
+  };
+
+  if (privateKey || mnemonicPhrase) {
     return <Redirect push to={routes.WALLET} />;
   }
 
-  const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
+  const [
+    newPrivateKey,
+    setNewPrivateKey,
+    newMnemonicPhrase,
+    setNewMnemonicPhrase
+  ] = useState(privateKey, mnemonicPhrase);
 
   return (
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
@@ -59,7 +83,7 @@ export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
                 Go back
               </Button>
               <Button variant="primary" type="submit">
-                Initialize wallet
+                Initialize wallet Use key string
               </Button>
             </Row>
           </Form>
@@ -67,7 +91,35 @@ export default ({ updateNodeSettings, setAccount, privateKey }: Props) => {
       </Tab>
       <Tab eventKey="mnemonic" title="Use mnemonic phrase">
         <Container>
-          <p>Under construction</p>
+          <Form onSubmit={handleSubmitMnemonic}>
+            <Form.Group>
+              <Form.Label>Mnemonic phrase:</Form.Label>
+              <Form.Control
+                required
+                type="text"
+                name="mnemonicPhrase"
+                value={newMnemonicPhrase}
+                onChange={event => setNewMnemonicPhrase(event.target.value)}
+              />
+              <Form.Text>
+                It&apos;s a string like:
+                <br />
+                <code>
+                  nerve lawn adjust chunk convince must patient agent limb
+                  symbol increase ridgel
+                </code>
+              </Form.Text>
+            </Form.Group>
+            <Row className="justify-content-between">
+              {/* TODO: bind this button */}
+              <Button variant="secondary" type="button">
+                Go back
+              </Button>
+              <Button variant="primary" type="submit">
+                Initialize wallet use mnemonic phrase
+              </Button>
+            </Row>
+          </Form>
         </Container>
       </Tab>
     </Tabs>
