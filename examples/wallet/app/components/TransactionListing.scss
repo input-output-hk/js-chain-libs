@@ -1,11 +1,16 @@
-.address {
-  overflow-wrap: break-word;
+.txHash {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  & :hover {
+    color: var(--blue);
+    text-decoration: underline;
+  }
 }
 
 .row {
   align-items: center;
   justify-content: space-between;
-  padding: 0.7em;
+  padding: 1em;
   margin: 0.7em;
   border-radius: 5px;
   background-color: var(--transaction-row-background);

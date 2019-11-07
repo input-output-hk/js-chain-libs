@@ -6,5 +6,6 @@
   "networkDiscrimination": "testnet",
   "addressPrefix": "addr",
   "nodeUrl": "http://localhost:8443",
+  "explorer": { "url": "http://localhost:3000", "transactionPath": "tx" },
   "APIBase": "/api/v0"
 }

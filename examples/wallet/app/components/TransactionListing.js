@@ -4,10 +4,13 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import curry from 'lodash/curry';
+import ClickableBox from 'clickable-box';
+import config from 'config';
+// FIXME: this is obviously not portable to a webapp
+import { shell } from 'electron';
 import type {
   Transaction,
   Address,
-  PoolId,
   TransactionInput,
   TransactionOutput
 } from '../models';
@@ -27,14 +30,6 @@ export default ({ transactions, myAddress }: Props) => {
   );
 };
 
-const findBiggestInputOrOutput = (
-  arr: Array<TransactionInput | TransactionOutput>
-) =>
-  arr.reduce(
-    (accumulator, it) => (it.amount > accumulator.amount ? it : accumulator),
-    { amount: 0 }
-  );
-
 const sumAmounts = (arr: Array<TransactionInput | TransactionOutput>) =>
   arr.reduce((sum, it) => it.amount + sum, 0);
 
@@ -43,28 +38,34 @@ const transactionToRow = (
   { id, certificate, inputs, outputs }: Transaction
 ) => {
   let transactionType: TransactionType;
-  let other: PoolId | Address;
   const inputSum = sumAmounts(inputs);
   if (certificate) {
     transactionType = 'DELEGATE';
-    other = certificate.pool;
   } else if (inputs.find(({ address }) => address === myAddress)) {
     transactionType = 'SEND';
-    other = findBiggestInputOrOutput(outputs).address;
   } else if ((outputs || []).find(({ address }) => address === myAddress)) {
     transactionType = 'RECEIVE';
-    other = findBiggestInputOrOutput(inputs).address;
   } else {
     console.error(`transaction with id: ${id} is malformed`);
     return null;
   }
   return (
     <Row key={id} className={styles.row}>
-      <Col className={styles.transactionType} xs={1}>
+      <Col className={styles.transactionType} xs={2}>
         {transactionType}
       </Col>
-      <Col xs={5} className={styles.address}>
-        {other}
+      <Col xs={2} className={styles.txHash}>
+        <ClickableBox
+          onClick={() =>
+            shell.openExternal(
+              `${config.get('explorer.url')}/${config.get(
+                'explorer.transactionPath'
+              )}/${id}`
+            )
+          }
+        >
+          {id}
+        </ClickableBox>
       </Col>
       {/* TODO show date */}
       <Col xs={1}>04/20/2020</Col>
