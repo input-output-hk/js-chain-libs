@@ -34,26 +34,27 @@ fn parse_bech32_normal_secret_key() {
     assert!(PrivateKey::from_bech32(key).is_ok());
 }
 
-fn mock_builder(input: u64, output: u64) -> TransactionBuilder {
-    let mut txbuilder = TransactionBuilder::new_no_payload();
+fn mock_io_builder(input: u64, output: u64) -> InputOutputBuilder {
+    let mut builder = InputOutputBuilder::empty();
+
     let txid = FragmentId::from_bytes(&[0]);
     let utxopointer = UtxoPointer::new(txid, 0, input.into());
     let input = Input::from_utxo(&utxopointer);
 
-    txbuilder.add_input(input);
+    builder.add_input(input).unwrap();
 
     let output_address =
         Address::from_string("ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344")
             .unwrap();
-    txbuilder.add_output(output_address, output.into());
-    txbuilder
+    builder.add_output(output_address, output.into()).unwrap();
+    builder
 }
 
 #[wasm_bindgen_test]
 fn transaction_builder_balance() {
-    let txbuilder = mock_builder(32, 20);
+    let iobuilder = mock_io_builder(32, 20);
     let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
-    let balance = txbuilder.get_balance(&fee_algorithm).unwrap();
+    let balance = iobuilder.get_balance(None, &fee_algorithm).unwrap();
 
     assert_eq!(balance.get_sign(), "positive");
     assert_eq!(balance.get_value(), (32u64 - 20 - 2).into());
@@ -61,57 +62,47 @@ fn transaction_builder_balance() {
 
 #[wasm_bindgen_test]
 fn transaction_builder_finalize_good_case() {
-    let txbuilder = mock_builder(32, 20);
+    let iobuilder = mock_io_builder(32, 20);
     let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
-    let output_policy = OutputPolicy::forget();
 
-    let transaction = txbuilder.seal_with_output_policy(&fee_algorithm, output_policy);
+    let txbuilder = TransactionBuilder::new();
+    let set_payload = txbuilder.no_payload();
+
+    let output_policy = OutputPolicy::forget();
+    let ios = iobuilder
+        .seal_with_output_policy(None, fee_algorithm, output_policy)
+        .unwrap();
+
+    let set_witness = set_payload.set_ios(ios.inputs(), ios.outputs());
+
+    let genesis_hash = Hash::from_bytes(&[0]);
+
+    let txid = set_witness.get_auth_data_for_witness();
+    let key = PrivateKey::from_bech32("ed25519e_sk1lzkckzvwh7gn5f0krrmrxlpsywypu3kka2u82l3akm5gr8khra8suz6zv5jcwg8h6jy4pjs4dfvcrja07q9758xctp6cgkn5ykkgj9cts0mef").unwrap();
+    let witness = Witness::for_utxo(genesis_hash, txid, key);
+
+    let mut witnesses = Witnesses::new();
+    witnesses.add(witness);
+
+    let add_auth_data = set_witness.set_witnesses(witnesses);
+
+    let auth_data = PayloadAuthData::for_no_payload();
+
+    let transaction = add_auth_data.set_payload_auth(auth_data);
+
     assert!(transaction.is_ok())
 }
 
 #[wasm_bindgen_test]
-fn transaction_builder_finalize_not_enough_input() {
-    let txbuilder = mock_builder(30, 31);
+fn io_builder_finalize_not_enough_input() {
+    let iobuilder = mock_io_builder(30, 31);
 
     let fee_algorithm = Fee::linear_fee(2u64.into(), 0u64.into(), 0u64.into());
     let output_policy = OutputPolicy::forget();
 
-    let transaction = txbuilder.seal_with_output_policy(&fee_algorithm, output_policy);
-    assert!(transaction.is_err())
+    let input_output = iobuilder.seal_with_output_policy(None, fee_algorithm, output_policy);
+    assert!(input_output.is_err())
 }
-
-#[wasm_bindgen_test]
-fn transaction_finalizer() {
-    let txbuilder = mock_builder(10, 5);
-
-    let tx = txbuilder.unchecked_finalize();
-
-    let mut finalizer = TransactionFinalizer::new(tx);
-    let genesis_hash = Hash::from_bytes(&[0]);
-    let txid = finalizer.get_tx_sign_data_hash();
-    let key = PrivateKey::from_bech32("ed25519e_sk1lzkckzvwh7gn5f0krrmrxlpsywypu3kka2u82l3akm5gr8khra8suz6zv5jcwg8h6jy4pjs4dfvcrja07q9758xctp6cgkn5ykkgj9cts0mef").unwrap();
-    let witness = Witness::for_utxo(genesis_hash, txid, key);
-    assert!(finalizer.set_witness(0, witness).is_ok());
-    assert!(finalizer.finalize().is_ok())
-}
-
-#[wasm_bindgen_test]
-fn add_transaction_faucet_input() {}
-
-/* #[wasm_bindgen_test]
-fn stake_delegation_certificate() {
-    let stake_pool_id =
-        StakePoolId::from_hex("541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d41")
-            .unwrap();
-    let public_key = PublicKey::from_bech32(
-        "ed25519_pk1ycaqtzewdqtmevzcu9e5mgup4x27xv6u8c2sm5kkyxeuzdj402ns0uny5a",
-    )
-    .unwrap();
-    let certificate = Certificate::stake_delegation(stake_pool_id, public_key);
-    let mut txbuilder = mock_builder(30, 20);
-    assert!(txbuilder.set_certificate(certificate).is_ok());
-}
- */
 
 #[wasm_bindgen_test]
 fn account_address_from_public_key() {

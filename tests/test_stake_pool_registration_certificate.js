@@ -42,10 +42,4 @@ it('generates certificate', async () => {
   expect(poolRegistration.id().to_string()).to.eql(
     '6d7afbf4a8e0574a5dbbf35a71a42da86ebf679d864a03153446a4e671b26edc'
   );
-  const certificate = Certificate.stake_pool_registration(poolRegistration);
-  certificate.sign(
-    PrivateKey.from_bech32(
-      'ed25519_sk1mr52spjelqhs5hegxuymh8la04gkrxh5543cf4c7hx8x3mz3sadqdfdx5y'
-    )
-  );
 });
