@@ -1,4 +1,5 @@
 // @flow
+import sortBy from 'lodash/sortBy';
 import {
   SET_KEYS,
   SET_ACCOUNT_STATE,
@@ -72,7 +73,16 @@ export default function account(
         transactionListAsObject(action.transactions)
       );
       return Object.assign({}, state, {
-        transactions: Object.values(mergedTransactionList)
+        // FIXME: transactions should also be ordered by transaction index, but this isnt
+        // exposed on the API
+        transactions: sortBy(Object.values(mergedTransactionList), it =>
+          // if the number is not present, then the transaction is in the mempool
+          // and it should show first
+          typeof it.blockHeight === 'number'
+            ? // more recent transaction first
+              -it.blockHeight
+            : Number.NEGATIVE_INFINITY
+        )
       });
     }
     default:

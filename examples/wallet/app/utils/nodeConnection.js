@@ -38,22 +38,22 @@ export function getTransactions(address: Address): Promise<Array<Transaction>> {
       query: graphQlGetTransactionsQuery
     })
     .then(({ data: { data: { address: { transactions } } } }) => ({
-      transactions: transactions.map(it =>
-        Object.assign({}, it, {
-          outputs: flattenInputOrOutput(it.outputs),
-          inputs: flattenInputOrOutput(it.inputs),
-          certificate:
-            it.certificate &&
-            // the only kind we handle so far
-            // eslint-disable-next-line no-underscore-dangle
-            it.certificate.__typename === 'StakeDelegation'
-              ? {
-                  pool: it.certificate.pool.id,
-                  type: 'STAKE_DELEGATION'
-                }
-              : null
-        })
-      )
+      transactions: transactions.map(it => ({
+        id: it.id,
+        outputs: flattenInputOrOutput(it.outputs),
+        inputs: flattenInputOrOutput(it.inputs),
+        blockHeight: Number(it.block.chainLength),
+        certificate:
+          it.certificate &&
+          // the only kind we handle so far
+          // eslint-disable-next-line no-underscore-dangle
+          it.certificate.__typename === 'StakeDelegation'
+            ? {
+                pool: it.certificate.pool.id,
+                type: 'STAKE_DELEGATION'
+              }
+            : null
+      }))
     }));
 }
 
@@ -89,6 +89,9 @@ const graphQlGetTransactionsQuery =
             id\
           }\
         }\
+      },\
+      block{\
+        chainLength\
       }\
       inputs{\
         amount,\
