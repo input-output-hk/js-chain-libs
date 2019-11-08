@@ -33,7 +33,6 @@ it('create transaction', async () => {
     Fee,
     PublicKey,
     Certificate,
-    TransactionFinalizer,
     Fragment,
     PrivateKey,
     Witness,
@@ -41,29 +40,37 @@ it('create transaction', async () => {
     Hash,
     Account,
     StakeDelegation,
+    DelegationType,
+    InputOutputBuilder,
+    PayloadAuthData,
+    StakeDelegationAuthData,
+    AccountBindingSignature,
+    Payload,
+    Witnesses,
     // eslint-disable-next-line camelcase
     uint8array_to_hex
   } = await rust;
 
+  const singlePoolDelegation = DelegationType.full(
+    PoolId.from_hex(delegation.poolId)
+  );
+
   const certificate = Certificate.stake_delegation(
     StakeDelegation.new(
-      PoolId.from_hex(delegation.poolId),
+      singlePoolDelegation,
       PublicKey.from_bech32(delegation.stakeKey)
     )
   );
 
-  certificate.sign(PrivateKey.from_bech32(delegation.privateKey));
-
-  const txbuilder = TransactionBuilder.new_payload(certificate);
+  const iobuilder = InputOutputBuilder.empty();
 
   const accountAddress = Address.from_string(inputAccount.address);
   const account = Account.from_address(accountAddress);
 
   const input = Input.from_account(account, Value.from_str(inputAccount.value));
+  iobuilder.add_input(input);
 
-  txbuilder.add_input(input);
-
-  txbuilder.add_output(
+  iobuilder.add_output(
     Address.from_string(outputAccount.address),
     Value.from_str(outputAccount.value)
   );
@@ -74,27 +81,44 @@ it('create transaction', async () => {
     Value.from_str('10')
   );
 
-  const finalizedTx = txbuilder.finalize(
+  const IOs = iobuilder.seal_with_output_policy(
+    Payload.certificate(certificate),
     feeAlgorithm,
     OutputPolicy.one(accountAddress)
   );
 
-  const finalizer = new TransactionFinalizer(finalizedTx);
+  const builderSetWitness = new TransactionBuilder()
+    .payload(certificate)
+    .set_ios(IOs.inputs(), IOs.outputs());
+
+  const txid = builderSetWitness.get_auth_data_for_witness();
 
   const witness = Witness.for_account(
     Hash.from_hex(genesisHash),
-    finalizer.get_txid(),
+    txid,
     PrivateKey.from_bech32(inputAccount.privateKey),
     SpendingCounter.zero()
   );
 
-  finalizer.set_witness(0, witness);
+  const witnesses = Witnesses.new();
+  witnesses.add(witness);
 
-  const signedTx = finalizer.build();
+  const builderSignCertificate = builderSetWitness.set_witnesses(witnesses);
 
-  const message = Fragment.from_authenticated_transaction(signedTx);
+  const signature = PayloadAuthData.for_stake_delegation(
+    StakeDelegationAuthData.new(
+      AccountBindingSignature.new(
+        PrivateKey.from_bech32(delegation.privateKey),
+        builderSignCertificate.get_auth_data()
+      )
+    )
+  );
+
+  const signedTx = builderSignCertificate.set_payload_auth(signature);
+
+  const message = Fragment.from_transaction(signedTx);
 
   expect(uint8array_to_hex(message.as_bytes())).to.eql(
-    '00ff04cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e219541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d410102ff00000000000003e8cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21905263a058b2e6817bcb058e1734da381a995e3335c3e150dd2d621b3c136557aa700000000000001f405cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21900000000000001c702ad3b6faf39aad65bfd793f25e2ec37fdddf6c4ca36a3c8563b659da30c3e7cfc2f1f276aaaf2a089013f301e04c8aae0fb42a958997c93f0400b0b830d64970a'
+    '01410400cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21901541db50349e2bc1a5b1a73939b9d86fc45067117cc930c36afbb6fb0a9329d410102ff00000000000003e8cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21905263a058b2e6817bcb058e1734da381a995e3335c3e150dd2d621b3c136557aa700000000000001f405cbc7ccdb9a51eea4e4c7088353c1a1902dcf685f739194dc9faff26b7f42e21900000000000001c702ab84ad4220573f1d5037af717d0999aa3726d6f549cd1a9d12feefb20ba0e7211546fb38015196e0061fe2f87d241a54529f93a5c6d4c53be27b43057883e40ee3d1cbb9679be5d0604fac4db2d6768bb332fa053f9db9aee69f8356926e82b31cf20aaec905d3988e2e5b29bc39f25e45583c4a5d765db5f952dc0b38effa0c'
   );
 });
