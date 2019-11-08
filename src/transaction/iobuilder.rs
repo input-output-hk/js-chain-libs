@@ -4,8 +4,11 @@ use crate::{
 };
 use wasm_bindgen::prelude::*;
 
+// Map payloads regardless of which type in a static way.
+// This is needed because Payload can't be made into a Trait object, so
+// it is not possible to use an FnOnce that takes any Payload
 macro_rules! map_payload {
-    ($payload:expr, $with:ident, $body:expr) => {
+    ($payload:expr, |$with:ident| $body:expr) => {
         match $payload {
             TaggedPayload::NoPayload => {
                 let $with = tx::NoExtra;
@@ -55,7 +58,7 @@ impl InputOutputBuilder {
         InputOutputBuilder(tx::InputOutputBuilder::empty())
     }
 
-    /// Add input to the transaction
+    /// Add input to the IO Builder
     #[wasm_bindgen]
     pub fn add_input(&mut self, input: &Input) -> Result<(), JsValue> {
         self.0
@@ -63,7 +66,7 @@ impl InputOutputBuilder {
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
-    /// Add output to the transaction
+    /// Add output to the IO Builder
     #[wasm_bindgen]
     pub fn add_output(&mut self, address: Address, value: Value) -> Result<(), JsValue> {
         self.0
@@ -78,11 +81,10 @@ impl InputOutputBuilder {
             FeeVariant::Linear(fee_algorithm) => fee_algorithm,
         };
         use tx::Payload as _;
-        map_payload! {
-            &payload.0,
-            p,
-            Value(self.0.estimate_fee(p.payload_data().borrow(), &fee_algorithm))
-        }
+        map_payload!(&payload.0, |payload| Value(
+            self.0
+                .estimate_fee(payload.payload_data().borrow(), &fee_algorithm)
+        ))
     }
 
     #[wasm_bindgen]
@@ -91,12 +93,9 @@ impl InputOutputBuilder {
             FeeVariant::Linear(fee_algorithm) => fee_algorithm,
         };
         use tx::Payload as _;
-        let balance = map_payload!(
-            &payload.0,
-            payload,
-            self.0
-                .get_balance(payload.payload_data().borrow(), &fee_algorithm)
-        );
+        let balance = map_payload!(&payload.0, |payload| self
+            .0
+            .get_balance(payload.payload_data().borrow(), &fee_algorithm));
 
         balance
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
@@ -115,7 +114,7 @@ impl InputOutputBuilder {
     pub fn build(self) -> InputOutput {
         InputOutput(self.0.build())
     }
-
+    /// Seal the transaction by passing fee rule
     #[wasm_bindgen]
     pub fn seal(self, payload: &Payload, fee_algorithm: Fee) -> Result<InputOutput, JsValue> {
         use tx::Payload as _;
@@ -123,16 +122,14 @@ impl InputOutputBuilder {
             FeeVariant::Linear(algo) => algo,
         };
 
-        map_payload!(
-            &payload.0,
-            p,
-            self.0.seal(p.payload_data().borrow(), &fee_algorithm)
-        )
+        map_payload!(&payload.0, |payload| self
+            .0
+            .seal(payload.payload_data().borrow(), &fee_algorithm))
         .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
         .map(InputOutput)
     }
 
-    // Seal the transaction by passing fee rule and the output policy
+    /// Seal the transaction by passing fee rule and the output policy
     //
     // Along with the transaction, this return the balance unassigned to output policy
     // if any
@@ -150,12 +147,11 @@ impl InputOutputBuilder {
         let fee_algorithm = match fee_algorithm.0 {
             FeeVariant::Linear(algo) => algo,
         };
-        map_payload!(
-            &payload.0,
-            p,
-            self.0
-                .seal_with_output_policy(p.payload_data().borrow(), &fee_algorithm, policy.0,)
-        )
+        map_payload!(&payload.0, |payload| self.0.seal_with_output_policy(
+            payload.payload_data().borrow(),
+            &fee_algorithm,
+            policy.0,
+        ))
         .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
         .map(|(_balance, _unassigned, io)| InputOutput(io))
     }

@@ -2,7 +2,7 @@ use crate::*;
 use wasm_bindgen::prelude::*;
 
 macro_rules! transition_from_to {
-    ($from:ident, $to:ident, $builder:expr, $with:ident, $body:expr) => {
+    ($builder: expr, $from:ident -> $to:ident, |$with:ident| $body:expr) => {
         match $builder {
             $from::NoExtra($with) => $to::NoExtra($body),
             $from::OwnerStakeDelegation($with) => $to::OwnerStakeDelegation($body),
@@ -15,7 +15,7 @@ macro_rules! transition_from_to {
 }
 
 macro_rules! for_all_payloads {
-    ($from:ident, $builder:expr, $with:ident, $body:expr) => {
+    ($from:ident, $builder:expr, |$with:ident| $body:expr) => {
         match $builder {
             $from::NoExtra($with) => $body,
             $from::OwnerStakeDelegation($with) => $body,
@@ -116,11 +116,10 @@ impl TransactionBuilderSetIOs {
         let outputs: Vec<_> = outputs.0.iter().map(|i| i.0.clone()).collect();
 
         let tagged = transition_from_to!(
-            TaggedTransactionBuilderSetIOs,
-            TaggedTransactionBuilderSetWitness,
             self.0,
-            builder,
-            builder.set_ios(&inputs[..], &outputs[..])
+            TaggedTransactionBuilderSetIOs ->
+            TaggedTransactionBuilderSetWitness,
+            |builder| builder.set_ios(&inputs[..], &outputs[..])
         );
         TransactionBuilderSetWitness(tagged)
     }
@@ -134,12 +133,9 @@ impl TransactionBuilderSetIOs {
 #[wasm_bindgen]
 impl TransactionBuilderSetWitness {
     pub fn get_auth_data_for_witness(&self) -> TransactionSignDataHash {
-        let hash = for_all_payloads!(
-            TaggedTransactionBuilderSetWitness,
-            &self.0,
-            builder,
+        let hash = for_all_payloads!(TaggedTransactionBuilderSetWitness, &self.0, |builder| {
             builder.get_auth_data_for_witness().hash()
-        );
+        });
 
         TransactionSignDataHash(hash)
     }
@@ -148,35 +144,22 @@ impl TransactionBuilderSetWitness {
         let witnesses: Vec<_> = witnesses.0.iter().map(|w| w.0.clone()).collect();
 
         let tagged = transition_from_to!(
-            TaggedTransactionBuilderSetWitness,
-            TaggedTransactionBuilderSetAuthData,
             self.0,
-            builder,
-            builder.set_witnesses(&witnesses[..])
+            TaggedTransactionBuilderSetWitness ->
+            TaggedTransactionBuilderSetAuthData,
+            |builder| builder.set_witnesses(&witnesses[..])
         );
 
         TransactionBuilderSetAuthData(tagged)
     }
 }
 
-macro_rules! try_map_builder {
-    ($payload:ident, $builder:expr, $with:ident, $body:expr) => {
-        match $builder {
-            TaggedTransactionBuilderSetAuthData::$payload($with) => $body,
-            _ => return Err(JsValue::from_str("Invalid auth type")),
-        }
-    };
-}
-
 #[wasm_bindgen]
 impl TransactionBuilderSetAuthData {
     pub fn get_auth_data(&self) -> TransactionBindingAuthData {
-        for_all_payloads!(
-            TaggedTransactionBuilderSetAuthData,
-            &self.0,
-            builder,
+        for_all_payloads!(TaggedTransactionBuilderSetAuthData, &self.0, |builder| {
             TransactionBindingAuthData(builder.get_auth_data().0.clone().to_owned())
-        )
+        })
     }
 
     /// Set the authenticated data
@@ -185,42 +168,42 @@ impl TransactionBuilderSetAuthData {
         use TaggedPayloadAuthData as P;
 
         let tx = match auth.0 {
-            P::NoPayload(a) => try_map_builder!(
-                NoExtra,
-                self.0,
-                builder,
-                T::NoExtra(builder.set_payload_auth(&a))
-            ),
-            P::OwnerStakeDelegation(a) => try_map_builder!(
-                OwnerStakeDelegation,
-                self.0,
-                builder,
-                T::OwnerStakeDelegation(builder.set_payload_auth(&a))
-            ),
-            P::StakeDelegation(a) => try_map_builder!(
-                StakeDelegation,
-                self.0,
-                builder,
-                T::StakeDelegation(builder.set_payload_auth(&a))
-            ),
-            P::PoolRegistration(a) => try_map_builder!(
-                PoolRegistration,
-                self.0,
-                builder,
-                T::PoolRegistration(builder.set_payload_auth(&a))
-            ),
-            P::PoolRetirement(a) => try_map_builder!(
-                PoolRetirement,
-                self.0,
-                builder,
-                T::PoolRetirement(builder.set_payload_auth(&a))
-            ),
-            P::PoolUpdate(a) => try_map_builder!(
-                PoolUpdate,
-                self.0,
-                builder,
-                T::PoolUpdate(builder.set_payload_auth(&a))
-            ),
+            P::NoPayload(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::NoExtra(builder) => {
+                    T::NoExtra(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::StakeDelegation(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::StakeDelegation(builder) => {
+                    T::StakeDelegation(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::OwnerStakeDelegation(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::OwnerStakeDelegation(builder) => {
+                    T::OwnerStakeDelegation(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::PoolRegistration(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::PoolRegistration(builder) => {
+                    T::PoolRegistration(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::PoolRetirement(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::PoolRetirement(builder) => {
+                    T::PoolRetirement(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::PoolUpdate(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::PoolUpdate(builder) => {
+                    T::PoolUpdate(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
         };
         Ok(Transaction(tx))
     }
