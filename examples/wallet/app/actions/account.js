@@ -36,7 +36,12 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
           ...keys
         })
       )
-      .then(() => dispatch(updateAccountState()));
+      .then(() =>
+        Promise.all([
+          dispatch(updateAccountTransactions()),
+          dispatch(updateAccountState())
+        ])
+      );
   };
 }
 
