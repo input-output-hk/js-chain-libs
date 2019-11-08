@@ -15,8 +15,8 @@ import typeof {
 import typeof { updateNodeSettings as UpdateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
-  setAccount: SetAccount,
   setAccountFromMnemonic: SetAccountFromMnemonic,
+  setAccount: SetAccount,
   updateNodeSettings: UpdateNodeSettings,
   privateKey: string,
   mnemonicPhrase: string
@@ -37,11 +37,11 @@ export default ({
   };
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
+    console.log('ESTOY HANDLEANDO');
+    const nn = mnemonicPhrase;
+    console.log(nn);
     event.preventDefault();
-    return Promise.all([
-      setAccountFromMnemonic(newMnemonicPhrase),
-      updateNodeSettings()
-    ]);
+    return Promise.all([setAccountFromMnemonic(newMnemonicPhrase)]);
   };
 
   if (privateKey || mnemonicPhrase) {
@@ -59,7 +59,7 @@ export default ({
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
       <Tab eventKey="keyString" title="Use key string">
         <Container>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} className="mt-5">
             <Form.Group>
               <Form.Label>Private key:</Form.Label>
               <Form.Control
@@ -91,24 +91,41 @@ export default ({
       </Tab>
       <Tab eventKey="mnemonic" title="Use mnemonic phrase">
         <Container>
-          <Form onSubmit={handleSubmitMnemonic}>
+          <Form onSubmit={handleSubmitMnemonic} className="mt-5">
             <Form.Group>
-              <Form.Label>Mnemonic phrase:</Form.Label>
+              <Form.Label>Wallet Seed:</Form.Label>
               <Form.Control
                 required
                 type="text"
                 name="mnemonicPhrase"
+                placeholder="Enter your secret twelve word phrase here to restore your vault"
                 value={newMnemonicPhrase}
                 onChange={event => setNewMnemonicPhrase(event.target.value)}
               />
               <Form.Text>
-                It&apos;s a string like:
+                Example:
                 <br />
                 <code>
                   nerve lawn adjust chunk convince must patient agent limb
                   symbol increase ridgel
                 </code>
               </Form.Text>
+              <Form.Control
+                required
+                type="password"
+                name="newMnemonicPassword"
+                placeholder="New password"
+                value={newMnemonicPhrase}
+                className="mt-3"
+              />
+              <Form.Control
+                required
+                type="password"
+                name="confirmationNewMnemonicPassword"
+                placeholder="Confirm password"
+                value={newMnemonicPhrase}
+                className="mt-3"
+              />
             </Form.Group>
             <Row className="justify-content-between">
               {/* TODO: bind this button */}
