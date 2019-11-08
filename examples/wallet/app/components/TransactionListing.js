@@ -39,6 +39,7 @@ const transactionToRow = (
 ) => {
   let transactionType: TransactionType;
   const inputSum = sumAmounts(inputs);
+  const outputSum = sumAmounts(outputs || []);
   if (certificate) {
     transactionType = 'DELEGATE';
   } else if (inputs.find(({ address }) => address === myAddress)) {
@@ -70,7 +71,7 @@ const transactionToRow = (
       {/* TODO show date */}
       <Col xs={1}>04/20/2020</Col>
       <Col className={styles.amount} xs={2}>
-        {inputSum}
+        {inputSum > outputSum ? inputSum : outputSum}
       </Col>
       {/* TODO show confirmations */}
       <Col className={styles.transactionStatus} xs={2}>
