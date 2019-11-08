@@ -10,17 +10,18 @@ export type Identifier = string;
 export type Delegation = Array<{ poolId: string, amount: number }>;
 export type PoolId = string;
 export type TransactionHash = string;
-export type CertificateType = 'STAKE_DELEGATION';
+export type CertificateType =
+  | 'STAKE_DELEGATION'
+  | 'POOL_REGISTRATION'
+  | 'OWNER_STAKE_DELEGATION';
 export type Certificate = {
-  type: CertificateType
-};
-export type DelegationCertificate = Certificate & {
+  type: CertificateType,
   pool: PoolId
 };
 
 export type Transaction = {
   id: TransactionHash,
-  certificate?: DelegationCertificate,
+  certificate?: Certificate,
   blockHeight?: number, // it will not be present until the transaction is included in a block
   inputs: Array<TransactionInput>,
   outputs: Array<TransactionOutput>

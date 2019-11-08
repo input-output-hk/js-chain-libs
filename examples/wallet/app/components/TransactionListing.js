@@ -20,7 +20,6 @@ type Props = {
   transactions: Array<Transaction>,
   myAddress: Address
 };
-type TransactionType = 'SEND' | 'RECEIVE' | 'DELEGATE';
 
 export default ({ transactions, myAddress }: Props) => {
   return (
@@ -37,11 +36,16 @@ const transactionToRow = (
   myAddress: Address,
   { id, certificate, inputs, outputs }: Transaction
 ) => {
-  let transactionType: TransactionType;
+  let transactionType;
   const inputSum = sumAmounts(inputs);
   const outputSum = sumAmounts(outputs || []);
   if (certificate) {
-    transactionType = 'DELEGATE';
+    const printableCertificateTypes = {
+      STAKE_DELEGATION: 'DELEGATION',
+      OWNER_STAKE_DELEGATION: 'OWNER DELEGATION',
+      POOL_REGISTRATION: 'POOL CREATION'
+    };
+    transactionType = printableCertificateTypes[certificate.type];
   } else if (inputs.find(({ address }) => address === myAddress)) {
     transactionType = 'SEND';
   } else if ((outputs || []).find(({ address }) => address === myAddress)) {

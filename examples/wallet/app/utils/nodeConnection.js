@@ -43,19 +43,25 @@ export function getTransactions(address: Address): Promise<Array<Transaction>> {
         outputs: flattenInputOrOutput(it.outputs),
         inputs: flattenInputOrOutput(it.inputs),
         blockHeight: Number(it.block.chainLength),
-        certificate:
-          it.certificate &&
-          // the only kind we handle so far
-          // eslint-disable-next-line no-underscore-dangle
-          it.certificate.__typename === 'StakeDelegation'
-            ? {
-                pool: it.certificate.pool.id,
-                type: 'STAKE_DELEGATION'
-              }
-            : null
+        certificate: getCertificate(it.certificate)
       }))
     }));
 }
+
+const getCertificate = it => {
+  if (!it) {
+    return null;
+  }
+  return {
+    type: {
+      StakeDelegation: 'STAKE_DELEGATION',
+      OwnerStakeDelegation: 'OWNER_STAKE_DELEGATION',
+      PoolRegistration: 'POOL_REGISTRATION'
+      // eslint-disable-next-line no-underscore-dangle
+    }[it.__typename],
+    pool: it.pool.id
+  };
+};
 
 export function getNodeSettings(): Promise<NodeSettings> {
   return axios
@@ -85,6 +91,16 @@ const graphQlGetTransactionsQuery =
       certificate{\
         __typename,\
         ... on StakeDelegation {\
+          pool{\
+            id\
+          }\
+        }\
+        ... on PoolRegistration {\
+          pool{\
+            id\
+          }\
+        }\
+        ... on OwnerStakeDelegation {\
           pool{\
             id\
           }\
