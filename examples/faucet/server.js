@@ -77,6 +77,21 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       (1 + 1) * nodeSettings.fees.coefficient + nodeSettings.fees.constant;
 
     const inputAmount = fastify.config.LOVELACES_TO_GIVE + computedFee;
+
+    // To get the account spending counter used for signing and the account available funds
+    const accountStatus = await jormungandrApi.getAccountStatus(
+      fastify.config.JORMUNGANDR_API,
+      uint8array_to_hex(secretKey.to_public().as_bytes())
+    );
+
+    const available_funds = accountStatus.value;
+    if (inputAmount > available_funds) {
+      reply
+        .code(503)
+        .send('No funds available in faucet account');
+      return;
+    }
+
     const input = Input.from_account(
       faucetAccount,
       Value.from_str(inputAmount.toString())
@@ -100,12 +115,6 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       Payload.no_payload(),
       feeAlgorithm,
       OutputPolicy.forget()
-    );
-
-    // To get the account counter used for signing
-    const accountStatus = await jormungandrApi.getAccountStatus(
-      fastify.config.JORMUNGANDR_API,
-      uint8array_to_hex(secretKey.to_public().as_bytes())
     );
 
     const builderSetWitness = new TransactionBuilder()
@@ -138,7 +147,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
       .code(200)
       .send(`transaction id: ${uint8array_to_hex(message.id().as_bytes())}`);
   } catch (err) {
-    fastify.log.error(err);
+    fastify.log.error(err.message);
   }
 });
 
