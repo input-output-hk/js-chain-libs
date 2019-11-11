@@ -19,7 +19,8 @@ type Props = {
   setAccount: SetAccount,
   updateNodeSettings: UpdateNodeSettings,
   privateKey: string,
-  mnemonicPhrase: string
+  mnemonicPhrase: string,
+  mnemonicPassword: string
 };
 
 // FIXME: this has no error handling, neither while parsing the address
@@ -29,7 +30,8 @@ export default ({
   setAccount,
   setAccountFromMnemonic,
   privateKey,
-  mnemonicPhrase
+  mnemonicPhrase,
+  mnemonicPassword
 }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
@@ -37,23 +39,23 @@ export default ({
   };
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
-    console.log('ESTOY HANDLEANDO');
-    const nn = mnemonicPhrase;
-    console.log(nn);
     event.preventDefault();
-    return Promise.all([setAccountFromMnemonic(newMnemonicPhrase)]);
+    return Promise.all([
+      setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
+    ]);
   };
 
-  if (privateKey || mnemonicPhrase) {
+  if (privateKey) {
     return <Redirect push to={routes.WALLET} />;
   }
 
-  const [
-    newPrivateKey,
-    setNewPrivateKey,
-    newMnemonicPhrase,
-    setNewMnemonicPhrase
-  ] = useState(privateKey, mnemonicPhrase);
+  const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
+
+  const [newMnemonicPhrase, setNewMnemonicPhrase] = useState(mnemonicPhrase);
+
+  const [newMnemonicPassword, setNewMnemonicPassword] = useState(
+    mnemonicPassword
+  );
 
   return (
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
@@ -98,7 +100,7 @@ export default ({
                 required
                 type="text"
                 name="mnemonicPhrase"
-                placeholder="Enter your secret twelve word phrase here to restore your vault"
+                placeholder="Enter your secret twenty four word phrase here to restore your vault"
                 value={newMnemonicPhrase}
                 onChange={event => setNewMnemonicPhrase(event.target.value)}
               />
@@ -106,24 +108,17 @@ export default ({
                 Example:
                 <br />
                 <code>
-                  nerve lawn adjust chunk convince must patient agent limb
-                  symbol increase ridgel
+                  decade panther require cruise robust mail gadget advice
+                  tonight post inner snack web sorry actor topple floor odor
+                  lift few reflect august cousin year
                 </code>
               </Form.Text>
               <Form.Control
-                required
                 type="password"
-                name="newMnemonicPassword"
-                placeholder="New password"
-                value={newMnemonicPhrase}
-                className="mt-3"
-              />
-              <Form.Control
-                required
-                type="password"
-                name="confirmationNewMnemonicPassword"
-                placeholder="Confirm password"
-                value={newMnemonicPhrase}
+                name="mnemonicPassword"
+                placeholder="Secret password"
+                value={newMnemonicPassword}
+                onChange={event => setNewMnemonicPassword(event.target.value)}
                 className="mt-3"
               />
             </Form.Group>

@@ -1,35 +1,32 @@
-import bip39 from 'bip39';
+import * as Bip39 from 'bip39';
 
-const validWords = bip39.wordlists.english;
+import wordlist from './wordlist.en';
 
-export const isValidMnemonic = (mnemonicPhrase, numberOfWords = 18) => {
+const { bip39 } = Bip39;
+
+export const isValidMnemonic = (mnemonicPhrase, numberOfWords = 24) => {
   console.log('*** fromMnemonic mnemonicPhrase: '.concat(mnemonicPhrase));
   return (
+    mnemonicPhrase &&
     mnemonicPhrase.split(' ').length === numberOfWords &&
-    bip39.validateMnemonic(mnemonicPhrase, validWords)
+    Bip39.validateMnemonic(mnemonicPhrase, wordlist)
   );
 };
 
 export const fromMnemonic = mnemonicPhrase => {
   console.log('*** fromMnemonic mnemonicPhrase: '.concat(mnemonicPhrase));
-  bip39.mnemonicToEntropy(mnemonicPhrase, validWords);
+  Bip39.mnemonicToEntropy(mnemonicPhrase, wordlist);
 };
 
-export const generateMnemonic = (ms: ?number = 18) => {
-  let ent = 192;
+export const generateMnemonic = (ms: ?number = 24) => {
+  let ent = 256;
   switch (ms) {
-    case 18:
-      ent = 192;
-      break;
-    case 21:
-      ent = 224;
-      break;
     case 24:
       ent = 256;
       break;
     default:
-      ent = 192;
+      ent = 256;
   }
 
-  return bip39.generateMnemonic(ent, null, validWords);
+  return bip39.generateMnemonic(ent, null, wordlist);
 };
