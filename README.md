@@ -40,9 +40,9 @@ wasm-pack pack
 
 ## Examples
 
-Check the [wallet example](/examples/wallet/app/utils/wasmWrapper.js) to see how to use this bindings in electron
+Check the [wallet example](./examples/wallet/app/utils/wasmWrapper.js) to see how to use this bindings in electron
 
-Check the [example faucet](/examples/faucet/server.js) to see how to use this bindings in node.
+Check the [example faucet](./examples/faucet/server.js) to see how to use this bindings in node.
 
 ## Testing
 
