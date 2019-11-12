@@ -39,6 +39,37 @@ export async function getAccountFromPrivateKey(
   };
 }
 
+export async function getAccountFromSeed(
+  seed: Uint8Array
+): Promise<AccountKeys> {
+  const {
+    PrivateKey,
+    PublicKey,
+    Account,
+    AccountIdentifier,
+    AddressDiscrimination
+  } = await wasmBindings;
+  const privateKey: PrivateKey = PrivateKey.from_normal_bytes(
+    seed.slice(0, 32)
+  );
+  const publicKey: PublicKey = privateKey.to_public();
+  const secret = privateKey.to_bech32();
+  const account: Account = Account.from_public_key(publicKey);
+  const identifier: AccountIdentifier = account.to_identifier();
+  const networkDiscrimination: AddressDiscrimination =
+    config.get('networkDiscrimination') === 'testnet'
+      ? AddressDiscrimination.Test
+      : AddressDiscrimination.Production;
+  const address: string = account
+    .to_address(networkDiscrimination)
+    .to_string(config.get('addressPrefix'));
+  return {
+    address,
+    privateKey: secret,
+    identifier: identifier.to_hex()
+  };
+}
+
 export async function buildDelegateTransaction(
   newDelegation: Delegation,
   secret: InternalPrivateKey,

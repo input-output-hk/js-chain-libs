@@ -8342,10 +8342,10 @@ js-base64@^2.1.8:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.1.tgz#1efa39ef2c5f7980bb1784ade4a8af2de3291121"
   integrity sha512-M7kLczedRMYX4L8Mdh4MzyAMM9O5osx+4FcOQuTvr3A9F2D9S5JXheN0ewNbrvK2UatkTRhL5ejGmGSjNMiZuw==
 
-js-chain-libs@0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/js-chain-libs/-/js-chain-libs-0.1.2.tgz#30db82ee8f530a6240421724e2c25822901d1178"
-  integrity sha512-8sOUhAOeOys/Qfqvr+IMNdQteu50axAoPvbY02rgZ6RhrnBAU751cZoHuwnInWjUGQPCVySoW0m8zecDhC5LuA==
+js-chain-libs@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/js-chain-libs/-/js-chain-libs-0.2.0.tgz#1207dc4bb8868321173190bf96f25c32f5406f30"
+  integrity sha512-wKJv+jtYmeSEmRi+8UpcfnTh2lzKSNSpGYpkUtAso/dsIOsLAWucdIPNZSh/MOeJUjxoGZEDxuzjChtiQsx35A==
 
 js-levenshtein@^1.1.3:
   version "1.1.6"

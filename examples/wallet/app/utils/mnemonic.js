@@ -13,9 +13,10 @@ export const isValidMnemonic = (mnemonicPhrase, numberOfWords = 24) => {
   );
 };
 
-export const fromMnemonic = mnemonicPhrase => {
+export const fromMnemonic = (mnemonicPhrase, mnemonicPassword) => {
   console.log('*** fromMnemonic mnemonicPhrase: '.concat(mnemonicPhrase));
-  Bip39.mnemonicToEntropy(mnemonicPhrase, wordlist);
+  const seed = Bip39.mnemonicToSeedSync(mnemonicPhrase, mnemonicPassword);
+  return seed;
 };
 
 export const generateMnemonic = (ms: ?number = 24) => {

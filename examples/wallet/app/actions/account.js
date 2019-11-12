@@ -17,6 +17,8 @@ import type {
 import {
   getAccountFromPrivateKey,
   buildSendFundsTransaction,
+  getAccountFromSeed,
+  buildTransaction,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
 import {
@@ -26,7 +28,9 @@ import {
 } from '../utils/nodeConnection';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
+export type SetMnemonicAction = { type: 'SET_MNEMONIC' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
+export const SET_MNEMONIC = 'SET_MNEMONIC';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
@@ -45,17 +49,43 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
       );
   };
 }
+
 export function setAccountFromMnemonic(
-  mnemonicPhrase: string
-): Thunk<SetKeysAction> {
-  console.log('setAccosetAccountFromMnemonicunt: '.concat(mnemonicPhrase));
+  mnemonicPhrase: string,
+  mnemonicPassword: string
+): Thunk<SetMnemonicAction> {
+  console.log(
+    'setAccountFromMnemonic: '
+      .concat('nmenmonic: ')
+      .concat(mnemonicPhrase)
+      .concat('password: ')
+      .concat(mnemonicPassword)
+  );
+  if (isValidMnemonic(mnemonicPhrase)) {
+    const seed = fromMnemonic(
+      mnemonicPhrase,
+      mnemonicPassword === undefined ? '' : mnemonicPassword
+    );
+    console.log('ESTO SE PUEDE CAMBIAR: '.concat(seed.toString()));
+    return function setAccountThunk(dispatch) {
+      return getAccountFromSeed(seed)
+        .then((keys: AccountKeys) =>
+          dispatch({
+            type: SET_KEYS,
+            ...keys
+          })
+        )
+        .then(() => dispatch(updateAccountState()));
+    };
+  }
 }
+
 export type SetAccountStateAction = {
   type: 'SET_ACCOUNT_STATE'
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk<SetAccountStateAction> {
+export function updateAccountState(): Thunk<SetAccountState> {
   return function updateAccountStateThunk(dispatch, getState) {
     const { identifier }: { identifier: Identifier } = getState().account;
     if (!identifier) {
