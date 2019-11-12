@@ -37,13 +37,13 @@ export function getTransactions(address: Address): Promise<Array<Transaction>> {
       variables: { address },
       query: graphQlGetTransactionsQuery
     })
-    .then(({ data: { data: { address: { transactions } } } }) => ({
-      transactions: transactions.map(it => ({
-        id: it.id,
-        outputs: flattenInputOrOutput(it.outputs),
-        inputs: flattenInputOrOutput(it.inputs),
-        blockHeight: Number(it.block.chainLength),
-        certificate: getCertificate(it.certificate)
+    .then(({ data: { data: { address: { transactions: { edges } } } } }) => ({
+      transactions: edges.map(({ node }) => ({
+        id: node.id,
+        outputs: flattenInputOrOutput(node.outputs),
+        inputs: flattenInputOrOutput(node.inputs),
+        blockHeight: Number(node.block.chainLength),
+        certificate: getCertificate(node.certificate)
       }))
     }));
 }
@@ -59,7 +59,8 @@ const getCertificate = it => {
       PoolRegistration: 'POOL_REGISTRATION'
       // eslint-disable-next-line no-underscore-dangle
     }[it.__typename],
-    pool: it.pool.id
+    // FIXME: handle multiple pool delegation
+    pool: it.pool ? it.pool.id : it.pools[0].id
   };
 };
 
@@ -87,38 +88,42 @@ const graphQlGetTransactionsQuery =
   address(bech32: $address){\
     id,\
     transactions {\
-      id,\
-      certificate{\
-        __typename,\
-        ... on StakeDelegation {\
-          pool{\
-            id\
+      edges{\
+        node{\
+          id,\
+          certificate{\
+            __typename,\
+            ... on StakeDelegation {\
+              pools:pool{\
+                id\
+              }\
+            }\
+            ... on PoolRegistration {\
+              pool{\
+                id\
+              }\
+            }\
+            ... on OwnerStakeDelegation {\
+              pools:pool{\
+                id\
+              }\
+            }\
+          },\
+          block{\
+            chainLength\
           }\
-        }\
-        ... on PoolRegistration {\
-          pool{\
-            id\
+          inputs{\
+            amount,\
+            address {\
+              id\
+            }\
           }\
-        }\
-        ... on OwnerStakeDelegation {\
-          pool{\
-            id\
+          outputs{\
+            amount,\
+            address{\
+              id\
+            }\
           }\
-        }\
-      },\
-      block{\
-        chainLength\
-      }\
-      inputs{\
-        amount,\
-        address {\
-          id\
-        }\
-      }\
-      outputs{\
-        amount,\
-        address{\
-          id\
         }\
       }\
     }\
