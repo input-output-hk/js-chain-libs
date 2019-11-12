@@ -47,13 +47,22 @@ export async function buildDelegateTransaction(
     OutputPolicy,
     PoolId,
     TransactionBuilder,
+    InputOutput,
+    InputOutputBuilder,
+    Payload,
+    Witnesses,
+    PayloadAuthData,
+    DelegationType,
+    StakeDelegationAuthData,
+    AccountBindingSignature,
+    Transaction,
+    TransactionBuilderSetWitness,
+    TransactionBuilderSetAuthData,
     Certificate,
     StakeDelegation,
     Input,
     Value,
     Fee,
-    TransactionFinalizer,
-    Transaction,
     Fragment,
     PrivateKey,
     PublicKey,
@@ -78,17 +87,16 @@ export async function buildDelegateTransaction(
     Value.from_str(computedFee.toString())
   );
   // Create certificate
+  const singlePoolDelegation: DelegationType = DelegationType.full(
+    PoolId.from_hex(poolId)
+  );
   const certificate: Certificate = Certificate.stake_delegation(
-    StakeDelegation.new(PoolId.from_hex(poolId), sourcePublicKey)
+    StakeDelegation.new(singlePoolDelegation, sourcePublicKey)
   );
 
-  certificate.sign(PrivateKey.from_bech32(secret));
+  const iobuilder: InputOutputBuilder = InputOutputBuilder.empty();
 
-  const txbuilder: TransactionBuilder = TransactionBuilder.new_payload(
-    certificate
-  );
-
-  txbuilder.add_input(input);
+  iobuilder.add_input(input);
 
   const feeAlgorithm: Fee = Fee.linear_fee(
     Value.from_str(nodeSettings.fees.constant.toString()),
@@ -97,21 +105,43 @@ export async function buildDelegateTransaction(
   );
 
   // The amount is exact, that's why we use `forget()`
-  const finalizedTx: Transaction = txbuilder.seal_with_output_policy(
+  const IOs: InputOutput = iobuilder.seal_with_output_policy(
+    Payload.certificate(certificate),
     feeAlgorithm,
     OutputPolicy.forget()
   );
-  const finalizer: TransactionFinalizer = new TransactionFinalizer(finalizedTx);
+
+  const builderSetWitness: TransactionBuilderSetWitness = new TransactionBuilder()
+    .payload(certificate)
+    .set_ios(IOs.inputs(), IOs.outputs());
 
   const witness: Witness = Witness.for_account(
     Hash.from_hex(nodeSettings.block0Hash),
-    finalizer.get_tx_sign_data_hash(),
+    builderSetWitness.get_auth_data_for_witness(),
     privateKey,
     SpendingCounter.from_u32(accountCounter)
   );
-  finalizer.set_witness(0, witness);
-  const signedTx = finalizer.finalize();
-  const message: Fragment = Fragment.from_authenticated_transaction(signedTx);
+  const witnesses: Witness = Witnesses.new();
+  witnesses.add(witness);
+
+  const builderSignCertificate: TransactionBuilderSetAuthData = builderSetWitness.set_witnesses(
+    witnesses
+  );
+
+  const signature: PayloadAuthData = PayloadAuthData.for_stake_delegation(
+    StakeDelegationAuthData.new(
+      AccountBindingSignature.new(
+        PrivateKey.from_bech32(secret),
+        builderSignCertificate.get_auth_data()
+      )
+    )
+  );
+
+  const signedTx: Transaction = builderSignCertificate.set_payload_auth(
+    signature
+  );
+
+  const message: Fragment = Fragment.from_transaction(signedTx);
 
   return {
     transaction: message.as_bytes(),
