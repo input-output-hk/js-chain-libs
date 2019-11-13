@@ -5,7 +5,6 @@ import wordlist from './wordlist.en';
 const { bip39 } = Bip39;
 
 export const isValidMnemonic = (mnemonicPhrase, numberOfWords = 24) => {
-  console.log('*** fromMnemonic mnemonicPhrase: '.concat(mnemonicPhrase));
   return (
     mnemonicPhrase &&
     mnemonicPhrase.split(' ').length === numberOfWords &&
@@ -14,7 +13,6 @@ export const isValidMnemonic = (mnemonicPhrase, numberOfWords = 24) => {
 };
 
 export const fromMnemonic = (mnemonicPhrase, mnemonicPassword) => {
-  console.log('*** fromMnemonic mnemonicPhrase: '.concat(mnemonicPhrase));
   const seed = Bip39.mnemonicToSeedSync(mnemonicPhrase, mnemonicPassword);
   return seed;
 };

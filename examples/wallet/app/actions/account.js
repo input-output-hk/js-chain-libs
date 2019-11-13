@@ -54,19 +54,11 @@ export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword: string
 ): Thunk<SetMnemonicAction> {
-  console.log(
-    'setAccountFromMnemonic: '
-      .concat('nmenmonic: ')
-      .concat(mnemonicPhrase)
-      .concat('password: ')
-      .concat(mnemonicPassword)
-  );
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = fromMnemonic(
       mnemonicPhrase,
       mnemonicPassword === undefined ? '' : mnemonicPassword
     );
-    console.log('ESTO SE PUEDE CAMBIAR: '.concat(seed.toString()));
     return function setAccountThunk(dispatch) {
       return getAccountFromSeed(seed)
         .then((keys: AccountKeys) =>
