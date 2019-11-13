@@ -1186,6 +1186,29 @@ impl Block {
             .collect::<Vec<Fragment>>()
             .into()
     }
+
+    pub fn epoch(&self) -> u32 {
+        self.0.date().epoch
+    }
+
+    pub fn slot(&self) -> u32 {
+        self.0.date().slot_id
+    }
+
+    pub fn chain_length(&self) -> u32 {
+        u32::from(self.0.chain_length())
+    }
+
+    pub fn leader_id(&self) -> Option<PoolId> {
+        match self.0.header.get_stakepool_id() {
+            Some(id) => Some(id.into()),
+            None => None,
+        }
+    }
+
+    pub fn content_size(&self) -> u32 {
+        self.0.header.block_content_size()
+    }
 }
 
 #[wasm_bindgen]
