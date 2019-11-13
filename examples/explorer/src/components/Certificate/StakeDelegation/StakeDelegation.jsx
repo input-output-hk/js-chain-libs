@@ -20,12 +20,14 @@ const StakeDelegation = ({ certificate }) => (
             <AddressLink id={certificate.account.id} />
           </td>
         </tr>
-        <tr>
-          <td>Pool:</td>
-          <td>
-            <StakePoolLink id={certificate.pool.id} />
-          </td>
-        </tr>
+        {certificate.pools.map(pool => (
+          <tr>
+            <td>Pool: </td>
+            <td>
+              <StakePoolLink id={pool.id} />
+            </td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   </div>
@@ -41,7 +43,7 @@ export default createFragmentContainer(
         account {
           id
         }
-        pool {
+        pools: pool {
           id
         }
       }

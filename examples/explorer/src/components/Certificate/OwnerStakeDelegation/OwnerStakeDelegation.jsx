@@ -13,12 +13,14 @@ const OwnerStakeDelegation = ({ certificate }) => (
           <td>Type:</td>
           <td>{certificate.__typename}</td>
         </tr>
-        <tr>
-          <td>Pool Id:</td>
-          <td>
-            <StakePoolLink id={certificate.pool.id} />
-          </td>
-        </tr>
+        {certificate.pools.map(pool => (
+          <tr>
+            <td>Pool: </td>
+            <td>
+              <StakePoolLink id={pool.id} />
+            </td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   </div>
@@ -31,7 +33,7 @@ export default createFragmentContainer(
     certificate: graphql`
       fragment OwnerStakeDelegation_certificate on OwnerStakeDelegation {
         __typename
-        pool {
+        pools: pool {
           id
         }
       }
