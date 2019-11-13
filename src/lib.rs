@@ -437,6 +437,14 @@ impl UtxoPointer {
             value: value.0,
         })
     }
+
+    pub fn output_index(&self) -> u8 {
+        self.0.output_index
+    }
+
+    pub fn fragment_id(&self) -> FragmentId {
+        self.0.transaction_id.into()
+    }
 }
 
 /// This is either an single account or a multisig account depending on the witness type
