@@ -107,7 +107,7 @@ it('create transaction', async () => {
 
   const signature = PayloadAuthData.for_stake_delegation(
     StakeDelegationAuthData.new(
-      AccountBindingSignature.new(
+      AccountBindingSignature.new_single(
         PrivateKey.from_bech32(delegation.privateKey),
         builderSignCertificate.get_auth_data()
       )

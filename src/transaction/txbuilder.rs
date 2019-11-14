@@ -264,7 +264,7 @@ impl StakeDelegationAuthData {
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct IndexedSignature {
-    index: u16,
+    index: u8,
     signature: AccountBindingSignature,
 }
 
@@ -272,7 +272,7 @@ crate::impl_collection!(IndexSignatures, IndexedSignature);
 
 #[wasm_bindgen]
 impl IndexedSignature {
-    pub fn new(index: u16, signature: AccountBindingSignature) -> IndexedSignature {
+    pub fn new(index: u8, signature: AccountBindingSignature) -> IndexedSignature {
         Self { index, signature }
     }
 }
@@ -283,8 +283,8 @@ pub struct AccountBindingSignature(tx::AccountBindingSignature);
 
 #[wasm_bindgen]
 impl AccountBindingSignature {
-    pub fn new(private_key: &PrivateKey, auth_data: &TransactionBindingAuthData) -> Self {
-        Self(tx::AccountBindingSignature::new(
+    pub fn new_single(private_key: &PrivateKey, auth_data: &TransactionBindingAuthData) -> Self {
+        Self(tx::AccountBindingSignature::new_single(
             &private_key.0,
             &tx::TransactionBindingAuthData(auth_data.0.as_slice()),
         ))
@@ -296,13 +296,22 @@ pub struct PoolRegistrationAuthData(<certificate::PoolRegistration as tx::Payloa
 
 #[wasm_bindgen]
 impl PoolRegistrationAuthData {
-    pub fn new(signatures: IndexSignatures) -> Self {
-        let signatures = signatures
+    pub fn new(signatures: IndexSignatures) -> Result<PoolRegistrationAuthData, JsValue> {
+        signatures
             .0
             .iter()
-            .map(|IndexedSignature { index, signature }| (*index, signature.0.clone()))
-            .collect();
-        Self(certificate::PoolOwnersSigned { signatures })
+            .map(|IndexedSignature { index, signature }| match &signature.0 {
+                tx::AccountBindingSignature::Single(s) => Ok((*index, s.clone())),
+                tx::AccountBindingSignature::Multi(_) => {
+                    Err(JsValue::from_str("Expected single account signature"))
+                }
+            })
+            .collect::<Result<_, JsValue>>()
+            .map(|signatures| {
+                Self(certificate::PoolSignature::Owners(
+                    certificate::PoolOwnersSigned { signatures },
+                ))
+            })
     }
 }
 
@@ -311,13 +320,22 @@ pub struct PoolRetirementAuthData(<certificate::PoolRetirement as tx::Payload>::
 
 #[wasm_bindgen]
 impl PoolRetirementAuthData {
-    pub fn new(signatures: IndexSignatures) -> Self {
-        let signatures = signatures
+    pub fn new(signatures: IndexSignatures) -> Result<PoolRetirementAuthData, JsValue> {
+        signatures
             .0
             .iter()
-            .map(|IndexedSignature { index, signature }| (*index, signature.0.clone()))
-            .collect();
-        Self(certificate::PoolOwnersSigned { signatures })
+            .map(|IndexedSignature { index, signature }| match &signature.0 {
+                tx::AccountBindingSignature::Single(s) => Ok((*index, s.clone())),
+                tx::AccountBindingSignature::Multi(_) => {
+                    Err(JsValue::from_str("Expected single account signature"))
+                }
+            })
+            .collect::<Result<_, JsValue>>()
+            .map(|signatures| {
+                Self(certificate::PoolSignature::Owners(
+                    certificate::PoolOwnersSigned { signatures },
+                ))
+            })
     }
 }
 
@@ -326,12 +344,21 @@ pub struct PoolUpdateAuthData(<certificate::PoolUpdate as tx::Payload>::Auth);
 
 #[wasm_bindgen]
 impl PoolUpdateAuthData {
-    pub fn new(signatures: IndexSignatures) -> Self {
-        let signatures = signatures
+    pub fn new(signatures: IndexSignatures) -> Result<PoolUpdateAuthData, JsValue> {
+        signatures
             .0
             .iter()
-            .map(|IndexedSignature { index, signature }| (*index, signature.0.clone()))
-            .collect();
-        Self(certificate::PoolOwnersSigned { signatures })
+            .map(|IndexedSignature { index, signature }| match &signature.0 {
+                tx::AccountBindingSignature::Single(s) => Ok((*index, s.clone())),
+                tx::AccountBindingSignature::Multi(_) => {
+                    Err(JsValue::from_str("Expected single account signature"))
+                }
+            })
+            .collect::<Result<_, JsValue>>()
+            .map(|signatures| {
+                Self(certificate::PoolSignature::Owners(
+                    certificate::PoolOwnersSigned { signatures },
+                ))
+            })
     }
 }

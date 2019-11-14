@@ -442,10 +442,10 @@ impl UtxoPointer {
 /// This is either an single account or a multisig account depending on the witness type
 #[wasm_bindgen]
 #[derive(Debug)]
-pub struct Account(tx::AccountIdentifier);
+pub struct Account(tx::UnspecifiedAccountIdentifier);
 
-impl From<tx::AccountIdentifier> for Account {
-    fn from(account_identifier: tx::AccountIdentifier) -> Account {
+impl From<tx::UnspecifiedAccountIdentifier> for Account {
+    fn from(account_identifier: tx::UnspecifiedAccountIdentifier) -> Account {
         Account(account_identifier)
     }
 }
@@ -454,9 +454,9 @@ impl From<tx::AccountIdentifier> for Account {
 impl Account {
     pub fn from_address(address: &Address) -> Result<Account, JsValue> {
         if let chain_addr::Kind::Account(key) = address.0.kind() {
-            Ok(Account(tx::AccountIdentifier::from_single_account(
-                key.clone().into(),
-            )))
+            Ok(Account(
+                tx::UnspecifiedAccountIdentifier::from_single_account(key.clone().into()),
+            ))
         } else {
             Err(JsValue::from_str("Address is not account"))
         }
@@ -471,7 +471,9 @@ impl Account {
     }
 
     pub fn from_public_key(key: PublicKey) -> Account {
-        Account(tx::AccountIdentifier::from_single_account(key.0.into()))
+        Account(tx::UnspecifiedAccountIdentifier::from_single_account(
+            key.0.into(),
+        ))
     }
 
     pub fn to_identifier(&self) -> AccountIdentifier {
@@ -715,7 +717,7 @@ impl StakeDelegation {
     /// Create a stake delegation object from account (stake key) to pool_id
     pub fn new(delegation_type: DelegationType, account: PublicKey) -> StakeDelegation {
         certificate::StakeDelegation {
-            account_id: tx::AccountIdentifier::from_single_account(account.0.into()),
+            account_id: tx::UnspecifiedAccountIdentifier::from_single_account(account.0.into()),
             delegation: delegation_type.0,
         }
         .into()
@@ -741,18 +743,23 @@ impl PoolRegistration {
     pub fn new(
         serial: U128,
         owners: PublicKeys,
-        management_threshold: u16,
+        operators: PublicKeys,
+        management_threshold: u8,
         start_validity: TimeOffsetSeconds,
         kes_public_key: KesPublicKey,
         vrf_public_key: VrfPublicKey,
     ) -> PoolRegistration {
+        use chain::certificate::PoolPermissions;
         chain::certificate::PoolRegistration {
             serial: serial.0,
             owners: owners.0.into_iter().map(|key| key.0).collect(),
-            management_threshold,
+            operators: operators.0.into_iter().map(|key| key.0).collect(),
+            permissions: PoolPermissions::new(management_threshold),
             start_validity: start_validity.0,
             // TODO: Hardcoded parameter
             rewards: chain::rewards::TaxType::zero(),
+            // TODO: Hardcoded parameter
+            reward_account: None,
             keys: chain::leadership::genesis::GenesisPraosLeader {
                 kes_public_key: kes_public_key.0,
                 vrf_public_key: vrf_public_key.0,
