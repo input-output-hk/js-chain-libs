@@ -1208,10 +1208,7 @@ impl Block {
     }
 
     pub fn leader_id(&self) -> Option<PoolId> {
-        match self.0.header.get_stakepool_id() {
-            Some(id) => Some(id.into()),
-            None => None,
-        }
+        Some(self.0.header.get_stakepool_id()?.into())
     }
 
     pub fn content_size(&self) -> u32 {
