@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import curry from 'lodash/curry';
@@ -15,6 +14,7 @@ import type {
   TransactionOutput
 } from '../models';
 import styles from './TransactionListing.scss';
+import ListingRow from './ListingRow';
 
 type Props = {
   transactions: Array<Transaction>,
@@ -55,7 +55,7 @@ const transactionToRow = (
     return null;
   }
   return (
-    <Row key={id} className={styles.row}>
+    <ListingRow key={id} className={styles.row}>
       <Col className={styles.transactionType} xs={2}>
         {transactionType}
       </Col>
@@ -82,6 +82,6 @@ const transactionToRow = (
         pending
       </Col>
       {/* TODO add a dropdown with details (inpt sum, output sum, ) */}
-    </Row>
+    </ListingRow>
   );
 };

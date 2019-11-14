@@ -1,6 +1,11 @@
 // @flow
 import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import type { PoolId } from '../models';
+import ListingRow from './ListingRow';
+import styles from './StakePoolList.scss';
 
 type Props = {
   stakePools: Array<PoolId>,
@@ -10,32 +15,25 @@ type Props = {
 
 export default ({ stakePools, onSelection, currentDelegation }: Props) => {
   return (
-    <div>
-      <h3>Pools available</h3>
-      <table>
-        <thead>
-          <tr>
-            <th> Pool id </th>
-          </tr>
-        </thead>
-        <tbody>
-          {stakePools &&
-            stakePools.map(poolId => (
-              <tr key={poolId}>
-                <td>{poolId}</td>
-                <td>
-                  {poolId !== currentDelegation ? (
-                    <button type="button" onClick={() => onSelection(poolId)}>
-                      select
-                    </button>
-                  ) : (
-                    'current delegation'
-                  )}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
+    <Container>
+      {stakePools &&
+        stakePools.map((poolId: PoolId) => (
+          <ListingRow key={poolId}>
+            <Col className={styles.poolId} xs={6}>
+              {poolId}
+            </Col>
+            <Col xs={2}>{poolId !== currentDelegation ? '100%' : '0%'}</Col>
+            <Col xs={3}>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => onSelection(poolId)}
+              >
+                Add to delegation
+              </Button>
+            </Col>
+          </ListingRow>
+        ))}
+    </Container>
   );
 };
