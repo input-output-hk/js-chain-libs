@@ -26,11 +26,10 @@ import {
   broadcastTransaction,
   getTransactions
 } from '../utils/nodeConnection';
+import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
-export type SetMnemonicAction = { type: 'SET_MNEMONIC' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
-export const SET_MNEMONIC = 'SET_MNEMONIC';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
@@ -52,13 +51,10 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
 
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
-  mnemonicPassword: string
-): Thunk<SetMnemonicAction> {
+  mnemonicPassword?: string
+): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
-    const seed = fromMnemonic(
-      mnemonicPhrase,
-      mnemonicPassword === undefined ? '' : mnemonicPassword
-    );
+    const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
       return getAccountFromSeed(seed)
         .then((keys: AccountKeys) =>
@@ -70,6 +66,7 @@ export function setAccountFromMnemonic(
         .then(() => dispatch(updateAccountState()));
     };
   }
+  return false;
 }
 
 export type SetAccountStateAction = {

@@ -33,7 +33,7 @@ export default ({
   mnemonicPhrase,
   mnemonicPassword
 }: Props) => {
-  const handleSubmit = function handleSubmit(event) {
+  const handleSubmitKeyString = function handleSubmitKeyString(event) {
     event.preventDefault();
     return Promise.all([setAccount(newPrivateKey), updateNodeSettings()]);
   };
@@ -61,7 +61,7 @@ export default ({
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
       <Tab eventKey="keyString" title="Use key string">
         <Container>
-          <Form onSubmit={handleSubmit} className="mt-5">
+          <Form onSubmit={handleSubmitKeyString} className="mt-5">
             <Form.Group>
               <Form.Label>Private key:</Form.Label>
               <Form.Control

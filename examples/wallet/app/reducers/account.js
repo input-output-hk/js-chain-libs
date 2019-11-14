@@ -2,7 +2,6 @@
 import sortBy from 'lodash/sortBy';
 import {
   SET_KEYS,
-  SET_MNEMONIC,
   SET_ACCOUNT_STATE,
   SEND_TRANSACTION,
   SEND_STAKE_DELEGATION,
@@ -33,12 +32,6 @@ export default function account(
   }
   switch (action.type) {
     case SET_KEYS:
-      return Object.assign({}, state, {
-        address: action.address,
-        privateKey: action.privateKey,
-        identifier: action.identifier
-      });
-    case SET_MNEMONIC:
       return Object.assign({}, state, {
         address: action.address,
         privateKey: action.privateKey,
