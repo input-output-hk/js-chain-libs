@@ -13,11 +13,18 @@ export function setStakePools(): (
   dispatch: Dispatch<SetStakePoolsAction>
 ) => Promise<SetStakePoolsAction> {
   return function setStakePoolsThunk(dispatch) {
-    return getStakePools().then((stakePools: Array<PoolId>) =>
-      dispatch({
-        type: SET_STAKEPOOLS,
-        stakePools
-      })
+    return (
+      getStakePools()
+        .then((stakePools: Array<PoolId>) =>
+          dispatch({
+            type: SET_STAKEPOOLS,
+            stakePools
+          })
+        )
+        // TODO: display a notification or something
+        .catch(() =>
+          console.error('there was an error fetching stake pools info')
+        )
     );
   };
 }

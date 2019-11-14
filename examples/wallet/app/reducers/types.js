@@ -7,7 +7,8 @@ import type {
   PrivateKey,
   Delegation,
   Identifier,
-  PoolId
+  PoolId,
+  Transaction
 } from '../models';
 
 export type Action = {
@@ -25,7 +26,8 @@ export type AppState = {
   stakePools: StakePools
 };
 
-export type Account = AccountKeys & AccountState;
+export type Account = AccountKeys &
+  AccountState & { transactions: Array<Transaction> };
 
 export type AccountKeys = {
   address: Address,

@@ -14,11 +14,17 @@ export function updateNodeSettings(): (
   dispatch: Dispatch<UpdateNodeSettingsAction>
 ) => Promise<UpdateNodeSettingsAction> {
   return function updateNodeSettingsThunk(dispatch) {
-    return getNodeSettings().then(nodeSettings =>
-      dispatch({
-        type: UPDATE_NODE_SETTINGS,
-        nodeSettings
-      })
+    return (
+      getNodeSettings()
+        .then(nodeSettings =>
+          dispatch({
+            type: UPDATE_NODE_SETTINGS,
+            nodeSettings
+          })
+        )
+        // TODO: display a notification or something
+        // FIXME since this is not called periodically, it should be retried
+        .catch(() => console.error('there was an error fetching node settings'))
     );
   };
 }

@@ -6,8 +6,12 @@ import { hot } from 'react-hot-loader/root';
 import config from 'config';
 import type { Store } from '../reducers/types';
 import Routes from '../Routes';
-import { updateAccountState } from '../actions/account';
+import {
+  updateAccountState,
+  updateAccountTransactions
+} from '../actions/account';
 import { setStakePools } from '../actions/stakePools';
+import { updateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
   store: Store,
@@ -22,11 +26,23 @@ const Root = ({ store, history }: Props) => {
   // no longer require polling.
   runInmmediatelyAndSetInterval(
     () => store.dispatch(updateAccountState()),
-    config.get('accountPollingInterval')
+    config.get('accountPollingInterval'),
+    'accountPolling'
   );
   runInmmediatelyAndSetInterval(
     () => store.dispatch(setStakePools()),
-    config.get('stakePoolsPollingInterval')
+    config.get('stakePoolsPollingInterval'),
+    'stakePoolsPolling'
+  );
+  runInmmediatelyAndSetInterval(
+    () => store.dispatch(updateNodeSettings()),
+    config.get('nodeSettingsPollingInterval'),
+    'nodeSettingsPolling'
+  );
+  runInmmediatelyAndSetInterval(
+    () => store.dispatch(updateAccountTransactions()),
+    config.get('transactionPollingInterval'),
+    'transactionPolling'
   );
   return (
     <Provider store={store}>
@@ -41,8 +57,14 @@ export default hot(Root);
 
 const runInmmediatelyAndSetInterval = (
   func: void => void,
-  interval: number
+  interval: number,
+  timerName: string
 ): void => {
   func();
-  setInterval(func, interval);
+  if (!window.periodicTimers) {
+    window.periodicTimers = {};
+  }
+  if (!window.periodicTimers[timerName]) {
+    window.periodicTimers[timerName] = setInterval(func, interval);
+  }
 };

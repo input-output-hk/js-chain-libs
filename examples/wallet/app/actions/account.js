@@ -5,13 +5,24 @@ import type {
   AccountKeys,
   AccountState
 } from '../reducers/types';
-import type { Amount, Address, PoolId } from '../models';
+import type {
+  Amount,
+  Address,
+  PoolId,
+  Identifier,
+  TransactionHash,
+  Transaction
+} from '../models';
 import {
   getAccountFromPrivateKey,
   buildTransaction,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
-import { getAccountState, broadcastTransaction } from '../utils/nodeConnection';
+import {
+  getAccountState,
+  broadcastTransaction,
+  getTransactions
+} from '../utils/nodeConnection';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
@@ -25,7 +36,12 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
           ...keys
         })
       )
-      .then(() => dispatch(updateAccountState()));
+      .then(() =>
+        Promise.all([
+          dispatch(updateAccountTransactions()),
+          dispatch(updateAccountState())
+        ])
+      );
   };
 }
 
@@ -34,23 +50,65 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk<SetAccountState> {
+export function updateAccountState(): Thunk<SetAccountStateAction> {
   return function updateAccountStateThunk(dispatch, getState) {
-    return getAccountState(getState().account.identifier).then(
-      ({ balance, counter, delegation }: AccountState) =>
-        dispatch({
-          type: SET_ACCOUNT_STATE,
-          balance,
-          counter,
-          delegation
-        })
+    const { identifier }: { identifier: Identifier } = getState().account;
+    if (!identifier) {
+      console.log('not fetching account because wallet is not initialized yet');
+      return;
+    }
+    return (
+      getAccountState(identifier)
+        .then(({ balance, counter, delegation }: AccountState) =>
+          dispatch({
+            type: SET_ACCOUNT_STATE,
+            balance,
+            counter,
+            delegation
+          })
+        )
+        // TODO: display a notification or something
+        .catch(() => console.error('there was an error fetching account info'))
+    );
+  };
+}
+
+export type SetTransactionsAction = {
+  type: 'SET_TRANSACTIONS',
+  transactions: Array<Transaction>
+};
+export const SET_TRANSACTIONS = 'SET_TRANSACTIONS';
+
+export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
+  return function updateAccountTransactionsThunk(dispatch, getState) {
+    const { address }: { address: Address } = getState().account;
+    if (!address) {
+      console.log(
+        'not fetching transactions because wallet is not initialized yet'
+      );
+      return;
+    }
+    return (
+      getTransactions(address)
+        .then(({ transactions }: { transactions: Array<Transaction> }) =>
+          dispatch({
+            type: SET_TRANSACTIONS,
+            transactions
+          })
+        )
+        // TODO: display a notification or something
+        .catch(() => console.error('there was an error fetching transactions'))
     );
   };
 }
 
 export type SendTransactionAction = {
   type: 'SEND_TRANSACTION',
-  newCounter: number
+  newCounter: number,
+  id: TransactionHash,
+  destination: Address,
+  amount: Amount,
+  fee: Amount
 };
 
 export const SEND_TRANSACTION = 'SEND_TRANSACTION';
@@ -69,16 +127,17 @@ export function sendTransaction(
       state.account.counter,
       state.nodeSettings
     )
-      .then(({ id, transaction }) => {
-        // TODO: dispatch an action which adds the transaction to the
-        // transaction list
-        console.log(id);
-        return broadcastTransaction(transaction);
+      .then(({ id, transaction, fee }) => {
+        return broadcastTransaction(transaction).then(() => ({ id, fee }));
       })
-      .then(() =>
+      .then(({ id, fee }) =>
         dispatch({
           type: SEND_TRANSACTION,
-          newCounter: state.account.counter + 1
+          newCounter: state.account.counter + 1,
+          id,
+          destination,
+          amount,
+          fee
         })
       );
   };
@@ -86,33 +145,34 @@ export function sendTransaction(
 
 export type SendStakeDelegation = {
   type: 'SEND_STAKE_DELEGATION',
-  newCounter: number
+  newCounter: number,
+  id: TransactionHash,
+  pool: PoolId,
+  fee: Amount
 };
 
 export const SEND_STAKE_DELEGATION = 'SEND_STAKE_DELEGATION';
 
-export function sendStakeDelegation(
-  poolId: PoolId
-): Thunk<SendStakeDelegation> {
+export function sendStakeDelegation(pool: PoolId): Thunk<SendStakeDelegation> {
   // Assume balance and counter are up to date
   return function sendStakeDelegationThunk(dispatch, getState) {
     const state: AppState = getState();
     return buildDelegateTransaction(
-      poolId,
+      pool,
       state.account.privateKey,
       state.account.counter,
       state.nodeSettings
     )
-      .then(({ id, transaction }) => {
-        // TODO: dispatch an action which adds the transaction to the
-        // transaction list
-        console.log(id);
-        return broadcastTransaction(transaction);
-      })
-      .then(() =>
+      .then(({ id, transaction, fee }) =>
+        broadcastTransaction(transaction).then(() => ({ id, fee }))
+      )
+      .then(({ id, fee }) =>
         dispatch({
           type: SEND_STAKE_DELEGATION,
-          newCounter: state.account.counter + 1
+          newCounter: state.account.counter + 1,
+          id,
+          pool,
+          fee
         })
       );
   };

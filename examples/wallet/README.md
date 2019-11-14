@@ -38,13 +38,33 @@ To build an appimage package, first install the dependencies with
   - [ x ] broadcast transaction
 - [ ] make configurable via settings file:
   - [ ] node address
-  - [ ] address prefix
-  - [ ] network discriminator
+  - [ x ] address prefix
+  - [ x ] network discriminator
 - [ ] locally store the user's private key
   - [ ] define a password schema for unlocking the app (so the funds are secure if the user's device is used by someone else)
   - [ ] define a password schema for encrypting the private keys(so the funds are secure if the device's storage is compromised)
 - [ ] view mode?
-- [ ] list user transactions and their status?
+- [ ] list user transactions and their status
+  - [ ] display transactions
+    - [ ] transaction type
+      - [ x ] send
+      - [ ] receive
+      - [ x ] delegate
+    - [ x ] 'other' 'address' (is the pool id in the case of a delegation)
+    - [ ] transaction date
+    - [ ] transaction details dropdown
+      - [ ] 'from' addresses and amounts
+      - [ ] 'to' addresses and amounts
+      - [ ] fee
+      - [ ] certificate details?
+    - [ ] transaction status
+  - [ x ] optimistic UI: insert a transaction when delegating
+  - [ x ] optimistic UI: insert a transaction when sending funds
+  - [ ] fetch transactions from the node.
+    - [ ] update status of existing transactions.
+- [ ] connect to the node using the gRPC API
+- [ ] generate delegation transaction
+  - [ ] set the delegated pool optimistically
 
 ## Tech debt
 
@@ -53,3 +73,7 @@ To build an appimage package, first install the dependencies with
       several times into memory if it is imported in more than one place?
   - [ ] if it is not, have the aforementioned module take care of
         initializing it only one time.
+- [ ] use react-connected-router
+  - [ ] tangible issue: redirect to the next screens in account restoration
+        only if there weren't any issues in the account's action.
+  - [ ] use redux actions instead of `useHistory`

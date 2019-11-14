@@ -1,0 +1,11 @@
+.qr {
+  border-radius: 5px;
+}
+.addressAndBalanceContainer {
+  width: 80%;
+  padding: 1em;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-around;
+  overflow-wrap: break-word;
+}
