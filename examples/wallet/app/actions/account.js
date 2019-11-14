@@ -15,7 +15,7 @@ import type {
 } from '../models';
 import {
   getAccountFromPrivateKey,
-  buildTransaction,
+  buildSendFundsTransaction,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
 import {
@@ -120,7 +120,7 @@ export function sendTransaction(
   // Assume balance and counter are up to date
   return function sendTransactionThunk(dispatch, getState) {
     const state: AppState = getState();
-    return buildTransaction(
+    return buildSendFundsTransaction(
       destination,
       amount,
       state.account.privateKey,
