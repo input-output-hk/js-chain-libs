@@ -22,7 +22,7 @@ export async function getAccountFromPrivateKey(
   } = await wasmBindings;
   const privateKey: PrivateKey = PrivateKey.from_bech32(secret);
   const publicKey: PublicKey = privateKey.to_public();
-  const account: Account = Account.from_public_key(publicKey);
+  const account: Account = Account.single_from_public_key(publicKey);
   const identifier: AccountIdentifier = account.to_identifier();
   const networkDiscrimination: AddressDiscrimination =
     config.get('networkDiscrimination') === 'testnet'
@@ -122,7 +122,7 @@ async function buildTransaction(
   } = await wasmBindings;
   const { calculateFee } = feeCalculator(nodeSettings);
   const privateKey: PrivateKey = PrivateKey.from_bech32(secret);
-  const sourceAccount: Account = Account.from_public_key(
+  const sourceAccount: Account = Account.single_from_public_key(
     privateKey.to_public()
   );
 
@@ -189,7 +189,7 @@ async function buildTransaction(
   const signature: PayloadAuthData = certificate
     ? PayloadAuthData.for_stake_delegation(
         StakeDelegationAuthData.new(
-          AccountBindingSignature.new(
+          AccountBindingSignature.new_single(
             PrivateKey.from_bech32(secret),
             builderSignCertificate.get_auth_data()
           )
