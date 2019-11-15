@@ -13,7 +13,7 @@ type Props = {
   sendStakeDelegation: SendStakeDelegation
 };
 
-type DelegationInfo = { parts: number, selectionOrder: number };
+type DelegationInfo = { parts: number, color: Color };
 
 type PieChartEntry = {
   value: number,
@@ -32,7 +32,7 @@ export default ({ sendStakeDelegation }: Props) => {
     setDelegation(
       Object.assign({}, delegation, {
         [poolId]: Object.assign(
-          { selectionOrder: selectionCount, parts: 0 },
+          { color: colors[selectionCount % colors.length], parts: 0 },
           delegation[poolId] || {},
           { parts: (currentDelegation || 0) + 1 }
         )
@@ -51,7 +51,7 @@ export default ({ sendStakeDelegation }: Props) => {
     pool => ({
       value: delegation[pool].parts,
       title: pool,
-      color: colors[delegation[pool].selectionOrder % colors.length]
+      color: delegation[pool].color
     })
   );
 
@@ -69,7 +69,27 @@ export default ({ sendStakeDelegation }: Props) => {
       {Object.keys(delegation).length ? (
         <div>
           <Row className="justify-content-center">
-            <PieChart data={pieChartData} labels />
+            <PieChart
+              data={pieChartData}
+              labelPosition={110}
+              radius={40}
+              style={{ 'max-height': '400px', width: '100%' }}
+              label={({ data, dataIndex, dx, dy, x, y, textAnchor }) => {
+                const currentData = data[dataIndex];
+                return (
+                  <text
+                    className={styles.svgText}
+                    fill={currentData.color}
+                    {...{ textAnchor, x, dx, y, dy }}
+                  >
+                    {`${currentData.title.slice(0, 5)}: ${parseInt(
+                      currentData.percentage,
+                      10
+                    )}%`}
+                  </text>
+                );
+              }}
+            />
           </Row>
           <Row className="justify-content-between">
             <Button
