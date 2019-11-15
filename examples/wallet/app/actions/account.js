@@ -18,7 +18,6 @@ import {
   getAccountFromPrivateKey,
   buildSendFundsTransaction,
   getAccountFromSeed,
-  buildTransaction,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
 import {
@@ -63,10 +62,16 @@ export function setAccountFromMnemonic(
             ...keys
           })
         )
-        .then(() => dispatch(updateAccountState()));
+        .then(() =>
+          Promise.all([
+            dispatch(updateAccountTransactions()),
+            dispatch(updateAccountState())
+          ])
+        );
     };
   }
-  return false;
+  // TODO: Add a message displaying error
+  console.log('Mnemonic phrase is not valid');
 }
 
 export type SetAccountStateAction = {
