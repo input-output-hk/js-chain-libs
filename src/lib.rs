@@ -367,7 +367,8 @@ impl Input {
     }
 
     pub fn from_account(account: &Account, v: Value) -> Self {
-        Input(tx::Input::from_account(account.0.clone(), v.0))
+        let identifier = account.to_identifier();
+        Input(tx::Input::from_account(identifier.0, v.0))
     }
 
     /// Get the kind of Input, this can be either "Account" or "Utxo"
@@ -405,9 +406,9 @@ impl Input {
     }
 
     /// Get the source Account if the Input type is Account
-    pub fn get_account(&self) -> Result<Account, JsValue> {
+    pub fn get_account_identifier(&self) -> Result<AccountIdentifier, JsValue> {
         match self.0.to_enum() {
-            tx::InputEnum::AccountInput(account, _) => Ok(account.into()),
+            tx::InputEnum::AccountInput(account, _) => Ok(AccountIdentifier(account)),
             _ => Err(JsValue::from_str("Input is not from account")),
         }
     }
@@ -442,10 +443,10 @@ impl UtxoPointer {
 /// This is either an single account or a multisig account depending on the witness type
 #[wasm_bindgen]
 #[derive(Debug)]
-pub struct Account(tx::UnspecifiedAccountIdentifier);
+pub struct Account(tx::AccountIdentifier);
 
-impl From<tx::UnspecifiedAccountIdentifier> for Account {
-    fn from(account_identifier: tx::UnspecifiedAccountIdentifier) -> Account {
+impl From<tx::AccountIdentifier> for Account {
+    fn from(account_identifier: tx::AccountIdentifier) -> Account {
         Account(account_identifier)
     }
 }
@@ -453,41 +454,67 @@ impl From<tx::UnspecifiedAccountIdentifier> for Account {
 #[wasm_bindgen]
 impl Account {
     pub fn from_address(address: &Address) -> Result<Account, JsValue> {
-        if let chain_addr::Kind::Account(key) = address.0.kind() {
-            Ok(Account(
-                tx::UnspecifiedAccountIdentifier::from_single_account(key.clone().into()),
-            ))
-        } else {
-            Err(JsValue::from_str("Address is not account"))
+        match address.0.kind() {
+            chain_addr::Kind::Account(key) => {
+                Ok(Account(tx::AccountIdentifier::Single(key.clone().into())))
+            }
+            chain_addr::Kind::Multisig(id) => {
+                Ok(Account(tx::AccountIdentifier::Multi(id.clone().into())))
+            }
+            _ => Err(JsValue::from_str("Address is not account")),
         }
     }
 
     pub fn to_address(&self, discriminant: AddressDiscrimination) -> Address {
-        let kind = match self.0.to_single_account() {
-            Some(key) => chain_addr::Kind::Account(key.into()),
-            None => panic!(),
+        let kind = match &self.0 {
+            tx::AccountIdentifier::Single(id) => chain_addr::Kind::Account(id.clone().into()),
+            tx::AccountIdentifier::Multi(id) => {
+                let mut bytes = [0u8; chain_crypto::hash::HASH_SIZE_256];
+                bytes.copy_from_slice(id.as_ref());
+                chain_addr::Kind::Multisig(bytes)
+            }
         };
         chain_addr::Address(discriminant.into(), kind).into()
     }
 
-    pub fn from_public_key(key: PublicKey) -> Account {
-        Account(tx::UnspecifiedAccountIdentifier::from_single_account(
-            key.0.into(),
-        ))
+    pub fn single_from_public_key(key: PublicKey) -> Account {
+        Account(tx::AccountIdentifier::Single(key.0.into()))
     }
 
     pub fn to_identifier(&self) -> AccountIdentifier {
-        AccountIdentifier(self.0.as_ref().to_vec())
+        let unspecified = match &self.0 {
+            tx::AccountIdentifier::Single(id) => {
+                tx::UnspecifiedAccountIdentifier::from_single_account(id.clone())
+            }
+            tx::AccountIdentifier::Multi(id) => {
+                tx::UnspecifiedAccountIdentifier::from_multi_account(id.clone())
+            }
+        };
+
+        AccountIdentifier(unspecified)
     }
 }
 
 #[wasm_bindgen]
-pub struct AccountIdentifier(Vec<u8>);
+pub struct AccountIdentifier(tx::UnspecifiedAccountIdentifier);
 
 #[wasm_bindgen]
 impl AccountIdentifier {
     pub fn to_hex(&self) -> String {
-        hex::encode(&self.0)
+        hex::encode(self.0.as_ref())
+    }
+
+    pub fn to_account_single(&self) -> Result<Account, JsValue> {
+        self.0
+            .to_single_account()
+            .ok_or(JsValue::from_str(
+                "can't be used as a public key for single account",
+            ))
+            .map(|acc| Account(tx::AccountIdentifier::Single(acc)))
+    }
+
+    pub fn to_account_multi(&self) -> Account {
+        Account(tx::AccountIdentifier::Multi(self.0.to_multi_account()))
     }
 }
 
