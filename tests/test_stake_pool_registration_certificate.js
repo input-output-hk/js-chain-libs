@@ -21,6 +21,9 @@ it('generates certificate', async () => {
       'ed25519_pk1m2mmtf6320yl3z9h2x23hhxtawwcudkpgzngp25wh2rpffdj8gmqws8lgr'
     )
   );
+
+  const operators = new PublicKeys();
+
   const kesPublicKey = KesPublicKey.from_bech32(
     'kes25519-12-pk1s6pr56t6uzkmgdqs2krrh0tw9yyvdwfkzk7e90nsfxg08wqxg6qs9nuu5s'
   );
@@ -33,6 +36,7 @@ it('generates certificate', async () => {
   const poolRegistration = new PoolRegistration(
     serial,
     owners,
+    operators,
     managementThreshold,
     startValidity,
     kesPublicKey,
@@ -40,6 +44,6 @@ it('generates certificate', async () => {
   );
 
   expect(poolRegistration.id().to_string()).to.eql(
-    '6d7afbf4a8e0574a5dbbf35a71a42da86ebf679d864a03153446a4e671b26edc'
+    '8a7b798c09f4ee16f1348d71a9b534a429f0cec9d6ef5ad9e274b2917167501c'
   );
 });

@@ -52,7 +52,8 @@ it('get block messages', async () => {
 
   expect(
     input
-      .get_account()
+      .get_account_identifier()
+      .to_account_single()
       .to_address(AddressDiscrimination.Test)
       .to_string('addr')
   ).to.eql('addr1s4w2w52z8cqy8xmn38dm45drg637lppc6uap255vg3nhzc8xp54c7zycnlu');
