@@ -22,6 +22,50 @@ use wasm_bindgen::prelude::*;
 
 pub use transaction::*;
 
+macro_rules! impl_signature {
+    ($name:ident, $signee_type:ty, $verifier_type:ty) => {
+        #[wasm_bindgen]
+        pub struct $name(crypto::Signature<$signee_type, $verifier_type>);
+
+        #[wasm_bindgen]
+        impl $name {
+            pub fn as_bytes(&self) -> Vec<u8> {
+                self.0.as_ref().to_vec()
+            }
+
+            pub fn to_bech32(&self) -> String {
+                self.0.to_bech32_str()
+            }
+
+            pub fn to_hex(&self) -> String {
+                hex::encode(&self.0.as_ref())
+            }
+
+            pub fn from_bytes(bytes: &[u8]) -> Result<$name, JsValue> {
+                crypto::Signature::from_binary(bytes)
+                    .map($name)
+                    .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            }
+
+            pub fn from_bech32(bech32_str: &str) -> Result<$name, JsValue> {
+                crypto::Signature::try_from_bech32_str(&bech32_str)
+                    .map($name)
+                    .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            }
+
+            pub fn from_hex(input: &str) -> Result<$name, JsValue> {
+                crypto::Signature::from_str(input)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+                    .map($name)
+            }
+        }
+    };
+}
+
+impl_signature!(Ed25519Signature, Vec<u8>, crypto::Ed25519);
+impl_signature!(AccountWitness, tx::WitnessAccountData, crypto::Ed25519);
+impl_signature!(UtxoWitness, tx::WitnessUtxoData, crypto::Ed25519);
+
 /// ED25519 signing key, either normal or extended
 #[wasm_bindgen]
 pub struct PrivateKey(key::EitherEd25519SecretKey);
@@ -93,6 +137,10 @@ impl PrivateKey {
             .map(PrivateKey)
             .map_err(|_| JsValue::from_str("Invalid normal secret key"))
     }
+
+    pub fn sign(&self, message: &[u8]) -> Ed25519Signature {
+        Ed25519Signature(self.0.sign(&message.to_vec()))
+    }
 }
 
 /// ED25519 key used as public key
@@ -127,6 +175,10 @@ impl PublicKey {
         crypto::PublicKey::from_binary(bytes)
             .map_err(|e| JsValue::from_str(&format!("{}", e)))
             .map(PublicKey)
+    }
+
+    pub fn verify(&self, data: &[u8], signature: &Ed25519Signature) -> bool {
+        signature.0.verify_slice(&self.0, data) == crypto::Verification::Success
     }
 }
 
@@ -966,6 +1018,11 @@ impl Witness {
         ))
     }
 
+    // Witness for a utxo-based transaction generated externally (such as hardware wallets)
+    pub fn from_external_utxo(witness: &UtxoWitness) -> Witness {
+        Witness(tx::Witness::Utxo(witness.0.clone()))
+    }
+
     /// Generate Witness for an account based transaction Input
     /// the account-spending-counter should be incremented on each transaction from this account
     pub fn for_account(
@@ -980,6 +1037,11 @@ impl Witness {
             &account_spending_counter.0,
             &secret_key.0,
         ))
+    }
+
+    // Witness for a account-based transaction generated externally (such as hardware wallets)
+    pub fn from_external_account(witness: &AccountWitness) -> Witness {
+        Witness(tx::Witness::Account(witness.0.clone()))
     }
 
     /// Get string representation
