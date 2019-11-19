@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
-import type { PoolId } from '../models';
+import type { PoolId, Delegation } from '../models';
 import type { DelegationInfo, PoolSelectionHandler } from './StakeDelegation';
 import ListingRow from './ListingRow';
 import styles from './StakePoolList.scss';
@@ -14,7 +14,7 @@ type Props = {
   newDelegation: {
     [PoolId]: DelegationInfo
   },
-  currentDelegation: PoolId,
+  currentDelegation?: Delegation,
   onSelection: PoolSelectionHandler
 };
 
@@ -42,6 +42,10 @@ export default ({
             : {};
           const newDelegationPercentage: number =
             totalParts && percentageFromParts(poolId);
+          const currentDelegationPercentage =
+            currentDelegation && currentDelegation[poolId]
+              ? currentDelegation[poolId] * 100
+              : 0;
           return (
             <ListingRow key={poolId}>
               <Col style={rowStyles} className={styles.poolId} xs={4}>
@@ -50,7 +54,7 @@ export default ({
               <Col style={rowStyles} xs={2}>
                 {newDelegationPercentage}%
               </Col>
-              <Col xs={2}>{poolId === currentDelegation ? '100%' : '0%'}</Col>
+              <Col xs={2}>{currentDelegationPercentage}%</Col>
               <Col xs={3}>
                 <Row className="justify-content-between">
                   <Button
