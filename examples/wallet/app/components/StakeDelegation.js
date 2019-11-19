@@ -13,7 +13,8 @@ type Props = {
   sendStakeDelegation: SendStakeDelegation
 };
 
-type DelegationInfo = { parts: number, color: Color };
+export type DelegationInfo = { parts: number, color: Color };
+export type PoolSelectionHandler = (poolId: PoolId, increment: number) => void;
 
 type PieChartEntry = {
   value: number,
@@ -27,14 +28,17 @@ export default ({ sendStakeDelegation }: Props) => {
   }>({});
   const [selectionCount, setSelectionCount] = useState<number>(0);
 
-  const poolSelectionHandler = (poolId: PoolId) => {
-    const currentDelegation = delegation[poolId] && delegation[poolId].parts;
+  const poolSelectionHandler: PoolSelectionHandler = (poolId, increment) => {
+    const currentDelegation =
+      (delegation[poolId] && delegation[poolId].parts) || 0;
     setDelegation(
       Object.assign({}, delegation, {
         [poolId]: Object.assign(
           { color: colors[selectionCount % colors.length], parts: 0 },
           delegation[poolId] || {},
-          { parts: (currentDelegation || 0) + 1 }
+          {
+            parts: Math.max(currentDelegation + increment, 0)
+          }
         )
       })
     );
@@ -47,13 +51,13 @@ export default ({ sendStakeDelegation }: Props) => {
     event.preventDefault();
     sendStakeDelegation(delegation);
   };
-  const pieChartData: Array<PieChartEntry> = Object.keys(delegation).map(
-    pool => ({
+  const pieChartData: Array<PieChartEntry> = Object.keys(delegation)
+    .map(pool => ({
       value: delegation[pool].parts,
       title: pool,
       color: delegation[pool].color
-    })
-  );
+    }))
+    .filter(it => it.value);
 
   return (
     <Container>
@@ -61,7 +65,10 @@ export default ({ sendStakeDelegation }: Props) => {
         <h3>Available pools</h3>
       </Row>
       <Row>
-        <StakePoolList onSelection={poolSelectionHandler} />
+        <StakePoolList
+          newDelegation={delegation}
+          onSelection={poolSelectionHandler}
+        />
       </Row>
       <Row>
         <h3>New delegation</h3>
