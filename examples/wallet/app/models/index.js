@@ -19,7 +19,7 @@ export type CertificateType =
   | 'OWNER_STAKE_DELEGATION';
 export type Certificate = {
   type: CertificateType,
-  pool: PoolId
+  pools: Array<PoolId>
 };
 
 export type Transaction = {

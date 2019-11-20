@@ -58,7 +58,8 @@ export default function account(
       const newTransaction: Transaction = {
         id: action.id,
         inputs: [{ address: state.address, amount: action.fee }],
-        certificate: { type: 'STAKE_DELEGATION', pool: action.pool }
+        certificate: { type: 'STAKE_DELEGATION', pools: action.pools },
+        outputs: []
       };
       return Object.assign({}, state, {
         counter: action.newCounter,

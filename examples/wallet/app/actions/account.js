@@ -148,7 +148,7 @@ export type SendStakeDelegation = {
   type: 'SEND_STAKE_DELEGATION',
   newCounter: number,
   id: TransactionHash,
-  pool: PoolId,
+  pools: Array<PoolId>,
   fee: Amount
 };
 
@@ -174,8 +174,7 @@ export function sendStakeDelegation(
           type: SEND_STAKE_DELEGATION,
           newCounter: state.account.counter + 1,
           id,
-          // TODO: store all the pools
-          pool: Object.keys(newDelegation)[0],
+          pools: Object.keys(newDelegation),
           fee
         })
       );
