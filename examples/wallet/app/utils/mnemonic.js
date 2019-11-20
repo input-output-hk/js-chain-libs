@@ -14,6 +14,9 @@ export const createSeedFromMnemonic = (
   mnemonicPhrase: string,
   mnemonicPassword?: string
 ) => {
+  // Warning: This is an example wallet and that is not how seed
+  // generation works in Cardano. For a correct implementation please
+  // read the following document https://github.com/satoshilabs/slips/blob/master/slip-0023.md
   const password = mnemonicPassword || '';
   const seed = mnemonicToSeedSync(mnemonicPhrase, password);
   return seed;
