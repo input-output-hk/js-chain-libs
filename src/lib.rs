@@ -679,6 +679,12 @@ impl From<chain::certificate::StakeDelegation> for StakeDelegation {
 /// * Ratio of stake to multiple pools
 pub struct DelegationType(chain::account::DelegationType);
 
+impl From<chain::account::DelegationType> for DelegationType {
+    fn from(delegation: chain::account::DelegationType) -> DelegationType {
+        DelegationType(delegation)
+    }
+}
+
 #[wasm_bindgen]
 impl DelegationType {
     pub fn non_delegated() -> Self {
@@ -749,8 +755,74 @@ impl StakeDelegation {
         }
         .into()
     }
+
+    pub fn delegation_type(&self) -> DelegationType {
+        self.0.delegation.clone().into()
+    }
+
+    pub fn account(&self) -> AccountIdentifier {
+        AccountIdentifier(self.0.account_id.clone())
+    }
 }
 
+#[wasm_bindgen]
+pub struct OwnerStakeDelegation(chain::certificate::OwnerStakeDelegation);
+
+impl From<chain::certificate::OwnerStakeDelegation> for OwnerStakeDelegation {
+    fn from(info: chain::certificate::OwnerStakeDelegation) -> OwnerStakeDelegation {
+        OwnerStakeDelegation(info)
+    }
+}
+
+#[wasm_bindgen]
+impl OwnerStakeDelegation {
+    pub fn new(delegation_type: &DelegationType) -> OwnerStakeDelegation {
+        certificate::OwnerStakeDelegation {
+            delegation: delegation_type.0.clone(),
+        }
+        .into()
+    }
+
+    pub fn delegation_type(&self) -> DelegationType {
+        self.0.delegation.clone().into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct PoolRetirement(chain::certificate::PoolRetirement);
+
+impl From<chain::certificate::PoolRetirement> for PoolRetirement {
+    fn from(retirement: chain::certificate::PoolRetirement) -> PoolRetirement {
+        PoolRetirement(retirement)
+    }
+}
+
+impl PoolRetirement {
+    pub fn new(pool_id: &PoolId, retirement_time_offset: &TimeOffsetSeconds) -> Self {
+        chain::certificate::PoolRetirement {
+            pool_id: pool_id.0.clone(),
+            retirement_time: retirement_time_offset.0,
+        }
+        .into()
+    }
+
+    pub fn pool_id(&self) -> PoolId {
+        self.0.pool_id.clone().into()
+    }
+
+    pub fn retirement_time(&self) -> TimeOffsetSeconds {
+        self.0.retirement_time.clone().into()
+    }
+}
+
+#[wasm_bindgen]
+pub enum CertificateType {
+    StakeDelegation,
+    OwnerStakeDelegation,
+    PoolRegistration,
+    PoolRetirement,
+    PoolUpdate,
+}
 #[wasm_bindgen]
 impl Certificate {
     /// Create a Certificate for StakeDelegation
@@ -762,6 +834,51 @@ impl Certificate {
     pub fn stake_pool_registration(pool_registration: PoolRegistration) -> Certificate {
         certificate::Certificate::PoolRegistration(pool_registration.0).into()
     }
+
+    /// Create a Certificate for PoolRetirement
+    pub fn stake_pool_retirement(pool_retirement: &PoolRetirement) -> Certificate {
+        certificate::Certificate::PoolRetirement(pool_retirement.0.clone()).into()
+    }
+
+    pub fn get_type(&self) -> CertificateType {
+        match &self.0 {
+            certificate::Certificate::StakeDelegation(_) => CertificateType::StakeDelegation,
+            certificate::Certificate::OwnerStakeDelegation(_) => CertificateType::OwnerStakeDelegation,
+            certificate::Certificate::PoolRegistration(_) => CertificateType::PoolRegistration,
+            certificate::Certificate::PoolRetirement(_) => CertificateType::PoolRetirement,
+            certificate::Certificate::PoolUpdate(_) => CertificateType::PoolUpdate,
+        }
+    }
+
+    pub fn get_stake_delegation(&self) -> Result<StakeDelegation, JsValue> {
+        match &self.0 {
+            certificate::Certificate::StakeDelegation(cert) => Ok(cert.clone().into()),
+            _ => Err(JsValue::from_str("Certificate is not StakeDelegation")),
+        }
+    }
+
+    pub fn get_owner_stake_delegation(&self) -> Result<OwnerStakeDelegation, JsValue> {
+        match &self.0 {
+            certificate::Certificate::OwnerStakeDelegation(cert) => Ok(cert.clone().into()),
+            _ => Err(JsValue::from_str("Certificate is not OwnerStakeDelegation")),
+        }
+    }
+
+    pub fn get_pool_registration(&self) -> Result<PoolRegistration, JsValue> {
+        match &self.0 {
+            certificate::Certificate::PoolRegistration(cert) => Ok(cert.clone().into()),
+            _ => Err(JsValue::from_str("Certificate is not PoolRegistration")),
+        }
+    }
+
+    pub fn get_pool_retirement(&self) -> Result<PoolRetirement, JsValue> {
+        match &self.0 {
+            certificate::Certificate::PoolRetirement(cert) => Ok(cert.clone().into()),
+            _ => Err(JsValue::from_str("Certificate is not PoolRetirement")),
+        }
+    }
+
+    // get_pool_update() not yet needed, implement here
 }
 
 #[wasm_bindgen]
@@ -798,6 +915,45 @@ impl PoolRegistration {
     pub fn id(&self) -> PoolId {
         self.0.to_id().into()
     }
+
+    pub fn start_validity(&self) -> TimeOffsetSeconds {
+        self.0.start_validity.into()
+    }
+
+    pub fn owners(&self) -> PublicKeys {
+        PublicKeys(self.0.owners.iter().map(|key| key.clone().into()).collect())
+    }
+
+    pub fn rewards(&self) -> TaxType {
+        self.0.rewards.into()
+    }
+}
+
+#[wasm_bindgen]
+pub struct TaxType(chain::rewards::TaxType);
+
+impl From<chain::rewards::TaxType> for TaxType {
+    fn from(inner: chain::rewards::TaxType) -> TaxType {
+        TaxType(inner)
+    }
+}
+
+impl TaxType {
+    pub fn fixed(&self) -> Value {
+        self.0.fixed.into()
+    }
+
+    pub fn ratio_numerator(&self) -> Value {
+        Value::from(self.0.ratio.numerator)
+    }
+
+    pub fn ratio_denominator(&self) -> Value {
+        Value::from(self.0.ratio.denominator.get())
+    }
+
+    pub fn max_limit(&self) -> Option<Value> {
+        Some(Value::from(self.0.max_limit?.get()))
+    }
 }
 
 #[wasm_bindgen]
@@ -818,6 +974,10 @@ impl TimeOffsetSeconds {
             .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
             .map(chain_time::DurationSeconds)
             .map(|duration| chain_time::timeline::TimeOffsetSeconds::from(duration).into())
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{}", u64::from(self.0))
     }
 }
 

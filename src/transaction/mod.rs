@@ -2,7 +2,7 @@ mod iobuilder;
 mod txbuilder;
 use super::certificate;
 use super::tx;
-use crate::{Input, Inputs, Output, Outputs, TransactionSignDataHash};
+use crate::{Certificate, Input, Inputs, Output, Outputs, TransactionSignDataHash};
 pub use iobuilder::*;
 pub use txbuilder::*;
 use wasm_bindgen::prelude::*;
@@ -52,6 +52,18 @@ impl TaggedTransaction {
     fn outputs(&self) -> Vec<tx::Output<chain_addr::Address>> {
         map_payloads!(self, tx, tx.as_slice().outputs().iter().collect())
     }
+
+    fn certificate(&self) -> Option<Certificate> {
+        Some(map_payloads!(
+            self,
+            tx,
+            tx.as_slice()
+                .payload()
+                .to_certificate_slice()?
+                .into_owned()
+                .into()
+        ))
+    }
 }
 
 impl From<tx::Transaction<tx::NoExtra>> for Transaction {
@@ -89,5 +101,10 @@ impl Transaction {
 
     pub fn clone(&self) -> Transaction {
         Transaction(self.0.clone())
+    }
+
+    // Certificate if it exists, otherwise null
+    pub fn certificate(&self) -> Option<Certificate> {
+        self.0.certificate()
     }
 }
