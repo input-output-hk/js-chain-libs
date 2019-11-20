@@ -2,7 +2,7 @@ mod iobuilder;
 mod txbuilder;
 use super::certificate;
 use super::tx;
-use crate::{Input, Inputs, Output, Outputs,  Witness, Witnesses, TransactionSignDataHash};
+use crate::{Input, Inputs, Output, Outputs, TransactionSignDataHash, Witness, Witnesses};
 pub use iobuilder::*;
 pub use txbuilder::*;
 use wasm_bindgen::prelude::*;
