@@ -2,12 +2,13 @@
 import config from 'config';
 import type { AccountKeys, NodeSettings } from '../reducers/types';
 import type {
-  PoolId as InternalPoolId,
   PrivateKey as InternalPrivateKey,
   Counter,
+  Delegation,
   TransactionOutput
 } from '../models';
 import feeCalculator from './feeCalculator';
+import { totalParts } from './proportionsHelper';
 
 const wasmBindings = import('js-chain-libs/js_chain_libs');
 export async function getAccountFromPrivateKey(
@@ -39,7 +40,7 @@ export async function getAccountFromPrivateKey(
 }
 
 export async function buildDelegateTransaction(
-  poolId: InternalPoolId,
+  newDelegation: Delegation,
   secret: InternalPrivateKey,
   accountCounter: Counter,
   nodeSettings: NodeSettings
@@ -49,17 +50,37 @@ export async function buildDelegateTransaction(
     Certificate,
     StakeDelegation,
     DelegationType,
+    DelegationRatio,
+    PoolDelegationRatios,
+    PoolDelegationRatio,
     PrivateKey,
     PublicKey
   } = await wasmBindings;
   const privateKey: PrivateKey = PrivateKey.from_bech32(secret);
   const sourcePublicKey: PublicKey = privateKey.to_public();
+  let delegationType: DelegationType;
+  const pools: Array<PoolId> = Object.keys(newDelegation);
+  if (pools.length === 0) {
+    delegationType = DelegationType.non_delegated();
+  } else if (pools.length === 1) {
+    delegationType = DelegationType.full(PoolId.from_hex(pools[0]));
+  } else {
+    const poolDelegationRatios = PoolDelegationRatios.new();
+    pools.forEach(poolId =>
+      poolDelegationRatios.add(
+        PoolDelegationRatio.new(
+          PoolId.from_hex(poolId),
+          newDelegation[poolId].parts
+        )
+      )
+    );
+    delegationType = DelegationType.ratio(
+      DelegationRatio.new(totalParts(newDelegation), poolDelegationRatios)
+    );
+  }
   // Create certificate
-  const singlePoolDelegation: DelegationType = DelegationType.full(
-    PoolId.from_hex(poolId)
-  );
   const certificate: Certificate = Certificate.stake_delegation(
-    StakeDelegation.new(singlePoolDelegation, sourcePublicKey)
+    StakeDelegation.new(delegationType, sourcePublicKey)
   );
   return buildTransaction(secret, nodeSettings, accountCounter, certificate);
 }

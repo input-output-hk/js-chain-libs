@@ -6,7 +6,10 @@ export type Amount = number;
 export type Counter = number;
 export type PublicKey = string;
 export type PrivateKey = string;
-export type Delegation = { [PoolId]: number };
+export type DelegationEntry = { parts: number };
+export type NewDelegationEntry = DelegationEntry & { color: Color };
+export type Delegation = { [PoolId]: DelegationEntry };
+export type NewDelegation = { [PoolId]: NewDelegationEntry };
 export type Identifier = string;
 export type PoolId = string;
 export type TransactionHash = string;
@@ -28,3 +31,14 @@ export type Transaction = {
 };
 export type TransactionInput = { address: Address, amount: Amount };
 export type TransactionOutput = { address: Address, amount: Amount };
+
+// there must be a better way to do this 😢
+export type Color =
+  | '#f2777a'
+  | '#99cc99'
+  | '#ffcc66'
+  | '#6699cc'
+  | '#cc99cc'
+  | '#66cccc'
+  | '#d3d0c8'
+  | '#747369';

@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import PieChart from 'react-minimal-pie-chart';
-import type { PoolId } from '../models';
+import type { NewDelegation, PoolId, Color } from '../models';
 import typeof { sendStakeDelegation as SendStakeDelegation } from '../actions/account';
 import StakePoolList from '../containers/StakePoolList';
 import styles from './StakeDelegation.scss';
@@ -13,7 +13,6 @@ type Props = {
   sendStakeDelegation: SendStakeDelegation
 };
 
-export type DelegationInfo = { parts: number, color: Color };
 export type PoolSelectionHandler = (poolId: PoolId, increment: number) => void;
 
 type PieChartEntry = {
@@ -23,9 +22,7 @@ type PieChartEntry = {
 };
 
 export default ({ sendStakeDelegation }: Props) => {
-  const [delegation, setDelegation] = useState<{
-    [key: PoolId]: DelegationInfo
-  }>({});
+  const [delegation, setDelegation] = useState<NewDelegation>({});
   const [selectionCount, setSelectionCount] = useState<number>(0);
 
   const poolSelectionHandler: PoolSelectionHandler = (poolId, increment) => {
@@ -135,13 +132,3 @@ const colors = [
   '#d3d0c8',
   '#747369'
 ];
-// there must be a better way to do this 😢
-type Color =
-  | '#f2777a'
-  | '#99cc99'
-  | '#ffcc66'
-  | '#6699cc'
-  | '#cc99cc'
-  | '#66cccc'
-  | '#d3d0c8'
-  | '#747369';

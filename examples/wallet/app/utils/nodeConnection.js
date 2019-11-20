@@ -16,7 +16,8 @@ export function getAccountState(identifier: Identifier): Promise<AccountState> {
       balance: value,
       counter,
       delegation: delegation.pools.reduce(
-        (acc, [poolId, amount]) => Object.assign(acc, { [poolId]: amount }),
+        (acc, [poolId, amount]) =>
+          Object.assign(acc, { [poolId]: { parts: amount } }),
         {}
       )
     }));

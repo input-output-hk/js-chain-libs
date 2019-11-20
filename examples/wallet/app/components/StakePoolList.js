@@ -4,16 +4,15 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
-import type { PoolId, Delegation } from '../models';
-import type { DelegationInfo, PoolSelectionHandler } from './StakeDelegation';
+import type { NewDelegation, PoolId, Delegation } from '../models';
+import type { PoolSelectionHandler } from './StakeDelegation';
+import { percentageFromParts } from '../utils/proportionsHelper';
 import ListingRow from './ListingRow';
 import styles from './StakePoolList.scss';
 
 type Props = {
   stakePools: Array<PoolId>,
-  newDelegation: {
-    [PoolId]: DelegationInfo
-  },
+  newDelegation: NewDelegation,
   currentDelegation?: Delegation,
   onSelection: PoolSelectionHandler
 };
@@ -24,28 +23,18 @@ export default ({
   currentDelegation,
   newDelegation
 }: Props) => {
-  const totalParts: number = Object.values(newDelegation).reduce(
-    (acc: number, it: DelegationInfo) => acc + it.parts,
-    0
-  );
-  const percentageFromParts = (poolId: PoolId) =>
-    newDelegation[poolId]
-      ? parseInt((100 * newDelegation[poolId].parts) / totalParts, 10)
-      : 0;
   return (
     <Container>
       {stakePools &&
         stakePools.map((poolId: PoolId) => {
-          const activeDelegation: DelegationInfo = newDelegation[poolId];
+          const activeDelegation = newDelegation[poolId];
           const rowStyles: { color: string } = activeDelegation
             ? { color: activeDelegation.color }
             : {};
           const newDelegationPercentage: number =
-            totalParts && percentageFromParts(poolId);
+            newDelegation && percentageFromParts(newDelegation, poolId);
           const currentDelegationPercentage =
-            currentDelegation && currentDelegation[poolId]
-              ? currentDelegation[poolId] * 100
-              : 0;
+            currentDelegation && percentageFromParts(currentDelegation, poolId);
           return (
             <ListingRow key={poolId}>
               <Col style={rowStyles} className={styles.poolId} xs={4}>
