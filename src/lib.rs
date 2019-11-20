@@ -843,7 +843,9 @@ impl Certificate {
     pub fn get_type(&self) -> CertificateType {
         match &self.0 {
             certificate::Certificate::StakeDelegation(_) => CertificateType::StakeDelegation,
-            certificate::Certificate::OwnerStakeDelegation(_) => CertificateType::OwnerStakeDelegation,
+            certificate::Certificate::OwnerStakeDelegation(_) => {
+                CertificateType::OwnerStakeDelegation
+            }
             certificate::Certificate::PoolRegistration(_) => CertificateType::PoolRegistration,
             certificate::Certificate::PoolRetirement(_) => CertificateType::PoolRetirement,
             certificate::Certificate::PoolUpdate(_) => CertificateType::PoolUpdate,
