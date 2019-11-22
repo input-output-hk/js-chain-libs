@@ -1,4 +1,6 @@
 // @flow
+import { push } from 'connected-react-router';
+import curry from 'lodash/curry';
 import type {
   AppState,
   Thunk,
@@ -14,6 +16,7 @@ import type {
   TransactionHash,
   Transaction
 } from '../models';
+import { updateNodeSettings } from './nodeSettings';
 import {
   getAccountFromPrivateKey,
   buildSendFundsTransaction,
@@ -26,27 +29,30 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
+import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey)
-      .then((keys: AccountKeys) =>
-        dispatch({
-          type: SET_KEYS,
-          ...keys
-        })
-      )
-      .then(() =>
-        Promise.all([
-          dispatch(updateAccountTransactions()),
-          dispatch(updateAccountState())
-        ])
-      );
+    return getAccountFromPrivateKey(privateKey).then(
+      curry(initializeKeysAndRedirect)(dispatch)
+    );
   };
 }
+
+const initializeKeysAndRedirect = (dispatch, keys: AccountKeys) => {
+  dispatch({
+    type: SET_KEYS,
+    ...keys
+  });
+  return Promise.all([
+    dispatch(updateAccountTransactions()),
+    dispatch(updateNodeSettings()),
+    dispatch(updateAccountState())
+  ]).then(() => dispatch(push(routes.WALLET)));
+};
 
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
@@ -55,19 +61,9 @@ export function setAccountFromMnemonic(
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
-      return getAccountFromSeed(seed)
-        .then((keys: AccountKeys) =>
-          dispatch({
-            type: SET_KEYS,
-            ...keys
-          })
-        )
-        .then(() =>
-          Promise.all([
-            dispatch(updateAccountTransactions()),
-            dispatch(updateAccountState())
-          ])
-        );
+      return getAccountFromSeed(seed).then(
+        curry(initializeKeysAndRedirect)(dispatch)
+      );
     };
   }
   // TODO: Add a message displaying error

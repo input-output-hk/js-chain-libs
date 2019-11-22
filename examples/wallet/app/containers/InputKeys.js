@@ -3,26 +3,12 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import InputKeys from '../pages/InputKeys';
 import { setAccount, setAccountFromMnemonic } from '../actions/account';
-import { updateNodeSettings } from '../actions/nodeSettings';
-
-function mapStateToProps(state) {
-  return {
-    privateKey: state.account.privateKey
-  };
-}
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(
-    {
-      setAccount,
-      updateNodeSettings,
-      setAccountFromMnemonic
-    },
-    dispatch
-  );
+  return bindActionCreators({ setAccount, setAccountFromMnemonic }, dispatch);
 }
 
 export default connect(
-  mapStateToProps,
+  undefined,
   mapDispatchToProps
 )(InputKeys);

@@ -11326,6 +11326,13 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-minimal-pie-chart@5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/react-minimal-pie-chart/-/react-minimal-pie-chart-5.0.2.tgz#65508b333a02904b4975058b86b19065bfa8b869"
+  integrity sha512-EHwFOyH/GMeKn1n5djYEe2pjhClXrwS9XyRhtv12LwzdAYf+U0Aj3ZdX72wyy7lbbo4hbWacp7/2GGGrVHpmNw==
+  dependencies:
+    prop-types "^15.5.7"
+
 react-overlays@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-1.2.0.tgz#205368eeb0a5fb0b7f9b717fa7a12d518500abdb"
