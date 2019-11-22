@@ -69,7 +69,7 @@ fastify.post('/send-money/:destinationAddress', async (request, reply) => {
     const iobuilder = InputOutputBuilder.empty();
 
     const secretKey = PrivateKey.from_bech32(fastify.config.SECRET_KEY);
-    const faucetAccount = Account.from_public_key(secretKey.to_public());
+    const faucetAccount = Account.single_from_public_key(secretKey.to_public());
 
     // Fee (#inputs + #outputs) * coefficient + constant + #certificates*certificate
     // #inputs = 1; #outputs = 2; #certificates = 0

@@ -2,7 +2,7 @@ mod iobuilder;
 mod txbuilder;
 use super::certificate;
 use super::tx;
-use crate::{Input, Inputs, Output, Outputs, TransactionSignDataHash};
+use crate::{Input, Inputs, Output, Outputs, TransactionSignDataHash, Witness, Witnesses};
 pub use iobuilder::*;
 pub use txbuilder::*;
 use wasm_bindgen::prelude::*;
@@ -43,6 +43,19 @@ pub enum TaggedTransaction {
 impl TaggedTransaction {
     fn id(&self) -> TransactionSignDataHash {
         map_payloads!(self, tx, tx.hash().into())
+    }
+
+    fn witnesses(&self) -> Witnesses {
+        map_payloads!(
+            self,
+            tx,
+            tx.as_slice()
+                .witnesses()
+                .iter()
+                .map(|witness| Witness(witness.clone()))
+                .collect::<Vec<Witness>>()
+                .into()
+        )
     }
 
     fn inputs(&self) -> Vec<tx::Input> {
@@ -89,5 +102,9 @@ impl Transaction {
 
     pub fn clone(&self) -> Transaction {
         Transaction(self.0.clone())
+    }
+
+    pub fn witnesses(&self) -> Witnesses {
+        self.0.witnesses()
     }
 }
