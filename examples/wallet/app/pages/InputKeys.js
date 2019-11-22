@@ -7,11 +7,13 @@ import Container from 'react-bootstrap/Container';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
+import Modal from 'react-bootstrap/Modal';
 import routes from '../constants/routes.json';
 import typeof {
   setAccountFromMnemonic as SetAccountFromMnemonic,
   setAccount as SetAccount
 } from '../actions/account';
+import { isValidMnemonic } from '../utils/mnemonic';
 import typeof { updateNodeSettings as UpdateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
@@ -40,14 +42,26 @@ export default ({
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
-    return Promise.all([
-      setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
-    ]);
+    const mnemonicWords = newMnemonicPhrase.split(' ');
+    if (isValidMnemonic(newMnemonicPhrase, mnemonicWords.length)) {
+      return Promise.all([
+        setAccountFromMnemonic(
+          newMnemonicPhrase,
+          mnemonicWords.length,
+          newMnemonicPassword
+        )
+      ]);
+    }
+    setShowWrongMnemonicPhrase(true);
   };
 
   if (privateKey) {
     return <Redirect push to={routes.WALLET} />;
   }
+
+  const [showWrongMnemonicPhrase, setShowWrongMnemonicPhrase] = useState(false);
+
+  const handleClose = () => setShowWrongMnemonicPhrase(false);
 
   const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
 
@@ -100,7 +114,7 @@ export default ({
                 required
                 type="text"
                 name="mnemonicPhrase"
-                placeholder="Enter your secret twenty four word phrase here to restore your vault"
+                placeholder="Enter your secret word phrase here to restore your vault. The phrase can have 12, 15, 18, 21 or 24 words."
                 value={newMnemonicPhrase}
                 onChange={event => setNewMnemonicPhrase(event.target.value)}
               />
@@ -109,8 +123,7 @@ export default ({
                 <br />
                 <code>
                   decade panther require cruise robust mail gadget advice
-                  tonight post inner snack web sorry actor topple floor odor
-                  lift few reflect august cousin year
+                  tonight post inner snack
                 </code>
               </Form.Text>
               <Form.Control
@@ -132,6 +145,20 @@ export default ({
               </Button>
             </Row>
           </Form>
+
+          <Modal show={showWrongMnemonicPhrase} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Wrong mnemonic phrase</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              A mnemonic phrase can have 12, 15, 18, 21 or 24 valid words.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </Container>
       </Tab>
     </Tabs>
