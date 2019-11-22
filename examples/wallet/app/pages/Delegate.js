@@ -2,7 +2,7 @@
 import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import SidebarLayout from '../layouts/SidebarLayout';
+import SidebarLayout from '../containers/SidebarLayout';
 import StakeDelegation from '../containers/StakeDelegation';
 
 export default () => {

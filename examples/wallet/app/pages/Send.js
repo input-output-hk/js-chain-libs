@@ -2,7 +2,7 @@
 import React from 'react';
 import Container from 'react-bootstrap/Container';
 import SendTransaction from '../containers/SendTransaction';
-import SidebarLayout from '../layouts/SidebarLayout';
+import SidebarLayout from '../containers/SidebarLayout';
 
 export default () => {
   return (
