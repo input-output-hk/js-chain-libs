@@ -1106,6 +1106,14 @@ impl Fragment {
             .map_err(|error| JsValue::from_str(&format!("{}", error)))
     }
 
+    pub fn from_bytes(bytes: Uint8Array) -> Result<Fragment, JsValue> {
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
+        bytes.copy_to(&mut *slice);
+        chain::fragment::Fragment::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(Fragment)
+    }
+
     pub fn is_initial(&self) -> bool {
         match self.0 {
             chain::fragment::Fragment::Initial(_) => true,
