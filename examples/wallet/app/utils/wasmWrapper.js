@@ -31,10 +31,9 @@ export async function getAccountFromSeed(
 }
 
 async function getAccountDataFromPrivateKey(
-  privateKey: PrivateKey
+  privateKey: any
 ): Promise<AccountKeys> {
   const {
-    PrivateKey,
     PublicKey,
     Account,
     AccountIdentifier,

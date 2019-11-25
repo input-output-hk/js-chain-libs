@@ -50,7 +50,6 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
 
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
-  numberOfWords?: number,
   mnemonicPassword?: string
 ): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
@@ -80,7 +79,7 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk<SetAccountState> {
+export function updateAccountState(): Thunk<SetAccountStateAction> {
   return function updateAccountStateThunk(dispatch, getState) {
     const { identifier }: { identifier: Identifier } = getState().account;
     if (!identifier) {

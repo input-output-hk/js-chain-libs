@@ -7,7 +7,6 @@ import Container from 'react-bootstrap/Container';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
-import Modal from 'react-bootstrap/Modal';
 import routes from '../constants/routes.json';
 import typeof {
   setAccountFromMnemonic as SetAccountFromMnemonic,
@@ -20,9 +19,7 @@ type Props = {
   setAccountFromMnemonic: SetAccountFromMnemonic,
   setAccount: SetAccount,
   updateNodeSettings: UpdateNodeSettings,
-  privateKey: string,
-  mnemonicPhrase: string,
-  mnemonicPassword: string
+  privateKey: string
 };
 
 // FIXME: this has no error handling, neither while parsing the address
@@ -31,10 +28,12 @@ export default ({
   updateNodeSettings,
   setAccount,
   setAccountFromMnemonic,
-  privateKey,
-  mnemonicPhrase,
-  mnemonicPassword
+  privateKey
 }: Props) => {
+  const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
+    setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
+  };
+
   const handleSubmitKeyString = function handleSubmitKeyString(event) {
     event.preventDefault();
     return Promise.all([setAccount(newPrivateKey), updateNodeSettings()]);
@@ -42,34 +41,25 @@ export default ({
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
-    const mnemonicWords = newMnemonicPhrase.split(' ');
     if (isValidMnemonic(newMnemonicPhrase)) {
       return Promise.all([
-        setAccountFromMnemonic(
-          newMnemonicPhrase,
-          mnemonicWords.length,
-          newMnemonicPassword
-        )
+        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
       ]);
     }
-    setShowWrongMnemonicPhrase(true);
+    setIsMnemonicValid(false);
   };
 
   if (privateKey) {
     return <Redirect push to={routes.WALLET} />;
   }
 
-  const [showWrongMnemonicPhrase, setShowWrongMnemonicPhrase] = useState(false);
-
-  const handleClose = () => setShowWrongMnemonicPhrase(false);
+  const [isMnemonicValid, setIsMnemonicValid] = useState(true);
 
   const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
 
-  const [newMnemonicPhrase, setNewMnemonicPhrase] = useState(mnemonicPhrase);
+  const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
-  const [newMnemonicPassword, setNewMnemonicPassword] = useState(
-    mnemonicPassword
-  );
+  const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
 
   return (
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
@@ -99,7 +89,7 @@ export default ({
                 Go back
               </Button>
               <Button variant="primary" type="submit">
-                Initialize wallet Use key string
+                Initialize wallet using key string
               </Button>
             </Row>
           </Form>
@@ -113,11 +103,19 @@ export default ({
               <Form.Control
                 required
                 type="text"
+                id="mnemonicPhrase"
                 name="mnemonicPhrase"
                 placeholder="Enter your secret word phrase here to restore your vault. The phrase can have 12, 15, 18, 21 or 24 words."
                 value={newMnemonicPhrase}
+                isInvalid={!isMnemonicValid}
                 onChange={event => setNewMnemonicPhrase(event.target.value)}
+                onBlur={() => checkIsValidMnemonicPhrase()}
               />
+              <Form.Label className="text-danger" hidden={isMnemonicValid}>
+                <code>
+                  The phrase can have 12, 15, 18, 21 or 24 valid words.
+                </code>
+              </Form.Label>
               <Form.Text>
                 Example:
                 <br />
@@ -141,24 +139,10 @@ export default ({
                 Go back
               </Button>
               <Button variant="primary" type="submit">
-                Initialize wallet use mnemonic phrase
+                Initialize wallet using mnemonic phrase
               </Button>
             </Row>
           </Form>
-
-          <Modal show={showWrongMnemonicPhrase} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Wrong mnemonic phrase</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              A mnemonic phrase can have 12, 15, 18, 21 or 24 valid words.
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleClose}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
         </Container>
       </Tab>
     </Tabs>

@@ -7,9 +7,7 @@ import { updateNodeSettings } from '../actions/nodeSettings';
 
 function mapStateToProps(state) {
   return {
-    privateKey: state.account.privateKey,
-    mnemonicPhrase: state.account.mnemonicPhrase,
-    mnemonicPassword: state.account.mnemonicPassword
+    privateKey: state.account.privateKey
   };
 }
 
