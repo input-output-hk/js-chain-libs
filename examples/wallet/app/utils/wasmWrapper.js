@@ -14,33 +14,24 @@ const wasmBindings = import('js-chain-libs/js_chain_libs');
 export async function getAccountFromPrivateKey(
   secret: InternalPrivateKey
 ): Promise<AccountKeys> {
-  const {
-    PrivateKey,
-    PublicKey,
-    Account,
-    AccountIdentifier,
-    AddressDiscrimination
-  } = await wasmBindings;
+  const { PrivateKey } = await wasmBindings;
   const privateKey: PrivateKey = PrivateKey.from_bech32(secret);
-  const publicKey: PublicKey = privateKey.to_public();
-  const account: Account = Account.from_public_key(publicKey);
-  const identifier: AccountIdentifier = account.to_identifier();
-  const networkDiscrimination: AddressDiscrimination =
-    config.get('networkDiscrimination') === 'testnet'
-      ? AddressDiscrimination.Test
-      : AddressDiscrimination.Production;
-  const address: string = account
-    .to_address(networkDiscrimination)
-    .to_string(config.get('addressPrefix'));
-  return {
-    address,
-    privateKey: secret,
-    identifier: identifier.to_hex()
-  };
+  return getAccountDataFromPrivateKey(privateKey);
 }
 
 export async function getAccountFromSeed(
   seed: Uint8Array
+): Promise<AccountKeys> {
+  const { PrivateKey } = await wasmBindings;
+  const privateKey: PrivateKey = PrivateKey.from_normal_bytes(
+    seed.slice(0, 32)
+  );
+
+  return getAccountDataFromPrivateKey(privateKey);
+}
+
+async function getAccountDataFromPrivateKey(
+  privateKey: PrivateKey
 ): Promise<AccountKeys> {
   const {
     PrivateKey,
@@ -49,12 +40,9 @@ export async function getAccountFromSeed(
     AccountIdentifier,
     AddressDiscrimination
   } = await wasmBindings;
-  const privateKey: PrivateKey = PrivateKey.from_normal_bytes(
-    seed.slice(0, 32)
-  );
   const publicKey: PublicKey = privateKey.to_public();
-  const secret = privateKey.to_bech32();
   const account: Account = Account.from_public_key(publicKey);
+  const secret = privateKey.to_bech32();
   const identifier: AccountIdentifier = account.to_identifier();
   const networkDiscrimination: AddressDiscrimination =
     config.get('networkDiscrimination') === 'testnet'
