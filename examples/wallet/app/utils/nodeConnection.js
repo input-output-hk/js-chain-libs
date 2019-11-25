@@ -15,10 +15,11 @@ export function getAccountState(identifier: Identifier): Promise<AccountState> {
     .then(({ data: { value, counter, delegation } }) => ({
       balance: value,
       counter,
-      delegation: delegation.pools.map(([poolId, amount]) => ({
-        poolId,
-        amount
-      }))
+      delegation: delegation.pools.reduce(
+        (acc, [poolId, amount]) =>
+          Object.assign(acc, { [poolId]: { parts: amount } }),
+        {}
+      )
     }));
 }
 

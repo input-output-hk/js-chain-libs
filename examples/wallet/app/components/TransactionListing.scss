@@ -7,15 +7,6 @@
   }
 }
 
-.row {
-  align-items: center;
-  justify-content: space-between;
-  padding: 1em;
-  margin: 0.7em;
-  border-radius: 5px;
-  background-color: var(--transaction-row-background);
-}
-
 .transactionType {
   text-transform: uppercase;
   font-weight: bold;

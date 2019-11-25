@@ -9,6 +9,7 @@ import type {
   Amount,
   Address,
   PoolId,
+  Delegation,
   Identifier,
   TransactionHash,
   Transaction
@@ -147,18 +148,20 @@ export type SendStakeDelegation = {
   type: 'SEND_STAKE_DELEGATION',
   newCounter: number,
   id: TransactionHash,
-  pool: PoolId,
+  pools: Array<PoolId>,
   fee: Amount
 };
 
 export const SEND_STAKE_DELEGATION = 'SEND_STAKE_DELEGATION';
 
-export function sendStakeDelegation(pool: PoolId): Thunk<SendStakeDelegation> {
+export function sendStakeDelegation(
+  newDelegation: Delegation
+): Thunk<SendStakeDelegation> {
   // Assume balance and counter are up to date
   return function sendStakeDelegationThunk(dispatch, getState) {
     const state: AppState = getState();
     return buildDelegateTransaction(
-      pool,
+      newDelegation,
       state.account.privateKey,
       state.account.counter,
       state.nodeSettings
@@ -171,7 +174,7 @@ export function sendStakeDelegation(pool: PoolId): Thunk<SendStakeDelegation> {
           type: SEND_STAKE_DELEGATION,
           newCounter: state.account.counter + 1,
           id,
-          pool,
+          pools: Object.keys(newDelegation),
           fee
         })
       );
