@@ -24,7 +24,10 @@ export function updateNodeSettings(): (
         )
         // TODO: display a notification or something
         // FIXME since this is not called periodically, it should be retried
-        .catch(() => console.error('there was an error fetching node settings'))
+        .catch(() => {
+          console.error('there was an error fetching node settings');
+          return Promise.reject();
+        })
     );
   };
 }

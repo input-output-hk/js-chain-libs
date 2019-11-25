@@ -93,7 +93,10 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
           })
         )
         // TODO: display a notification or something
-        .catch(() => console.error('there was an error fetching account info'))
+        .catch(() => {
+          console.error('there was an error fetching account info');
+          return Promise.reject();
+        })
     );
   };
 }
@@ -122,7 +125,10 @@ export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
           })
         )
         // TODO: display a notification or something
-        .catch(() => console.error('there was an error fetching transactions'))
+        .catch(() => {
+          console.error('there was an error fetching transactions');
+          return Promise.reject();
+        })
     );
   };
 }
