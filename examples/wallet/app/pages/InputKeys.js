@@ -43,7 +43,7 @@ export default ({
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
     const mnemonicWords = newMnemonicPhrase.split(' ');
-    if (isValidMnemonic(newMnemonicPhrase, mnemonicWords.length)) {
+    if (isValidMnemonic(newMnemonicPhrase)) {
       return Promise.all([
         setAccountFromMnemonic(
           newMnemonicPhrase,

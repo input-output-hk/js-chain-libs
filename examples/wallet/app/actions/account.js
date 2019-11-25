@@ -53,7 +53,7 @@ export function setAccountFromMnemonic(
   numberOfWords?: number,
   mnemonicPassword?: string
 ): Thunk<SetKeysAction> {
-  if (isValidMnemonic(mnemonicPhrase, numberOfWords)) {
+  if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
       return getAccountFromSeed(seed)
