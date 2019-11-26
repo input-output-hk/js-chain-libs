@@ -17,6 +17,7 @@ import type {
 import {
   getAccountFromPrivateKey,
   buildSendFundsTransaction,
+  getAccountFromSeed,
   buildDelegateTransaction
 } from '../utils/wasmWrapper';
 import {
@@ -24,6 +25,7 @@ import {
   broadcastTransaction,
   getTransactions
 } from '../utils/nodeConnection';
+import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
@@ -44,6 +46,32 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
         ])
       );
   };
+}
+
+export function setAccountFromMnemonic(
+  mnemonicPhrase: string,
+  mnemonicPassword?: string
+): Thunk<SetKeysAction> {
+  if (isValidMnemonic(mnemonicPhrase)) {
+    const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
+    return function setAccountThunk(dispatch) {
+      return getAccountFromSeed(seed)
+        .then((keys: AccountKeys) =>
+          dispatch({
+            type: SET_KEYS,
+            ...keys
+          })
+        )
+        .then(() =>
+          Promise.all([
+            dispatch(updateAccountTransactions()),
+            dispatch(updateAccountState())
+          ])
+        );
+    };
+  }
+  // TODO: Add a message displaying error
+  console.log('Mnemonic phrase is not valid');
 }
 
 export type SetAccountStateAction = {
