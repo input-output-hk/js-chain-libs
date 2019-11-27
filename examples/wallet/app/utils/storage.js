@@ -1,0 +1,25 @@
+export const saveAccountInfoInLocalStorage = (keys: AccountKeys) => {
+  localStorage.setItem('savedKeys', 'true');
+  localStorage.setItem('address', keys.address);
+  localStorage.setItem('identifier', keys.identifier);
+  localStorage.setItem('privateKey', keys.privateKey);
+};
+
+export const isAccountInfoInLocalStorage = () => {
+  const savedKeys = localStorage.getItem('savedKeys') === 'true';
+  return savedKeys;
+};
+
+export const readAccountKeysFromLocalStorage = () => {
+  return new Promise((resolve, reject) => {
+    const savedKeys = localStorage.getItem('savedKeys') === 'true';
+    if (savedKeys) {
+      const address = localStorage.getItem('address') === 'true';
+      const identifier = localStorage.getItem('identifier') === 'true';
+      const privateKey = localStorage.getItem('privateKey') === 'true';
+      const accountKeys = { address, identifier, privateKey };
+      resolve(accountKeys);
+    }
+    reject(new Error('There are no keys stored in the wallet yet'));
+  });
+};

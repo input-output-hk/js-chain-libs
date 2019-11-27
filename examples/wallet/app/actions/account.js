@@ -29,6 +29,8 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
+import { saveAccountInfoInLocalStorage } from '../utils/storage';
+
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
@@ -47,6 +49,9 @@ const initializeKeysAndRedirect = (dispatch, keys: AccountKeys) => {
     type: SET_KEYS,
     ...keys
   });
+
+  saveAccountInfoInLocalStorage(keys);
+
   return Promise.all([
     dispatch(updateAccountTransactions()),
     dispatch(updateNodeSettings()),
