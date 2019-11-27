@@ -1,42 +1,31 @@
 // @flow
 import React, { useState } from 'react';
-import { Redirect } from 'react-router';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
-import routes from '../constants/routes.json';
 import typeof {
   setAccountFromMnemonic as SetAccountFromMnemonic,
   setAccount as SetAccount
 } from '../actions/account';
 import { isValidMnemonic } from '../utils/mnemonic';
-import typeof { updateNodeSettings as UpdateNodeSettings } from '../actions/nodeSettings';
 
 type Props = {
   setAccountFromMnemonic: SetAccountFromMnemonic,
-  setAccount: SetAccount,
-  updateNodeSettings: UpdateNodeSettings,
-  privateKey: string
+  setAccount: SetAccount
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({
-  updateNodeSettings,
-  setAccount,
-  setAccountFromMnemonic,
-  privateKey
-}: Props) => {
-  const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
-    setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
-  };
-
+export default ({ setAccount, setAccountFromMnemonic }: Props) => {
   const handleSubmitKeyString = function handleSubmitKeyString(event) {
     event.preventDefault();
-    return Promise.all([setAccount(newPrivateKey), updateNodeSettings()]);
+    return setAccount(newPrivateKey);
+  };
+  const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
+    setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
   };
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
@@ -49,13 +38,9 @@ export default ({
     setIsMnemonicValid(false);
   };
 
-  if (privateKey) {
-    return <Redirect push to={routes.WALLET} />;
-  }
-
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
 
-  const [newPrivateKey, setNewPrivateKey] = useState(privateKey);
+  const [newPrivateKey, setNewPrivateKey] = useState('');
 
   const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 

@@ -6,7 +6,7 @@ import App from './containers/App';
 import Wallet from './pages/Wallet';
 import Send from './pages/Send';
 import Settings from './pages/Settings';
-import ChooseRestoreOrImport from './pages/ChooseRestoreOrImport';
+import ChooseRestoreOrImport from './containers/ChooseRestoreOrImport';
 import Delegate from './pages/Delegate';
 import Index from './containers/Index';
 import InputKeys from './containers/InputKeys';

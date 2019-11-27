@@ -1,5 +1,6 @@
 // @flow
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux';
+import type { RouterHistory } from 'react-router-dom';
 import type {
   Address,
   Balance,
@@ -23,7 +24,8 @@ export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
 export type AppState = {
   account: Account,
   nodeSettings: NodeSettings,
-  stakePools: StakePools
+  stakePools: StakePools,
+  router: RouterHistory
 };
 
 export type Account = AccountKeys &

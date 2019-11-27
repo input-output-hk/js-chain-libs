@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import AccountInfo from '../containers/AccountInfo';
 import TransactionListing from '../containers/TransactionListing';
-import SidebarLayout from '../layouts/SidebarLayout';
+import SidebarLayout from '../containers/SidebarLayout';
 
 export default () => {
   return (
