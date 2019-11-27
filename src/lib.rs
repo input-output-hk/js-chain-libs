@@ -438,6 +438,14 @@ impl UtxoPointer {
             value: value.0,
         })
     }
+
+    pub fn output_index(&self) -> u8 {
+        self.0.output_index
+    }
+
+    pub fn fragment_id(&self) -> FragmentId {
+        self.0.transaction_id.into()
+    }
 }
 
 /// This is either an single account or a multisig account depending on the witness type
@@ -1219,6 +1227,26 @@ impl Block {
             .map(|m| Fragment::from(m.clone()))
             .collect::<Vec<Fragment>>()
             .into()
+    }
+
+    pub fn epoch(&self) -> u32 {
+        self.0.date().epoch
+    }
+
+    pub fn slot(&self) -> u32 {
+        self.0.date().slot_id
+    }
+
+    pub fn chain_length(&self) -> u32 {
+        u32::from(self.0.chain_length())
+    }
+
+    pub fn leader_id(&self) -> Option<PoolId> {
+        Some(self.0.header.get_stakepool_id()?.into())
+    }
+
+    pub fn content_size(&self) -> u32 {
+        self.0.header.block_content_size()
     }
 }
 
