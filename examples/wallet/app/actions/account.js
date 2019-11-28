@@ -44,13 +44,29 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   };
 }
 
-const initializeKeysAndRedirect = (dispatch, keys: AccountKeys) => {
+export function loadAccountFromPrivateKey(
+  privateKey: string
+): Thunk<SetKeysAction> {
+  return function setAccountThunk(dispatch) {
+    return getAccountFromPrivateKey(privateKey).then(loadedPrivateKey =>
+      curry(initializeKeysAndRedirect)(dispatch, loadedPrivateKey, false)
+    );
+  };
+}
+
+const initializeKeysAndRedirect = (
+  dispatch,
+  keys: AccountKeys,
+  saveAccount = true
+) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
 
-  saveAccountInfoInLocalStorage(keys);
+  if (saveAccount) {
+    saveAccountInfoInLocalStorage(keys);
+  }
 
   return Promise.all([
     dispatch(updateAccountTransactions()),
