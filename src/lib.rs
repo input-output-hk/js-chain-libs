@@ -331,7 +331,7 @@ impl From<key::Hash> for Hash {
 
 #[wasm_bindgen]
 impl Hash {
-    pub fn from_bytes(bytes: &[u8]) -> Hash {
+    pub fn calculate(bytes: &[u8]) -> Hash {
         key::Hash::hash_bytes(bytes).into()
     }
 
@@ -1269,6 +1269,18 @@ impl From<key::Hash> for BlockId {
 
 #[wasm_bindgen]
 impl BlockId {
+    pub fn calculate(bytes: &[u8]) -> Hash {
+        key::Hash::hash_bytes(bytes).into()
+    }
+
+    pub fn from_bytes(bytes: Uint8Array) -> Result<BlockId, JsValue> {
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
+        bytes.copy_to(&mut *slice);
+        key::Hash::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(BlockId)
+    }
+
     pub fn as_bytes(&self) -> Vec<u8> {
         self.0.serialize_as_vec().unwrap()
     }
@@ -1285,8 +1297,16 @@ impl From<chain::fragment::FragmentId> for FragmentId {
 
 #[wasm_bindgen]
 impl FragmentId {
-    pub fn from_bytes(bytes: &[u8]) -> FragmentId {
+    pub fn calculate(bytes: &[u8]) -> FragmentId {
         chain::fragment::FragmentId::hash_bytes(bytes).into()
+    }
+
+    pub fn from_bytes(bytes: Uint8Array) -> Result<FragmentId, JsValue> {
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
+        bytes.copy_to(&mut *slice);
+        chain::fragment::FragmentId::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(FragmentId)
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
