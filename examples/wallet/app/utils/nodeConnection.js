@@ -7,7 +7,8 @@ import type { AccountState, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
 const NODE_URL = config.get('nodeUrl');
-const BASE_REST_URL = NODE_URL + config.get('APIBase');
+const REST_PORT = config.get('nodeRESTPort');
+const BASE_REST_URL = `${NODE_URL}:${REST_PORT}${config.get('APIBase')}`;
 
 export function getAccountState(identifier: Identifier): Promise<AccountState> {
   return axios
@@ -33,7 +34,7 @@ const flattenInputOrOutput = (
 
 export function getTransactions(address: Address): Promise<Array<Transaction>> {
   return axios
-    .post(`${NODE_URL}/explorer/graphql`, {
+    .post(`${NODE_URL}:${REST_PORT}/explorer/graphql`, {
       operationName: 'getTransactions',
       variables: { address },
       query: graphQlGetTransactionsQuery
@@ -68,7 +69,10 @@ const getCertificate = it => {
 export function getNodeSettings(): Promise<NodeSettings> {
   return axios
     .get(`${BASE_REST_URL}/settings`)
-    .then(({ data: { block0Hash, fees } }) => ({ block0Hash, fees }));
+    .then(({ data: { block0Hash } }) => ({
+      block0Hash,
+      fees: config.get('fees')
+    }));
 }
 
 export function getStakePools(): Promise<Array<PoolId>> {

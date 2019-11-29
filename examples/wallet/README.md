@@ -38,6 +38,20 @@ generate the gRPC-web interface:
 protoc -I=../../chain-libs/network-grpc/proto node.proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:app/generated
 ```
 
+## proxy for interaction with grpc API
+
+The application assumes the existence of a proxy on port `8298`, to which it'll
+make grpc-web calls.
+To run it, install [envoy](https://www.getenvoy.io/) and run `envoy -c envoy.yaml`
+Until we figure out a way of forcing the proxy to use the ipv4 address (which
+jormungandr uses by defalut), you'll have to add:
+
+```
+127.0.0.1 localhost4
+```
+
+to your `/etc/hosts` file.
+
 ## TODO
 
 - [ x ] show the balance of a given address
