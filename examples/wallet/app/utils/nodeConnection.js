@@ -95,7 +95,7 @@ const graphQlGetTransactionsQuery =
           certificate{\
             __typename,\
             ... on StakeDelegation {\
-              pools:pool{\
+              pools{\
                 id\
               }\
             }\
@@ -105,7 +105,7 @@ const graphQlGetTransactionsQuery =
               }\
             }\
             ... on OwnerStakeDelegation {\
-              pools:pool{\
+              pools{\
                 id\
               }\
             }\
