@@ -2,13 +2,20 @@
 import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
 import config from 'config';
+import { NodePromiseClient } from '../generated/node_grpc_web_pb';
+import { uint8ArrayToHexString } from './lowLevelHelper';
+import { HandshakeRequest, HandshakeResponse } from '../generated/node_pb';
 import type { Address, Identifier, PoolId, Transaction } from '../models';
 import type { AccountState, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
 const NODE_URL = config.get('nodeUrl');
 const REST_PORT = config.get('nodeRESTPort');
+const GRPC_PORT = config.get('nodeGRPCPort');
 const BASE_REST_URL = `${NODE_URL}:${REST_PORT}${config.get('APIBase')}`;
+const GRPC_URL = `${NODE_URL}:${GRPC_PORT}`;
+
+const grpcClient: NodePromiseClient = new NodePromiseClient(GRPC_URL);
 
 export function getAccountState(identifier: Identifier): Promise<AccountState> {
   return axios
@@ -67,10 +74,10 @@ const getCertificate = it => {
 };
 
 export function getNodeSettings(): Promise<NodeSettings> {
-  return axios
-    .get(`${BASE_REST_URL}/settings`)
-    .then(({ data: { block0Hash } }) => ({
-      block0Hash,
+  return grpcClient
+    .handshake(new HandshakeRequest())
+    .then((response: HandshakeResponse) => ({
+      block0Hash: uint8ArrayToHexString(response.getBlock0_asU8()),
       fees: config.get('fees')
     }));
 }

@@ -7,7 +7,7 @@
   "addressPrefix": "addr",
   "nodeUrl": "http://localhost",
   "nodeRESTPort": "8443",
-  "nodeGRPCPort": "9090",
+  "nodeGRPCPort": "8298",
   "explorer": { "url": "http://localhost:3000", "transactionPath": "tx" },
   "fees": {
     "certificate": 10,
