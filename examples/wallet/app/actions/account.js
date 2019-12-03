@@ -84,7 +84,6 @@ const initializeKeysAndRedirect = (
   ])
     .then(() => dispatch(push(routes.WALLET)))
     .catch(error => {
-      console.log('EHHHHHHHH ACA PINCHO GATIN');
       console.log(error);
       setHarcodedAccount(dispatch);
       dispatch(push(routes.WALLET));
