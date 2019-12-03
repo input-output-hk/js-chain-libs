@@ -1,5 +1,6 @@
 // @flow
 import { push } from 'connected-react-router';
+import type { Dispatch } from 'redux';
 import curry from 'lodash/curry';
 import type {
   AppState,
@@ -14,7 +15,9 @@ import type {
   Delegation,
   Identifier,
   TransactionHash,
-  Transaction
+  Transaction,
+  Balance,
+  Counter
 } from '../models';
 import { updateNodeSettings } from './nodeSettings';
 import {
@@ -38,6 +41,7 @@ export const SET_KEYS = 'SET_KEYS';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
+    console.log('setAccount setAccount setAccount');
     return getAccountFromPrivateKey(privateKey).then(
       curry(initializeKeysAndRedirect)(dispatch)
     );
@@ -45,13 +49,18 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
 }
 
 export function loadAccountFromPrivateKey(
+  dispatch: Dispatch,
   privateKey: string
-): Thunk<SetKeysAction> {
-  return function setAccountThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey).then(loadedPrivateKey =>
-      curry(initializeKeysAndRedirect)(dispatch, loadedPrivateKey, false)
-    );
-  };
+): void {
+  getAccountFromPrivateKey(privateKey)
+    .then(loadedPrivateKey => {
+      curry(initializeKeysAndRedirect)(dispatch, loadedPrivateKey, false);
+      return null;
+    })
+    .catch(error => {
+      // TODO: SHOW A MESSAGE SHOWING ERROR
+      console.log(error);
+    });
 }
 
 const initializeKeysAndRedirect = (
@@ -63,8 +72,8 @@ const initializeKeysAndRedirect = (
     type: SET_KEYS,
     ...keys
   });
-
   if (saveAccount) {
+    console.log('saved');
     saveAccountInfoInLocalStorage(keys);
   }
 
@@ -72,9 +81,39 @@ const initializeKeysAndRedirect = (
     dispatch(updateAccountTransactions()),
     dispatch(updateNodeSettings()),
     dispatch(updateAccountState())
-  ]).then(() => dispatch(push(routes.WALLET)));
+  ])
+    .then(() => dispatch(push(routes.WALLET)))
+    .catch(error => {
+      console.log('EHHHHHHHH ACA PINCHO GATIN');
+      console.log(error);
+      setHarcodedAccount(dispatch);
+      dispatch(push(routes.WALLET));
+    });
 };
 
+function setHarcodedAccount(dispatch: Dispatch): void {
+  const transactions: Array<Transaction> = [];
+  dispatch({
+    type: SET_TRANSACTIONS,
+    transactions
+  });
+
+  const hardcoded = {
+    hardBalance: 0,
+    hardCounter: 0,
+    hardDelegation: { '00000x': { parts: 1, color: '#747369' } }
+  };
+  const balance: Balance = hardcoded.hardBalance;
+  const counter: Counter = hardcoded.hardCounter;
+  const delegation: Delegation = hardcoded.hardDelegation;
+
+  dispatch({
+    type: SET_ACCOUNT_STATE,
+    balance,
+    counter,
+    delegation
+  });
+}
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword?: string

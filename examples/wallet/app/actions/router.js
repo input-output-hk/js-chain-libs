@@ -12,8 +12,8 @@ export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
     const accountKeys = readAccountKeysFromLocalStorage();
     if (accountKeys !== undefined) {
-      loadAccountFromPrivateKey(accountKeys.privateKey);
-      return dispatch(push(routes.WALLET));
+      loadAccountFromPrivateKey(dispatch, accountKeys.privateKey);
+      return;
     }
     const {
       account: { address }
