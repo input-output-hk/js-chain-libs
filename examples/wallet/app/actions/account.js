@@ -63,17 +63,24 @@ export function loadAccountFromPrivateKey(
     });
 }
 
+/**
+ * @dev This function is used to obtain the list of transactions, the balance
+ * and the delegation of a given account after obtaining the public, private
+ * and identifier keys.
+ * @param {Dispatch} dispatch
+ * @param {AccountKeys} keys
+ * @param {boolean} saveAccount If true, the keys are stored in the local storage
+ */
 const initializeKeysAndRedirect = (
-  dispatch,
+  dispatch: Dispatch,
   keys: AccountKeys,
-  saveAccount = true
+  saveAccount?: boolean = true
 ) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
   if (saveAccount) {
-    console.log('saved');
     saveAccountInfoInLocalStorage(keys);
   }
 
