@@ -4,6 +4,7 @@ import type { NodeSettings } from '../reducers/types';
 import { getNodeSettings } from '../utils/nodeConnection';
 
 export const UPDATE_NODE_SETTINGS = 'UPDATE_NODE_SETTINGS';
+export const ACCOUNT_STATE_ERROR = 'ACCOUNT_STATE_ERROR';
 
 export type UpdateNodeSettingsAction = {
   type: 'UPDATE_NODE_SETTINGS',
@@ -25,8 +26,7 @@ export function updateNodeSettings(): (
         // TODO: display a notification or something
         // FIXME since this is not called periodically, it should be retried
         .catch(() => {
-          console.error('there was an error fetching node settings');
-          return Promise.reject();
+          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
         })
     );
   };

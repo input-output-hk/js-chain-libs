@@ -31,9 +31,7 @@ export default ({ setAccount, setAccountFromMnemonic }: Props) => {
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
     if (isValidMnemonic(newMnemonicPhrase)) {
-      return Promise.all([
-        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
-      ]);
+      setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword);
     }
     setIsMnemonicValid(false);
   };

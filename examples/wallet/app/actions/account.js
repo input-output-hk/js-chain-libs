@@ -15,9 +15,7 @@ import type {
   Delegation,
   Identifier,
   TransactionHash,
-  Transaction,
-  Balance,
-  Counter
+  Transaction
 } from '../models';
 import { updateNodeSettings } from './nodeSettings';
 import {
@@ -38,29 +36,44 @@ import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
+export const PRIVATE_KEY_ERROR = 'privateKeyError';
+export const ACCOUNT_STATE_ERROR = 'accountStateError';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
-    console.log('setAccount setAccount setAccount');
     return getAccountFromPrivateKey(privateKey).then(
       curry(initializeKeysAndRedirect)(dispatch)
     );
   };
 }
 
-export function loadAccountFromPrivateKey(
-  dispatch: Dispatch,
+export function setAccountFromPrivateKey(
   privateKey: string
-): void {
-  getAccountFromPrivateKey(privateKey)
-    .then(loadedPrivateKey => {
-      curry(initializeKeysAndRedirect)(dispatch, loadedPrivateKey, false);
-      return null;
-    })
-    .catch(error => {
-      // TODO: SHOW A MESSAGE SHOWING ERROR
-      console.log(error);
-    });
+): Thunk<SetKeysAction> {
+  return function setAccountFromPrivateKeyThunk(dispatch) {
+    getAccountFromPrivateKey(privateKey)
+      .then(loadedPrivateKey => {
+        dispatch({
+          type: SET_KEYS,
+          ...loadedPrivateKey
+        });
+        return dispatch(updateAccountTransactionsAndState());
+      })
+      .catch(error => {
+        console.error(error);
+        throw new Error(PRIVATE_KEY_ERROR);
+      });
+  };
+}
+
+export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
+  return function updateAccountTransactionsAndStateThunk(dispatch) {
+    return Promise.all([
+      dispatch(updateAccountTransactions()),
+      dispatch(updateNodeSettings()),
+      dispatch(updateAccountState())
+    ]).then(() => dispatch(push(routes.WALLET)));
+  };
 }
 
 /**
@@ -84,42 +97,9 @@ const initializeKeysAndRedirect = (
     saveAccountInfoInLocalStorage(keys);
   }
 
-  return Promise.all([
-    dispatch(updateAccountTransactions()),
-    dispatch(updateNodeSettings()),
-    dispatch(updateAccountState())
-  ])
-    .then(() => dispatch(push(routes.WALLET)))
-    .catch(error => {
-      console.log(error);
-      setHarcodedAccount(dispatch);
-      dispatch(push(routes.WALLET));
-    });
+  return dispatch(updateAccountTransactionsAndState());
 };
 
-function setHarcodedAccount(dispatch: Dispatch): void {
-  const transactions: Array<Transaction> = [];
-  dispatch({
-    type: SET_TRANSACTIONS,
-    transactions
-  });
-
-  const hardcoded = {
-    hardBalance: 0,
-    hardCounter: 0,
-    hardDelegation: { '00000x': { parts: 1, color: '#747369' } }
-  };
-  const balance: Balance = hardcoded.hardBalance;
-  const counter: Counter = hardcoded.hardCounter;
-  const delegation: Delegation = hardcoded.hardDelegation;
-
-  dispatch({
-    type: SET_ACCOUNT_STATE,
-    balance,
-    counter,
-    delegation
-  });
-}
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword?: string
@@ -161,7 +141,7 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching account info');
-          return Promise.reject();
+          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
         })
     );
   };
@@ -193,7 +173,7 @@ export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching transactions');
-          return Promise.reject();
+          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
         })
     );
   };

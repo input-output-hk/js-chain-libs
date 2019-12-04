@@ -5,7 +5,15 @@ import config from 'config';
 import { NodePromiseClient } from '../generated/node_grpc_web_pb';
 import { uint8ArrayToHexString } from './lowLevelHelper';
 import { HandshakeRequest, HandshakeResponse } from '../generated/node_pb';
-import type { Address, Identifier, PoolId, Transaction } from '../models';
+import type {
+  Address,
+  Identifier,
+  PoolId,
+  Transaction,
+  Balance,
+  Delegation,
+  Counter
+} from '../models';
 import type { AccountState, NodeSettings } from '../reducers/types';
 
 axios.defaults.adapter = httpAdapter;
@@ -28,7 +36,25 @@ export function getAccountState(identifier: Identifier): Promise<AccountState> {
           Object.assign(acc, { [poolId]: { parts: amount } }),
         {}
       )
-    }));
+    }))
+    .catch(error => {
+      // When an account is imported with BIP39, the account may not
+      // exist in the blockchain. For this DEMO we hardcode the account
+      // information when an HTTP 404 occurs because we interpret that
+      // the account exists. If any type of error occurs, an exception
+      // is thrown to be handled in the upper layers.
+      if (error && error.response && error.response.status === 404) {
+        const balance: Balance = 0;
+        const counter: Counter = 0;
+        const delegation: Delegation = { '00000x': { parts: 1 } };
+        return {
+          balance,
+          counter,
+          delegation
+        };
+      }
+      throw error;
+    });
 }
 
 const flattenInputOrOutput = (
@@ -54,7 +80,19 @@ export function getTransactions(address: Address): Promise<Array<Transaction>> {
         blockHeight: Number(node.block.chainLength),
         certificate: getCertificate(node.certificate)
       }))
-    }));
+    }))
+    .catch(error => {
+      // When an account is imported with BIP39, the account may not
+      // exist in the blockchain. For this DEMO we hardcode the account
+      // information when an HTTP 404 occurs because we interpret that
+      // the account exists. If any type of error occurs, an exception
+      // is thrown to be handled in the upper layers.
+      if (error && error.response && error.response.status === 404) {
+        const transactions = { data: { address: { transactions: [] } } };
+        return transactions;
+      }
+      throw error;
+    });
 }
 
 const getCertificate = it => {
