@@ -19,6 +19,39 @@ To run the application in development mode, first install the dependencies with
 To build an appimage package, first install the dependencies with
 `yarn install` and then package the app with `yarn package-{linux,win}`
 
+## Regeneration of proto files
+
+The javascript files generated from the `.proto` file are checked into source
+control. Upon changes to the node's gRPC API, it's necessary to regenerate them.
+It's necessary to have protoc (packaged as `protobuf-container` on debian) and
+[protoc-gen-grpc-web](https://github.com/grpc/grpc-web) installed
+
+generate the protobuffer interface:
+
+```
+protoc -I=../../chain-libs/network-grpc/proto node.proto --js_out=import_style=commonjs:app/generated
+```
+
+generate the gRPC-web interface:
+
+```
+protoc -I=../../chain-libs/network-grpc/proto node.proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:app/generated
+```
+
+## proxy for interaction with grpc API
+
+The application assumes the existence of a proxy on port `8298`, to which it'll
+make grpc-web calls.
+To run it, install [envoy](https://www.getenvoy.io/) and run `envoy -c envoy.yaml`
+Until we figure out a way of forcing the proxy to use the ipv4 address (which
+jormungandr uses by defalut), you'll have to add:
+
+```
+127.0.0.1 localhost4
+```
+
+to your `/etc/hosts` file.
+
 ## TODO
 
 - [ x ] show the balance of a given address
