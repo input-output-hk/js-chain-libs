@@ -3,8 +3,12 @@ import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http';
 import config from 'config';
 import { NodePromiseClient } from '../generated/node_grpc_web_pb';
-import { uint8ArrayToHexString } from './lowLevelHelper';
-import { HandshakeRequest, HandshakeResponse } from '../generated/node_pb';
+import { uint8ArrayToHexString, hexStringToUint8Array } from './lowLevelHelper';
+import {
+  HandshakeRequest,
+  HandshakeResponse,
+  PullBlocksToTipRequest
+} from '../generated/node_pb';
 import type { Address, Identifier, PoolId, Transaction } from '../models';
 import type { AccountState, NodeSettings } from '../reducers/types';
 
@@ -92,6 +96,14 @@ export function broadcastTransaction(tx: Uint8Array): Promise<void> {
       'content-type': 'application/octet-stream'
     }
   });
+}
+
+export function createBlockSubscription(blockFrom: string) {
+  const request: PullBlocksToTipRequest = new PullBlocksToTipRequest([
+    hexStringToUint8Array(blockFrom)
+  ]);
+  request.setFromList([hexStringToUint8Array(blockFrom)]);
+  return grpcClient.pullBlocksToTip(request);
 }
 
 const graphQlGetTransactionsQuery =

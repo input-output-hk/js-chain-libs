@@ -16,7 +16,7 @@ export type Action = {
   type: string
 };
 
-export type Store = ReduxStore<AppState, Action>;
+export type Store = ReduxStore<AppState, Action | Thunk<Action>>;
 export type GetState = () => AppState;
 export type Dispatch = ReduxDispatch<Action> & Thunk<Action>;
 export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
