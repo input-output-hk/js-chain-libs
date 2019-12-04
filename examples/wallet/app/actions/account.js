@@ -15,7 +15,9 @@ import type {
   Delegation,
   Identifier,
   TransactionHash,
-  Transaction
+  Transaction,
+  Balance,
+  Counter
 } from '../models';
 import { updateNodeSettings } from './nodeSettings';
 import {

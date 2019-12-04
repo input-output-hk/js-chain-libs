@@ -16,17 +16,7 @@ export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
     const accountKeys = readAccountKeysFromLocalStorage();
     if (accountKeys) {
-      dispatch({
-        type: SET_KEYS,
-        ...accountKeys
-      });
-      return dispatch(updateAccountTransactionsAndState()).catch(error => {
-        if (error.message === ACCOUNT_STATE_ERROR) {
-          console.error('There was an error retrieving account status');
-        }
-
-        return dispatch(push(routes.WALLET));
-      });
+      return dispatch(setAccountFromPrivateKey(accountKeys.privateKey));
     }
     const {
       account: { address }
