@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import typeof { setAccountFromMnemonic as SetAccountFromMnemonic } from '../actions/account';
-import { isValidMnemonic } from '../utils/mnemonic';
 
 type Props = {
   setAccountFromMnemonic: SetAccountFromMnemonic
@@ -18,46 +17,70 @@ export default ({ setAccountFromMnemonic }: Props) => {
     event
   ) {
     event.preventDefault();
-    if (isValidMnemonic(newMnemonicPhrase)) {
-      return Promise.all([
-        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
-      ]);
+    if (checkValidPassword(password, confirmPassword)) {
+      return Promise.all([setAccountFromMnemonic(password, confirmPassword)]);
     }
-    setIsMnemonicValid(false);
   };
 
-  const [isMnemonicValid, setIsMnemonicValid] = useState(true);
+  const checkValidPassword = function checkValidPassword(pass, confirmation) {
+    if (!pass) return false;
+    if (pass.length < 8) {
+      setIsValidPassword(false);
+      return false;
+    }
+    setIsValidPassword(true);
 
-  const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
+    if (pass !== confirmation) {
+      setArePasswordAndConfirmationEqual(false);
+      return false;
+    }
+    setArePasswordAndConfirmationEqual(true);
+    return true;
+  };
 
-  const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
+  const [isValidPassword, setIsValidPassword] = useState(true);
+  const [
+    arePasswordAndConfirmationEqual,
+    setArePasswordAndConfirmationEqual
+  ] = useState(true);
+
+  const [password, setPassword] = useState('');
+
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   return (
     <Container>
       <Form onSubmit={handleSubmitCreateSpending} className="mt-5">
         <Form.Group>
-          <Form.Label>Create your new wallet password:</Form.Label>
+          <Form.Label>Create a password for your encrypted storage</Form.Label>
           <Form.Control
             required
             type="password"
-            id="mnemonicPhrase"
-            name="mnemonicPhrase"
+            id="password"
+            name="password"
             placeholder="New password (min 8 chars)"
-            value={newMnemonicPhrase}
-            isInvalid={!isMnemonicValid}
-            onChange={event => setNewMnemonicPhrase(event.target.value)}
+            value={password}
+            isInvalid={!isValidPassword}
+            onChange={event => setPassword(event.target.value)}
           />
-          <Form.Label className="text-danger" hidden={isMnemonicValid}>
-            <code>You should not share your password with others.</code>
+          <Form.Label className="text-danger" hidden={isValidPassword}>
+            <code>The password must have at least 8 chars.</code>
           </Form.Label>
           <Form.Control
             type="password"
-            name="mnemonicPassword"
+            name="confirmPassword"
+            id="confirmPassword"
             placeholder="Confirm password"
-            value={newMnemonicPassword}
-            onChange={event => setNewMnemonicPassword(event.target.value)}
+            value={confirmPassword}
+            onChange={event => setConfirmPassword(event.target.value)}
             className="mt-3"
           />
+          <Form.Label
+            className="text-danger"
+            hidden={arePasswordAndConfirmationEqual}
+          >
+            <code>password and confirmation must be the same.</code>
+          </Form.Label>
         </Form.Group>
         <Row className="justify-content-center">
           <Button variant="primary" type="submit">
