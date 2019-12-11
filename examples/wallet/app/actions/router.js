@@ -2,18 +2,21 @@
 import { push } from 'connected-react-router';
 import type { Dispatch, GetState } from '../reducers/types';
 import type { Address } from '../models';
-import routes from '../constants/routes.json';
+import routes from '../constants/routes';
+import { setAccountFromPrivateKey } from './account';
+
 import {
-  updateAccountTransactionsAndState,
-  ACCOUNT_STATE_ERROR
-} from './account';
-import { readAccountKeysFromLocalStorage } from '../utils/storage';
+  readAccountKeysFromLocalStorage,
+  isSpedingPasswordCreated
+} from '../utils/storage';
 
 export const SET_KEYS = 'SET_KEYS';
 
 // eslint-disable-next-line import/prefer-default-export
 export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
+    if (!isSpedingPasswordCreated())
+      return dispatch(push(routes.CREATE_SPENDING_PASSWORD));
     const accountKeys = readAccountKeysFromLocalStorage();
     if (accountKeys) {
       return dispatch(setAccountFromPrivateKey(accountKeys.privateKey));
