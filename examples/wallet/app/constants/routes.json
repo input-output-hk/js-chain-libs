@@ -6,5 +6,6 @@
   "SEND": "/send",
   "STAKING": "/staking",
   "SETTINGS": "/settings",
-  "UNLOCK_WALLET": "/unlock"
+  "UNLOCK_WALLET": "/unlock",
+  "CREATE_SPENDING_PASSWORD": "/create_spending_password"
 }
