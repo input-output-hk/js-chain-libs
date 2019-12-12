@@ -4,81 +4,64 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import typeof { setAccount as SetAccount } from '../actions/account';
-import CreateUnlockWalletPassword from '../containers/CreateUnlockWalletPassword';
-import { getAccountFromPrivateKey } from '../utils/wasmWrapper';
+import typeof { setAccountFromMnemonic as SetAccountFromMnemonic } from '../actions/account';
+import { isValidMnemonic } from '../utils/mnemonic';
 
 type Props = {
-  setAccount: SetAccount
+  setAccountFromMnemonic: SetAccountFromMnemonic
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({ setAccount }: Props) => {
-  const handleSubmit = function handleSubmit(event) {
+export default ({ setAccountFromMnemonic }: Props) => {
+  const handleSubmitCreateSpending = function handleSubmitCreateSpending(
+    event
+  ) {
     event.preventDefault();
-    if (isValidUnlockPassword) {
-      return setAccount(newPrivateKey, unlockWalletPassword).catch(error => {
-        console.error(error);
-        setPrivateKeyErrorMessage('Invalid private key');
-      });
+    if (isValidMnemonic(newMnemonicPhrase)) {
+      return Promise.all([
+        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
+      ]);
     }
+    setIsMnemonicValid(false);
   };
 
-  const checkValidPrivateKey = function checkValidPrivateKey() {
-    getAccountFromPrivateKey(newPrivateKey)
-      .then(() => setPrivateKeyErrorMessage(''))
-      .catch(error => {
-        console.error(error);
-        setPrivateKeyErrorMessage('Invalid private key');
-      });
-  };
+  const [isMnemonicValid, setIsMnemonicValid] = useState(true);
 
-  const setValidCreateUnlockWalletPassword = function setValidCreateUnlockWalletPassword(
-    unlockPwd: string,
-    isValid: boolean
-  ): void {
-    setUnlockWalletPassword(unlockPwd);
-    setIsValidUnlockPassword(isValid);
-  };
+  const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
-  const [unlockWalletPassword, setUnlockWalletPassword] = useState('');
-  const [isValidUnlockPassword, setIsValidUnlockPassword] = useState(false);
-
-  const [newPrivateKey, setNewPrivateKey] = useState('');
-  const [privateKeyErrorMessage, setPrivateKeyErrorMessage] = useState('');
+  const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
 
   return (
     <Container>
-      <Form onSubmit={handleSubmit} className="mt-5">
+      <Form onSubmit={handleSubmitCreateSpending} className="mt-5">
         <Form.Group>
-          <Form.Label>Private key:</Form.Label>
+          <Form.Label>Create your new wallet password:</Form.Label>
           <Form.Control
             required
-            type="text"
-            name="privateKey"
-            value={newPrivateKey}
-            isInvalid={privateKeyErrorMessage}
-            onChange={event => setNewPrivateKey(event.target.value)}
-            onBlur={() => checkValidPrivateKey()}
+            type="password"
+            id="mnemonicPhrase"
+            name="mnemonicPhrase"
+            placeholder="New password (min 8 chars)"
+            value={newMnemonicPhrase}
+            isInvalid={!isMnemonicValid}
+            onChange={event => setNewMnemonicPhrase(event.target.value)}
           />
-          <Form.Control.Feedback type="invalid">
-            {privateKeyErrorMessage}
-          </Form.Control.Feedback>
-          <Form.Text>
-            It&apos;s a string like:
-            <br />
-            ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
-          </Form.Text>
-          <CreateUnlockWalletPassword
-            setValidCreateUnlockWalletPassword={
-              setValidCreateUnlockWalletPassword
-            }
+          <Form.Label className="text-danger" hidden={isMnemonicValid}>
+            <code>You should not share your password with others.</code>
+          </Form.Label>
+          <Form.Control
+            type="password"
+            name="mnemonicPassword"
+            placeholder="Confirm password"
+            value={newMnemonicPassword}
+            onChange={event => setNewMnemonicPassword(event.target.value)}
+            className="mt-3"
           />
         </Form.Group>
         <Row className="justify-content-center">
           <Button variant="primary" type="submit">
-            Initialize wallet using key string
+            Create
           </Button>
         </Row>
       </Form>
