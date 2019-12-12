@@ -1,12 +1,11 @@
 // @flow
-import React, { useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
+import React from 'react';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import RestoreWalletFromPrivateKey from '../components/RestoreWalletFromPrivateKey';
+import RestoreWalletFromMnemonic from '../components/RestoreWalletFromMnemonic';
+
 import typeof {
   setAccountFromMnemonic as SetAccountFromMnemonic,
   setAccount as SetAccount
@@ -45,54 +44,9 @@ export default ({ setAccountFromMnemonic, setAccount }: Props) => {
         <RestoreWalletFromPrivateKey setAccount={setAccount} />
       </Tab>
       <Tab eventKey="mnemonic" title="Use mnemonic phrase">
-        <Container>
-          <Form onSubmit={handleSubmitMnemonic} className="mt-5">
-            <Form.Group>
-              <Form.Label>Wallet Seed:</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                id="mnemonicPhrase"
-                name="mnemonicPhrase"
-                placeholder="Enter your secret word phrase here to restore your vault. The phrase can have 12, 15, 18, 21 or 24 words."
-                value={newMnemonicPhrase}
-                isInvalid={!isMnemonicValid}
-                onChange={event => setNewMnemonicPhrase(event.target.value)}
-                onBlur={() => checkIsValidMnemonicPhrase()}
-              />
-              <Form.Label className="text-danger" hidden={isMnemonicValid}>
-                <code>
-                  The phrase can have 12, 15, 18, 21 or 24 valid words.
-                </code>
-              </Form.Label>
-              <Form.Text>
-                Example:
-                <br />
-                <code>
-                  decade panther require cruise robust mail gadget advice
-                  tonight post inner snack
-                </code>
-              </Form.Text>
-              <Form.Control
-                type="password"
-                name="mnemonicPassword"
-                placeholder="Secret password"
-                value={newMnemonicPassword}
-                onChange={event => setNewMnemonicPassword(event.target.value)}
-                className="mt-3"
-              />
-            </Form.Group>
-            <Row className="justify-content-between">
-              {/* TODO: bind this button */}
-              <Button variant="secondary" type="button">
-                Go back
-              </Button>
-              <Button variant="primary" type="submit">
-                Initialize wallet using mnemonic phrase
-              </Button>
-            </Row>
-          </Form>
-        </Container>
+        <RestoreWalletFromMnemonic
+          setAccountFromMnemonic={setAccountFromMnemonic}
+        />
       </Tab>
     </Tabs>
   );
