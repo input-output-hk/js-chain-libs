@@ -6,6 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
+import RestoreWalletFromPrivateKey from '../components/RestoreWalletFromPrivateKey';
 import typeof {
   setAccountFromMnemonic as SetAccountFromMnemonic,
   setAccount as SetAccount
@@ -19,11 +20,7 @@ type Props = {
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({ setAccount, setAccountFromMnemonic }: Props) => {
-  const handleSubmitKeyString = function handleSubmitKeyString(event) {
-    event.preventDefault();
-    return setAccount(newPrivateKey);
-  };
+export default ({ setAccountFromMnemonic, setAccount }: Props) => {
   const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
     setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
   };
@@ -38,8 +35,6 @@ export default ({ setAccount, setAccountFromMnemonic }: Props) => {
 
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
 
-  const [newPrivateKey, setNewPrivateKey] = useState('');
-
   const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
   const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
@@ -47,36 +42,7 @@ export default ({ setAccount, setAccountFromMnemonic }: Props) => {
   return (
     <Tabs fill defaultActiveKey="keyString" className="justify-content-center">
       <Tab eventKey="keyString" title="Use key string">
-        <Container>
-          <Form onSubmit={handleSubmitKeyString} className="mt-5">
-            <Form.Group>
-              <Form.Label>Private key:</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                name="privateKey"
-                value={newPrivateKey}
-                onChange={event => setNewPrivateKey(event.target.value)}
-              />
-              <Form.Text>
-                It&apos;s a string like:
-                <br />
-                <code>
-                  ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
-                </code>
-              </Form.Text>
-            </Form.Group>
-            <Row className="justify-content-between">
-              {/* TODO: bind this button */}
-              <Button variant="secondary" type="button">
-                Go back
-              </Button>
-              <Button variant="primary" type="submit">
-                Initialize wallet using key string
-              </Button>
-            </Row>
-          </Form>
-        </Container>
+        <RestoreWalletFromPrivateKey setAccount={setAccount} />
       </Tab>
       <Tab eventKey="mnemonic" title="Use mnemonic phrase">
         <Container>

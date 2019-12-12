@@ -10,7 +10,6 @@ import ChooseRestoreOrImport from './containers/ChooseRestoreOrImport';
 import Delegate from './pages/Delegate';
 import Index from './containers/Index';
 import InputKeys from './containers/InputKeys';
-import CreateSpendingPassword from './containers/CreateSpendingPassword';
 
 export default () => (
   <App>
@@ -23,10 +22,6 @@ export default () => (
       <Route
         path={routes.CHOOSE_RESTORE_OR_IMPORT}
         component={ChooseRestoreOrImport}
-      />
-      <Route
-        path={routes.CREATE_SPENDING_PASSWORD}
-        component={CreateSpendingPassword}
       />
       <Route path={routes.INDEX} component={Index} />
     </Switch>

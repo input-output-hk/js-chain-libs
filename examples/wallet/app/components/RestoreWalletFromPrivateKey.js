@@ -4,26 +4,26 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import typeof { setAccountFromMnemonic as SetAccountFromMnemonic } from '../actions/account';
+import typeof { setAccount as SetAccount } from '../actions/account';
 
 type Props = {
-  setAccountFromMnemonic: SetAccountFromMnemonic
+  setAccount: SetAccount
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({ setAccountFromMnemonic }: Props) => {
+export default ({ setAccount }: Props) => {
   const handleSubmitCreateSpending = function handleSubmitCreateSpending(
     event
   ) {
     event.preventDefault();
     if (checkValidPassword(password, confirmPassword)) {
-      return Promise.all([setAccountFromMnemonic(password, confirmPassword)]);
+      setAccount(newPrivateKey);
     }
   };
 
   const checkValidPassword = function checkValidPassword(pass, confirmation) {
-    if (!pass) return false;
+    if (!pass && !confirmation) return true;
     if (pass.length < 8) {
       setIsValidPassword(false);
       return false;
@@ -39,6 +39,8 @@ export default ({ setAccountFromMnemonic }: Props) => {
   };
 
   const [isValidPassword, setIsValidPassword] = useState(true);
+  const [newPrivateKey, setNewPrivateKey] = useState('');
+
   const [
     arePasswordAndConfirmationEqual,
     setArePasswordAndConfirmationEqual
@@ -52,9 +54,26 @@ export default ({ setAccountFromMnemonic }: Props) => {
     <Container>
       <Form onSubmit={handleSubmitCreateSpending} className="mt-5">
         <Form.Group>
-          <Form.Label>Create a password for your encrypted storage</Form.Label>
+          <Form.Label>Private key:</Form.Label>
           <Form.Control
             required
+            type="text"
+            name="privateKey"
+            value={newPrivateKey}
+            onChange={event => setNewPrivateKey(event.target.value)}
+          />
+          <Form.Text>
+            It&apos;s a string like:
+            <br />
+            <code>
+              ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
+            </code>
+          </Form.Text>
+          <Form.Label>
+            Create a password to store your settings securely in an encrypted
+            storage
+          </Form.Label>
+          <Form.Control
             type="password"
             id="password"
             name="password"
@@ -84,7 +103,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
         </Form.Group>
         <Row className="justify-content-center">
           <Button variant="primary" type="submit">
-            Create
+            Initialize wallet using key string
           </Button>
         </Row>
       </Form>

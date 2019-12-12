@@ -5,18 +5,13 @@ import type { Address } from '../models';
 import routes from '../constants/routes';
 import { setAccountFromPrivateKey } from './account';
 
-import {
-  readAccountKeysFromLocalStorage,
-  isSpedingPasswordCreated
-} from '../utils/storage';
+import { readAccountKeysFromLocalStorage } from '../utils/storage';
 
 export const SET_KEYS = 'SET_KEYS';
 
 // eslint-disable-next-line import/prefer-default-export
 export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
-    if (!isSpedingPasswordCreated())
-      return dispatch(push(routes.CREATE_SPENDING_PASSWORD));
     const accountKeys = readAccountKeysFromLocalStorage();
     if (accountKeys) {
       return dispatch(setAccountFromPrivateKey(accountKeys.privateKey));

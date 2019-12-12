@@ -5,6 +5,5 @@
   "INPUT_KEYS": "/input_keys",
   "SEND": "/send",
   "STAKING": "/staking",
-  "SETTINGS": "/settings",
-  "CREATE_SPENDING_PASSWORD": "/create_spending_password"
+  "SETTINGS": "/settings"
 }
