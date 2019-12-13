@@ -32,7 +32,7 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
-import { saveAccountInfoInLocalStorage } from '../utils/storage';
+import { saveAccountInfoInDEN, saveSpendingPassword } from '../utils/storage';
 
 import routes from '../constants/routes.json';
 
@@ -94,7 +94,8 @@ const initializeKeysAndRedirect = (
     ...keys
   });
   if (saveAccount) {
-    saveAccountInfoInLocalStorage(keys);
+    saveSpendingPassword('manteca');
+    saveAccountInfoInDEN('manteca', keys);
   }
 
   return dispatch(updateAccountTransactionsAndState());

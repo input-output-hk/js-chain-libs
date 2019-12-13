@@ -7,6 +7,7 @@ import {
 } from './decrypt';
 
 const WALLET_SPEDING_PASSWORD_KEY = 'wallet.spending.pwd';
+const WALLET_ENCRYPTED_KEYS = 'wallet.encrypted.account.info';
 
 export function saveSpendingPassword(spendingPassword: string): void {
   const spendingHash = computeBlake2bHexWithSecret(spendingPassword);
@@ -26,10 +27,17 @@ export function isSpedingPasswordCreated(): boolean {
   return false;
 }
 
-export function saveAccountInfoInLocalStorage(keys: AccountKeys): void {
-  Object.keys(keys).forEach(key => localStorage.setItem(key, keys[key]));
+export function saveAccountInfoInDEN(
+  spendingPassword: ?string,
+  keys: AccountKeys
+): void {
+  const plainTextAccountInfo = JSON.stringify(keys);
+  const spedingPwd: string = !spendingPassword ? '' : spendingPassword;
+  const encryptedTextAccountInfo = aesEncrypt(spedingPwd, plainTextAccountInfo);
+  localStorage.setItem(WALLET_ENCRYPTED_KEYS, encryptedTextAccountInfo);
 }
 
+// eslint-disable-next-line flowtype/space-after-type-colon
 export function readAccountKeysFromLocalStorage(): ?AccountKeys {
   if (localStorage.getItem('privateKey')) {
     return {
