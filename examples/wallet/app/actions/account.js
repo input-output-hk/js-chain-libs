@@ -41,15 +41,20 @@ export const SET_KEYS = 'SET_KEYS';
 export const PRIVATE_KEY_ERROR = 'privateKeyError';
 export const ACCOUNT_STATE_ERROR = 'accountStateError';
 
-export function setAccount(privateKey: string): Thunk {
+export function setAccount(
+  privateKey: string,
+  spendingPassword: ?string
+): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey).then(
-      curry(initializeKeysAndRedirect)(dispatch)
+    return getAccountFromPrivateKey(privateKey).then(keys =>
+      curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
     );
   };
 }
 
-export function setAccountFromPrivateKey(privateKey: string): Thunk {
+export function setAccountFromPrivateKey(
+  privateKey: string
+): Thunk<SetKeysAction> {
   return function setAccountFromPrivateKeyThunk(dispatch) {
     getAccountFromPrivateKey(privateKey)
       .then(loadedPrivateKey => {
@@ -66,7 +71,7 @@ export function setAccountFromPrivateKey(privateKey: string): Thunk {
   };
 }
 
-export function updateAccountTransactionsAndState(): Thunk {
+export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
   return function updateAccountTransactionsAndStateThunk(dispatch) {
     return Promise.all([
       dispatch(updateAccountTransactions()),
@@ -85,31 +90,31 @@ export function updateAccountTransactionsAndState(): Thunk {
  * @param {boolean} saveAccount If true, the keys are stored in the local storage
  */
 const initializeKeysAndRedirect = (
-  dispatch: Dispatch<SetKeysAction>,
+  dispatch: Dispatch,
   keys: AccountKeys,
-  saveAccount?: boolean = true
+  spendingPassword: ?string = ''
 ) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
-  if (saveAccount) {
-    saveSpendingPassword('manteca');
-    saveAccountInfoInDEN('manteca', keys);
-  }
+
+  saveSpendingPassword(spendingPassword);
+  saveAccountInfoInDEN(spendingPassword, keys);
 
   return dispatch(updateAccountTransactionsAndState());
 };
 
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
-  mnemonicPassword?: string
-) {
+  mnemonicPassword: string,
+  spendingPassword: ?string
+): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
-      return getAccountFromSeed(seed).then(
-        curry(initializeKeysAndRedirect)(dispatch)
+      return getAccountFromSeed(seed).then(keys =>
+        curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
       );
     };
   }
@@ -122,7 +127,7 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk {
+export function updateAccountState(): Thunk<SetAccountStateAction> {
   return function updateAccountStateThunk(dispatch, getState) {
     const { identifier }: { identifier: Identifier } = getState().account;
     if (!identifier) {
@@ -154,7 +159,7 @@ export type SetTransactionsAction = {
 };
 export const SET_TRANSACTIONS = 'SET_TRANSACTIONS';
 
-export function updateAccountTransactions(): Thunk {
+export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
   return function updateAccountTransactionsThunk(dispatch, getState) {
     const { address }: { address: Address } = getState().account;
     if (!address) {

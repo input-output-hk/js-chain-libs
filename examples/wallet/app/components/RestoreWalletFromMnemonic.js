@@ -25,7 +25,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
       checkValidPassword(password, confirmPassword)
     ) {
       return Promise.all([
-        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword)
+        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword, password)
       ]);
     }
     setIsMnemonicValid(false);

@@ -18,7 +18,7 @@ export default ({ setAccount }: Props) => {
   ) {
     event.preventDefault();
     if (checkValidPassword(password, confirmPassword)) {
-      setAccount(newPrivateKey);
+      setAccount(newPrivateKey, password);
     }
   };
 
@@ -98,7 +98,7 @@ export default ({ setAccount }: Props) => {
             className="text-danger"
             hidden={arePasswordAndConfirmationEqual}
           >
-            <code>password and confirmation must be the same.</code>
+            <code>Password and confirmation must be the same.</code>
           </Form.Label>
         </Form.Group>
         <Row className="justify-content-center">

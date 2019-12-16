@@ -9,7 +9,7 @@ import {
 const WALLET_SPEDING_PASSWORD_KEY = 'wallet.spending.pwd';
 const WALLET_ENCRYPTED_KEYS = 'wallet.encrypted.account.info';
 
-export function saveSpendingPassword(spendingPassword: string): void {
+export function saveSpendingPassword(spendingPassword: ?string = ''): void {
   const spendingHash = computeBlake2bHexWithSecret(spendingPassword);
   localStorage.setItem(WALLET_SPEDING_PASSWORD_KEY, spendingHash);
 }
