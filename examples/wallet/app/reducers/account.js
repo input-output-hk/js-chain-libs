@@ -1,6 +1,7 @@
 // @flow
 import sortBy from 'lodash/sortBy';
 import {
+  SET_SPENDING_PASSWORD,
   SET_KEYS,
   SET_ACCOUNT_STATE,
   SEND_TRANSACTION,
@@ -12,6 +13,7 @@ import type {
   SendFundsAction,
   SetAccountStateAction,
   SetTransactionsAction,
+  SetKeysWithSpendingPasswordAction,
   SendStakeDelegation
 } from '../actions/account';
 import type { Account } from './types';
@@ -21,6 +23,7 @@ export default function account(
   state: Account,
   // eslint-disable-next-line flowtype/space-after-type-colon
   action:
+    | SetKeysWithSpendingPasswordAction
     | SetKeysAction
     | SetAccountStateAction
     | SendFundsAction
@@ -31,6 +34,11 @@ export default function account(
     return { transactions: [] };
   }
   switch (action.type) {
+    case SET_SPENDING_PASSWORD:
+      return Object.assign({}, state, {
+        walletId: action.walletId,
+        spendingPassword: action.spendingPassword
+      });
     case SET_KEYS:
       return {
         ...state,

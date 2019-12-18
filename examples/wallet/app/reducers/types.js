@@ -37,6 +37,11 @@ export type AccountKeys = {
   identifier: Identifier
 };
 
+export type SpendingPassword = {
+  walletId: ?string,
+  spendingPassword: ?string
+};
+
 export type AccountState = {
   balance: Balance,
   counter: Counter,
