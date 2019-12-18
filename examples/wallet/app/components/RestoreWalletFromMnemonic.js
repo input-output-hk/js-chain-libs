@@ -20,18 +20,41 @@ export default ({ setAccountFromMnemonic }: Props) => {
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
-    if (
-      isValidMnemonic(newMnemonicPhrase) &&
-      checkValidPassword(password, confirmPassword)
-    ) {
+    if (mustCreateSpendingPassword) {
+      if (
+        isValidMnemonic(newMnemonicPhrase) &&
+        checkValidPassword(password, confirmPassword)
+      ) {
+        return Promise.all([
+          setAccountFromMnemonic(
+            newMnemonicPhrase,
+            newMnemonicPassword,
+            password
+          )
+        ]);
+      }
+    }
+    if (isValidMnemonic(newMnemonicPhrase)) {
       return Promise.all([
-        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword, password)
+        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword, '')
       ]);
     }
+
     setIsMnemonicValid(false);
   };
 
+  const handleCheckCreateSpendingPassword = function handleCheckCreateSpendingPassword(
+    evt
+  ) {
+    setMustCreateSpendingPassword(evt.target.checked);
+    setHiddenSpendingPassword(!evt.target.checked);
+  };
+
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
+  const [hiddenSpendingPassword, setHiddenSpendingPassword] = useState(false);
+  const [mustCreateSpendingPassword, setMustCreateSpendingPassword] = useState(
+    true
+  );
 
   const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
@@ -97,37 +120,43 @@ export default ({ setAccountFromMnemonic }: Props) => {
             onChange={event => setNewMnemonicPassword(event.target.value)}
             className="mt-3"
           />
-          <Form.Label>
-            Create a password to store your settings securely in an encrypted
-            storage
-          </Form.Label>
-          <Form.Control
-            type="password"
-            id="password"
-            name="password"
-            placeholder="New password (min 8 chars)"
-            value={password}
-            isInvalid={!isValidPassword}
-            onChange={event => setPassword(event.target.value)}
-          />
-          <Form.Label className="text-danger" hidden={isValidPassword}>
-            <code>The password must have at least 8 chars.</code>
-          </Form.Label>
-          <Form.Control
-            type="password"
-            name="confirmPassword"
-            id="confirmPassword"
-            placeholder="Confirm password"
-            value={confirmPassword}
-            onChange={event => setConfirmPassword(event.target.value)}
-            className="mt-3"
-          />
-          <Form.Label
-            className="text-danger"
-            hidden={arePasswordAndConfirmationEqual}
-          >
-            <code>password and confirmation must be the same.</code>
-          </Form.Label>
+          <Form.Group controlId="formCreateSpendingPassword" className="mt-4">
+            <Form.Check
+              type="switch"
+              label="Create a password to store your settings securely in an encrypted
+              storage"
+              onChange={event => handleCheckCreateSpendingPassword(event)}
+            />
+          </Form.Group>
+          <Form.Group hidden={hiddenSpendingPassword}>
+            <Form.Control
+              type="password"
+              id="password"
+              name="password"
+              placeholder="New password (min 8 chars)"
+              value={password}
+              isInvalid={!isValidPassword}
+              onChange={event => setPassword(event.target.value)}
+            />
+            <Form.Label className="text-danger" hidden={isValidPassword}>
+              <code>The password must have at least 8 chars.</code>
+            </Form.Label>
+            <Form.Control
+              type="password"
+              name="confirmPassword"
+              id="confirmPassword"
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={event => setConfirmPassword(event.target.value)}
+              className="mt-3"
+            />
+            <Form.Label
+              className="text-danger"
+              hidden={arePasswordAndConfirmationEqual}
+            >
+              <code>password and confirmation must be the same.</code>
+            </Form.Label>
+          </Form.Group>
         </Form.Group>
         <Row className="justify-content-between">
           <Button variant="secondary" type="button">

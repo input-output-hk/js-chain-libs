@@ -5,14 +5,17 @@ import type { Address } from '../models';
 import routes from '../constants/routes';
 import { setAccountFromPrivateKey } from './account';
 
-import { readAccountKeysFromLocalStorage } from '../utils/storage';
-
-export const SET_KEYS = 'SET_KEYS';
+import {
+  isSpedingPasswordCreated,
+  readAccountKeysFromDEN
+} from '../utils/storage';
 
 // eslint-disable-next-line import/prefer-default-export
 export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
-    const accountKeys = readAccountKeysFromLocalStorage();
+    if (isSpedingPasswordCreated()) return dispatch(push(routes.UNLOCK_WALLET));
+
+    const accountKeys = readAccountKeysFromDEN('manteca');
     if (accountKeys) {
       return dispatch(setAccountFromPrivateKey(accountKeys.privateKey));
     }

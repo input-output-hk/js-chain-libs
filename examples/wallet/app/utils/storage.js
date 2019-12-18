@@ -1,9 +1,10 @@
 // @flow
 import type { AccountKeys } from '../reducers/types';
-import type { Address, Identifier, PrivateKey } from '../models';
 import {
   computeBlake2bHexWithSecret,
-  isBlake2HashHexWithSecretOk
+  isBlake2HashHexWithSecretOk,
+  aesEncrypt,
+  aesDecrypt
 } from './decrypt';
 
 const WALLET_SPEDING_PASSWORD_KEY = 'wallet.spending.pwd';
@@ -38,13 +39,18 @@ export function saveAccountInfoInDEN(
 }
 
 // eslint-disable-next-line flowtype/space-after-type-colon
-export function readAccountKeysFromLocalStorage(): ?AccountKeys {
-  if (localStorage.getItem('privateKey')) {
-    return {
-      address: (localStorage.getItem('address'): Address),
-      identifier: (localStorage.getItem('identifier'): Identifier),
-      privateKey: (localStorage.getItem('privateKey'): PrivateKey)
-    };
+export function readAccountKeysFromDEN(
+  spendingPassword: ?string
+): ?AccountKeys {
+  const encryptedHex = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
+  try {
+    if (encryptedHex && encryptedHex.length > 0) {
+      const plainText = aesDecrypt(spendingPassword, encryptedHex);
+      const accountKeys = JSON.parse(plainText);
+      return accountKeys;
+    }
+  } catch (e) {
+    console.error('There was an error unlocking wallet', e.toString());
   }
   return undefined;
 }

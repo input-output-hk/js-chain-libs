@@ -6,7 +6,8 @@ import type {
   AppState,
   Thunk,
   AccountKeys,
-  AccountState
+  AccountState,
+  SpendingPassword
 } from '../reducers/types';
 import type {
   Amount,
@@ -32,11 +33,18 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
-import { saveAccountInfoInDEN, saveSpendingPassword } from '../utils/storage';
+import {
+  saveAccountInfoInDEN,
+  saveSpendingPassword,
+  readAccountKeysFromDEN
+} from '../utils/storage';
 
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
+export type SetKeysWithSpendingPasswordAction = {
+  type: 'SET_SPENDING_PASSWORD'
+} & SpendingPassword;
 export const SET_KEYS = 'SET_KEYS';
 export const PRIVATE_KEY_ERROR = 'privateKeyError';
 export const ACCOUNT_STATE_ERROR = 'accountStateError';
@@ -56,7 +64,7 @@ export function setAccountFromPrivateKey(
   privateKey: string
 ): Thunk<SetKeysAction> {
   return function setAccountFromPrivateKeyThunk(dispatch) {
-    getAccountFromPrivateKey(privateKey)
+    return getAccountFromPrivateKey(privateKey)
       .then(loadedPrivateKey => {
         dispatch({
           type: SET_KEYS,
