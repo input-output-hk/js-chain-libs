@@ -23,7 +23,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
     if (mustCreateSpendingPassword) {
       if (
         isValidMnemonic(newMnemonicPhrase) &&
-        checkValidPassword(password, confirmPassword)
+        checkValidSpendingPassword(password, confirmPassword)
       ) {
         return Promise.all([
           setAccountFromMnemonic(
@@ -60,7 +60,10 @@ export default ({ setAccountFromMnemonic }: Props) => {
 
   const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
 
-  const checkValidPassword = function checkValidPassword(pass, confirmation) {
+  const checkValidSpendingPassword = function checkValidSpendingPassword(
+    pass,
+    confirmation
+  ) {
     if (!pass && !confirmation) return true;
     if (pass.length < 8) {
       setIsValidPassword(false);
@@ -126,6 +129,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
               label="Create a password to store your settings securely in an encrypted
               storage"
               onChange={event => handleCheckCreateSpendingPassword(event)}
+              checked={mustCreateSpendingPassword}
             />
           </Form.Group>
           <Form.Group hidden={hiddenSpendingPassword}>

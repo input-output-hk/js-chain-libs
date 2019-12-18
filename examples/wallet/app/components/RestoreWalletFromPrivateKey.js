@@ -18,7 +18,7 @@ export default ({ setAccount }: Props) => {
   ) {
     event.preventDefault();
     if (mustCreateSpendingPassword) {
-      if (checkValidPassword(password, confirmPassword)) {
+      if (checkValidSpendingPassword(password, confirmPassword)) {
         setAccount(newPrivateKey, password);
       }
     } else {
@@ -33,7 +33,10 @@ export default ({ setAccount }: Props) => {
     setHiddenSpendingPassword(!evt.target.checked);
   };
 
-  const checkValidPassword = function checkValidPassword(pass, confirmation) {
+  const checkValidSpendingPassword = function checkValidSpendingPassword(
+    pass,
+    confirmation
+  ) {
     if (!pass && !confirmation) return true;
     if (pass.length < 8) {
       setIsValidPassword(false);
@@ -92,6 +95,7 @@ export default ({ setAccount }: Props) => {
               type="switch"
               label="Create a password to store your settings securely in an encrypted
               storage"
+              checked={mustCreateSpendingPassword}
               onChange={event => handleCheckCreateSpendingPassword(event)}
             />
           </Form.Group>
