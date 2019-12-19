@@ -14,11 +14,6 @@ import {
 export const redirectToFirstAppPage = () => {
   return (dispatch: Dispatch, getState: GetState) => {
     if (isSpedingPasswordCreated()) return dispatch(push(routes.UNLOCK_WALLET));
-
-    const accountKeys = readAccountKeysFromDEN('manteca');
-    if (accountKeys) {
-      return dispatch(setAccountFromPrivateKey(accountKeys.privateKey));
-    }
     const {
       account: { address }
     }: { account: { address: Address } } = getState();
