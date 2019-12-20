@@ -3,6 +3,7 @@
   "WALLET": "/wallet",
   "CHOOSE_RESTORE_OR_IMPORT": "/choose_restore_or_import",
   "INPUT_KEYS": "/input_keys",
+  "CREATE_WALLET_KEYS": "/create_wallet_keys",
   "SEND": "/send",
   "STAKING": "/staking",
   "SETTINGS": "/settings",

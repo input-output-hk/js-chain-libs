@@ -12,6 +12,7 @@ import Index from './containers/Index';
 import InputKeys from './pages/InputKeys';
 import UnlockWallet from './containers/UnlockWallet';
 import CreateSpendingPassword from './containers/CreateSpendingPassword';
+import CreateWallet from './containers/CreateWallet';
 
 export default () => (
   <App>
@@ -22,6 +23,7 @@ export default () => (
       <Route path={routes.SETTINGS} component={Settings} />
       <Route path={routes.INPUT_KEYS} component={InputKeys} />
       <Route path={routes.UNLOCK_WALLET} component={UnlockWallet} />
+      <Route path={routes.CREATE_WALLET_KEYS} component={CreateWallet} />
       <Route
         path={routes.CHOOSE_RESTORE_OR_IMPORT}
         component={ChooseRestoreOrImport}

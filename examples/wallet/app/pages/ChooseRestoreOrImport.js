@@ -22,9 +22,9 @@ export default ({ push }: Props) => (
       />
       <BigSquareButton
         label="Generate a new wallet"
-        description="not implemented yet"
+        description="create the new keys and a mnemonic phrase to recover it"
         icon={importIcon}
-        onClick={() => console.log('not implemented')}
+        onClick={() => push(routes.CREATE_WALLET_KEYS)}
       />
     </div>
   </div>
