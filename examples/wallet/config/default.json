@@ -5,6 +5,7 @@
   "transactionPollingInterval": 25000,
   "networkDiscrimination": "testnet",
   "addressPrefix": "addr",
+  "coinName": "LOVELACE",
   "nodeUrl": "http://localhost",
   "nodeRESTPort": "8443",
   "nodeGRPCPort": "8298",
