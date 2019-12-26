@@ -10,8 +10,8 @@
   "nodeGRPCPort": "8298",
   "explorer": { "url": "http://localhost:3000", "transactionPath": "tx" },
   "fees": {
-    "certificate": 10,
-    "coefficient": 10,
+    "certificate": 0,
+    "coefficient": 0,
     "constant": 10
   },
   "APIBase": "/api/v0"
