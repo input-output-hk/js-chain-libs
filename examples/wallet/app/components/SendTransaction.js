@@ -1,12 +1,14 @@
 // @flow
 import React, { useState } from 'react';
 import config from 'config';
+import { debounce } from 'lodash';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import typeof { sendTransaction as SendTransaction } from '../actions/account';
 import styles from './SendTransaction.scss';
+import { isValidAddress } from '../utils/wasmWrapper';
 
 type Props = {
   sendTransaction: SendTransaction
@@ -18,7 +20,16 @@ export default ({ sendTransaction }: Props) => {
     sendTransaction(destinationAddress, Number(amount));
   };
   const [destinationAddress, setDestinationAddress] = useState<string>('');
+  const [validAddress, setValidAddress] = useState<boolean>(true);
   const [amount, setAmount] = useState<?number>();
+  // This is asyncronous and might be resource intensive, so it's better to debounce it.
+  const debouncedAddressValidator = debounce(
+    value =>
+      isValidAddress(value)
+        .then(setValidAddress)
+        .catch(console.error),
+    config.get('formDebounceInterval')
+  );
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -27,9 +38,17 @@ export default ({ sendTransaction }: Props) => {
         <Form.Control
           type="text"
           name="recipient"
+          isInvalid={!validAddress && destinationAddress}
+          isValid={destinationAddress && validAddress}
           value={destinationAddress}
-          onChange={event => setDestinationAddress(event.target.value)}
+          onChange={event => {
+            debouncedAddressValidator(event.target.value);
+            setDestinationAddress(event.target.value);
+          }}
         />
+        <Form.Control.Feedback type="invalid">
+          Please enter a valid address
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group htmlFor="amount">
