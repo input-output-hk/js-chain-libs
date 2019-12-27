@@ -25,7 +25,7 @@ export default ({ balance, nodeSettings, sendTransaction }: Props) => {
     sendTransaction(destinationAddress, Number(amount));
   };
   const [destinationAddress, setDestinationAddress] = useState<string>('');
-  const [validAddress, setValidAddress] = useState<boolean>(true);
+  const [validAddress, setValidAddress] = useState<boolean>(false);
   const [amount, setAmount] = useState<?number>();
   const isValidAmount = (value, currentBalance) =>
     transactionFee + value <= currentBalance &&
@@ -98,7 +98,12 @@ export default ({ balance, nodeSettings, sendTransaction }: Props) => {
         </Row>
       </Form.Group>
       <Row className="justify-content-between mt-2 flex-sm-row-reverse">
-        <Button size="lg" variant="primary" type="submit">
+        <Button
+          size="lg"
+          variant="primary"
+          disabled={!validAddress || !isValidAmount(amount, balance)}
+          type="submit"
+        >
           Send
         </Button>
       </Row>
