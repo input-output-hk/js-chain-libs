@@ -14,5 +14,6 @@ const calculateFee = (nodeSettings: NodeSettings) => (
 };
 
 export default (nodeSettings: NodeSettings) => ({
-  calculateFee: calculateFee(nodeSettings)
+  calculateFee: calculateFee(nodeSettings),
+  sendFundsFee: () => calculateFee(nodeSettings)(1, 1, 0)
 });

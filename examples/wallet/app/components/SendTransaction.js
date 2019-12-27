@@ -8,13 +8,18 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import typeof { sendTransaction as SendTransaction } from '../actions/account';
 import styles from './SendTransaction.scss';
+import type { Balance } from '../models';
+import type { NodeSettings } from '../reducers/types';
 import { isValidAddress } from '../utils/wasmWrapper';
+import feeCalculator from '../utils/feeCalculator';
 
 type Props = {
-  sendTransaction: SendTransaction
+  sendTransaction: SendTransaction,
+  balance: Balance,
+  nodeSettings: NodeSettings
 };
 
-export default ({ sendTransaction }: Props) => {
+export default ({ balance, nodeSettings, sendTransaction }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     sendTransaction(destinationAddress, Number(amount));
@@ -22,6 +27,10 @@ export default ({ sendTransaction }: Props) => {
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [validAddress, setValidAddress] = useState<boolean>(true);
   const [amount, setAmount] = useState<?number>();
+  const isValidAmount = (value, currentBalance) =>
+    transactionFee + value <= currentBalance &&
+    (typeof value === 'number' && value > 0);
+  const transactionFee = feeCalculator(nodeSettings).sendFundsFee();
   // This is asyncronous and might be resource intensive, so it's better to debounce it.
   const debouncedAddressValidator = debounce(
     value =>
@@ -59,8 +68,26 @@ export default ({ sendTransaction }: Props) => {
               type="number"
               name="amount"
               value={amount}
-              onChange={event => setAmount(event.target.value)}
+              // why the typeof checks? because we want:
+              // * The form to start with an empty value (not with zero).
+              // * Have zero be an invalid amount (this could be argued).
+              // * The form to start in a valid state.
+              isInvalid={
+                typeof amount === 'number' && !isValidAmount(amount, balance)
+              }
+              isValid={
+                typeof amount === 'number' && isValidAmount(amount, balance)
+              }
+              onChange={({ target: { value } }) => setAmount(Number(value))}
             />
+            <Form.Control.Feedback type="invalid">
+              {typeof amount === 'number' && amount <= 0
+                ? 'Balance must be positive'
+                : `insufficient balance. Max: ${balance - transactionFee}`}
+            </Form.Control.Feedback>
+            <Form.Control.Feedback type="valid">
+              {`After fee: ${transactionFee + amount}`}
+            </Form.Control.Feedback>
           </Col>
           <Col
             xs="2"
