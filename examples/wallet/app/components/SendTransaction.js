@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import typeof { sendTransaction as SendTransaction } from '../actions/account';
+import type { SendFunds } from '../actions/account';
 import styles from './SendTransaction.scss';
 import type { Balance } from '../models';
 import type { NodeSettings } from '../reducers/types';
@@ -14,15 +14,15 @@ import { isValidAddress } from '../utils/wasmWrapper';
 import feeCalculator from '../utils/feeCalculator';
 
 type Props = {
-  sendTransaction: SendTransaction,
+  sendFunds: SendFunds,
   balance: Balance,
   nodeSettings: NodeSettings
 };
 
-export default ({ balance, nodeSettings, sendTransaction }: Props) => {
+export default ({ balance, nodeSettings, sendFunds }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    sendTransaction(destinationAddress, Number(amount));
+    sendFunds(destinationAddress, Number(amount));
   };
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [validAddress, setValidAddress] = useState<boolean>(false);

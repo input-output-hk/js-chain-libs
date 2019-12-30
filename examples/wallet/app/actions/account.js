@@ -20,13 +20,13 @@ import type {
 import { updateNodeSettings } from './nodeSettings';
 import {
   getAccountFromPrivateKey,
-  buildSendFundsTransaction,
   getAccountFromSeed,
-  buildDelegateTransaction
+  typeof buildSendFundsTransaction as BuildSendFundsTransaction,
+  typeof buildDelegateTransaction as BuildDelegateTransaction
 } from '../utils/wasmWrapper';
 import {
   getAccountState,
-  broadcastTransaction,
+  typeof broadcastTransaction as BroadcastTransaction,
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
@@ -39,7 +39,7 @@ export const SET_KEYS = 'SET_KEYS';
 export const PRIVATE_KEY_ERROR = 'privateKeyError';
 export const ACCOUNT_STATE_ERROR = 'accountStateError';
 
-export function setAccount(privateKey: string): Thunk<SetKeysAction> {
+export function setAccount(privateKey: string): Thunk {
   return function setAccountThunk(dispatch) {
     return getAccountFromPrivateKey(privateKey).then(
       curry(initializeKeysAndRedirect)(dispatch)
@@ -47,9 +47,7 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   };
 }
 
-export function setAccountFromPrivateKey(
-  privateKey: string
-): Thunk<SetKeysAction> {
+export function setAccountFromPrivateKey(privateKey: string): Thunk {
   return function setAccountFromPrivateKeyThunk(dispatch) {
     getAccountFromPrivateKey(privateKey)
       .then(loadedPrivateKey => {
@@ -66,7 +64,7 @@ export function setAccountFromPrivateKey(
   };
 }
 
-export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
+export function updateAccountTransactionsAndState(): Thunk {
   return function updateAccountTransactionsAndStateThunk(dispatch) {
     return Promise.all([
       dispatch(updateAccountTransactions()),
@@ -85,7 +83,7 @@ export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
  * @param {boolean} saveAccount If true, the keys are stored in the local storage
  */
 const initializeKeysAndRedirect = (
-  dispatch: Dispatch,
+  dispatch: Dispatch<SetKeysAction>,
   keys: AccountKeys,
   saveAccount?: boolean = true
 ) => {
@@ -103,7 +101,7 @@ const initializeKeysAndRedirect = (
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword?: string
-): Thunk<SetKeysAction> {
+) {
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
@@ -121,7 +119,7 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk<SetAccountStateAction> {
+export function updateAccountState(): Thunk {
   return function updateAccountStateThunk(dispatch, getState) {
     const { identifier }: { identifier: Identifier } = getState().account;
     if (!identifier) {
@@ -153,7 +151,7 @@ export type SetTransactionsAction = {
 };
 export const SET_TRANSACTIONS = 'SET_TRANSACTIONS';
 
-export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
+export function updateAccountTransactions(): Thunk {
   return function updateAccountTransactionsThunk(dispatch, getState) {
     const { address }: { address: Address } = getState().account;
     if (!address) {
@@ -179,7 +177,7 @@ export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
   };
 }
 
-export type SendTransactionAction = {
+export type SendFundsAction = {
   type: 'SEND_TRANSACTION',
   newCounter: number,
   id: TransactionHash,
@@ -189,36 +187,43 @@ export type SendTransactionAction = {
 };
 
 export const SEND_TRANSACTION = 'SEND_TRANSACTION';
+export type BuildSendFundsAction = typeof buildSendFundsAction;
+export type SendFunds = $Call<
+  BuildSendFundsAction,
+  BuildDelegateTransaction,
+  BroadcastTransaction
+>;
 
-export function sendTransaction(
-  destination: Address,
-  amount: Amount
-): Thunk<SendTransactionAction> {
-  // Assume balance and counter are up to date
-  return function sendTransactionThunk(dispatch, getState) {
-    const state: AppState = getState();
-    return buildSendFundsTransaction(
-      destination,
-      amount,
-      state.account.privateKey,
-      state.account.counter,
-      state.nodeSettings
-    )
-      .then(({ id, transaction, fee }) => {
-        return broadcastTransaction(transaction).then(() => ({ id, fee }));
-      })
-      .then(({ id, fee }) =>
-        dispatch({
-          type: SEND_TRANSACTION,
-          newCounter: state.account.counter + 1,
-          id,
-          destination,
-          amount,
-          fee
+export const buildSendFundsAction = (
+  buildSendFundsTransaction: BuildSendFundsTransaction,
+  broadcastTransaction: BroadcastTransaction
+) =>
+  function sendFunds(destination: Address, amount: Amount): Thunk {
+    // Assume balance and counter are up to date
+    return function sendFundsThunk(dispatch, getState) {
+      const state: AppState = getState();
+      return buildSendFundsTransaction(
+        destination,
+        amount,
+        state.account.privateKey,
+        state.account.counter,
+        state.nodeSettings
+      )
+        .then(({ id, transaction, fee }) => {
+          return broadcastTransaction(transaction).then(() => ({ id, fee }));
         })
-      );
+        .then(({ id, fee }) =>
+          dispatch({
+            type: SEND_TRANSACTION,
+            newCounter: state.account.counter + 1,
+            id,
+            destination,
+            amount,
+            fee
+          })
+        );
+    };
   };
-}
 
 export type SendStakeDelegation = {
   type: 'SEND_STAKE_DELEGATION',
@@ -230,11 +235,18 @@ export type SendStakeDelegation = {
 
 export const SEND_STAKE_DELEGATION = 'SEND_STAKE_DELEGATION';
 
-export function sendStakeDelegation(
-  newDelegation: Delegation
-): Thunk<SendStakeDelegation> {
+export type BuildDelegationAction = typeof buildDelegationAction;
+export type Delegate = $Call<
+  BuildDelegationAction,
+  BuildDelegateTransaction,
+  BroadcastTransaction
+>;
+export const buildDelegationAction = (
+  buildDelegateTransaction: BuildDelegateTransaction,
+  broadcastTransaction: BroadcastTransaction
+) => (newDelegation: Delegation): Thunk => {
   // Assume balance and counter are up to date
-  return function sendStakeDelegationThunk(dispatch, getState) {
+  return function delegationThunk(dispatch, getState) {
     const state: AppState = getState();
     return buildDelegateTransaction(
       newDelegation,
@@ -255,4 +267,4 @@ export function sendStakeDelegation(
         })
       );
   };
-}
+};
