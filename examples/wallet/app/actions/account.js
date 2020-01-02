@@ -16,9 +16,7 @@ import type {
   Delegation,
   Identifier,
   TransactionHash,
-  Transaction,
-  Balance,
-  Counter
+  Transaction
 } from '../models';
 import { updateNodeSettings } from './nodeSettings';
 import {
@@ -34,7 +32,7 @@ import {
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
 import {
-  saveAccountInfoInDEN,
+  saveEncryptedAccountInfo,
   saveSpendingPassword,
   readAccountKeysFromDEN
 } from '../utils/storage';
@@ -46,8 +44,7 @@ export type SetKeysWithSpendingPasswordAction = {
   type: 'SET_SPENDING_PASSWORD'
 } & SpendingPassword;
 export const SET_KEYS = 'SET_KEYS';
-export const PRIVATE_KEY_ERROR = 'privateKeyError';
-export const ACCOUNT_STATE_ERROR = 'accountStateError';
+export const SET_SPENDING_PASSWORD = 'SET_SPENDING_PASSWORD';
 
 export function setAccount(
   privateKey: string,
@@ -60,32 +57,49 @@ export function setAccount(
   };
 }
 
+export function setKeysWithSpendingPassword(
+  spendingPassword: ?string = ''
+): Thunk<SetKeysAction> {
+  return function setKeysWithSpendingPasswordThunk(dispatch) {
+    const accountKeys = readAccountKeysFromDEN(spendingPassword);
+    if (accountKeys) {
+      const spendingPasswordKeys = {
+        walletId: 'wallet01',
+        spendingPassword
+      };
+      dispatch({
+        type: SET_SPENDING_PASSWORD,
+        ...spendingPasswordKeys
+      });
+
+      return getAccountFromPrivateKey(accountKeys.privateKey).then(keys =>
+        curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
+      );
+    }
+    throw new Error('Invalid password');
+  };
+}
+
 export function setAccountFromPrivateKey(
   privateKey: string
 ): Thunk<SetKeysAction> {
   return function setAccountFromPrivateKeyThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey)
-      .then(loadedPrivateKey => {
-        dispatch({
-          type: SET_KEYS,
-          ...loadedPrivateKey
-        });
-        return dispatch(updateAccountTransactionsAndState());
-      })
-      .catch(error => {
-        console.error(error);
-        throw new Error(PRIVATE_KEY_ERROR);
+    return getAccountFromPrivateKey(privateKey).then(loadedPrivateKey => {
+      dispatch({
+        type: SET_KEYS,
+        ...loadedPrivateKey
       });
-  };
-}
-
-export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
-  return function updateAccountTransactionsAndStateThunk(dispatch) {
-    return Promise.all([
-      dispatch(updateAccountTransactions()),
-      dispatch(updateNodeSettings()),
-      dispatch(updateAccountState())
-    ]).then(() => dispatch(push(routes.WALLET)));
+      return Promise.all([
+        dispatch(updateAccountTransactions()),
+        dispatch(updateNodeSettings()),
+        dispatch(updateAccountState())
+      ])
+        .then(() => dispatch(push(routes.WALLET)))
+        .catch(error => {
+          console.log(error);
+          dispatch(push(routes.INPUT_KEYS));
+        });
+    });
   };
 }
 
@@ -108,9 +122,18 @@ const initializeKeysAndRedirect = (
   });
 
   saveSpendingPassword(spendingPassword);
-  saveAccountInfoInDEN(spendingPassword, keys);
+  saveEncryptedAccountInfo(spendingPassword, keys);
 
-  return dispatch(updateAccountTransactionsAndState());
+  return Promise.all([
+    dispatch(updateAccountTransactions()),
+    dispatch(updateNodeSettings()),
+    dispatch(updateAccountState())
+  ])
+    .then(() => dispatch(push(routes.WALLET)))
+    .catch(error => {
+      console.log(error);
+      dispatch(push(routes.WALLET));
+    });
 };
 
 export function setAccountFromMnemonic(
@@ -155,7 +178,7 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching account info');
-          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
+          return Promise.reject();
         })
     );
   };
@@ -187,7 +210,7 @@ export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching transactions');
-          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
+          return Promise.reject();
         })
     );
   };

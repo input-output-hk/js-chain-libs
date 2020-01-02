@@ -28,12 +28,12 @@ export function isSpedingPasswordCreated(): boolean {
   return false;
 }
 
-export function saveAccountInfoInDEN(
+export function saveEncryptedAccountInfo(
   spendingPassword: ?string,
   keys: AccountKeys
 ): void {
   const plainTextAccountInfo = JSON.stringify(keys);
-  const spedingPwd: string = !spendingPassword ? '' : spendingPassword;
+  const spedingPwd: string = spendingPassword || '';
   const encryptedTextAccountInfo = aesEncrypt(spedingPwd, plainTextAccountInfo);
   localStorage.setItem(WALLET_ENCRYPTED_KEYS, encryptedTextAccountInfo);
 }

@@ -11,8 +11,6 @@ type Props = {
   setAccountFromMnemonic: SetAccountFromMnemonic
 };
 
-// FIXME: this has no error handling, neither while parsing the address
-// nor when fetching the balance.
 export default ({ setAccountFromMnemonic }: Props) => {
   const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
     setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
@@ -20,41 +18,20 @@ export default ({ setAccountFromMnemonic }: Props) => {
 
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
-    if (mustCreateSpendingPassword) {
-      if (
-        isValidMnemonic(newMnemonicPhrase) &&
-        checkValidSpendingPassword(password, confirmPassword)
-      ) {
-        return Promise.all([
-          setAccountFromMnemonic(
-            newMnemonicPhrase,
-            newMnemonicPassword,
-            password
-          )
-        ]);
-      }
-    }
     if (isValidMnemonic(newMnemonicPhrase)) {
-      return Promise.all([
-        setAccountFromMnemonic(newMnemonicPhrase, newMnemonicPassword, '')
-      ]);
+      if (checkValidSpendingPassword(password, confirmPassword)) {
+        return setAccountFromMnemonic(
+          newMnemonicPhrase,
+          newMnemonicPassword,
+          password
+        );
+      }
+    } else {
+      setIsMnemonicValid(false);
     }
-
-    setIsMnemonicValid(false);
-  };
-
-  const handleCheckCreateSpendingPassword = function handleCheckCreateSpendingPassword(
-    evt
-  ) {
-    setMustCreateSpendingPassword(evt.target.checked);
-    setHiddenSpendingPassword(!evt.target.checked);
   };
 
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
-  const [hiddenSpendingPassword, setHiddenSpendingPassword] = useState(false);
-  const [mustCreateSpendingPassword, setMustCreateSpendingPassword] = useState(
-    true
-  );
 
   const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
@@ -118,21 +95,17 @@ export default ({ setAccountFromMnemonic }: Props) => {
           <Form.Control
             type="password"
             name="mnemonicPassword"
-            placeholder="Secret password"
+            placeholder="Secret password of wallet seed"
             value={newMnemonicPassword}
             onChange={event => setNewMnemonicPassword(event.target.value)}
             className="mt-3"
           />
-          <Form.Group controlId="formCreateSpendingPassword" className="mt-4">
-            <Form.Check
-              type="switch"
-              label="Create a password to store your settings securely in an encrypted
-              storage"
-              onChange={event => handleCheckCreateSpendingPassword(event)}
-              checked={mustCreateSpendingPassword}
-            />
-          </Form.Group>
-          <Form.Group hidden={hiddenSpendingPassword}>
+          <Form.Text>
+            This secret password is part of the BIP39 standard to generate safer
+            wallet seeds.
+          </Form.Text>
+          <Form.Label className="mt-5">Unlock wallet (optional):</Form.Label>
+          <Form.Group>
             <Form.Control
               type="password"
               id="password"
@@ -154,6 +127,10 @@ export default ({ setAccountFromMnemonic }: Props) => {
               onChange={event => setConfirmPassword(event.target.value)}
               className="mt-3"
             />
+            <Form.Text>
+              This key allows you to unlock your wallet every time you start it
+              and to keep your account data in a more secure way.
+            </Form.Text>
             <Form.Label
               className="text-danger"
               hidden={arePasswordAndConfirmationEqual}

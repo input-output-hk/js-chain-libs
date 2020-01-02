@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 import aesjs from 'aes-js';
 import blakejs from 'blakejs';
 
@@ -22,7 +23,6 @@ export function isBlake2HashHexWithSecretOk(
 export function aesEncrypt(spendingPassword: string, text: string): string {
   const aesPasswordText = spendingPassword.concat(SECRET).concat(AES_SECRET);
   const aesKey = blake2b(aesPasswordText);
-  // eslint-disable-next-line new-cap
   const aesCtr = new aesjs.ModeOfOperation.ctr(aesKey, new aesjs.Counter(5));
   const encryptedBytes = aesCtr.encrypt(aesjs.utils.utf8.toBytes(text));
   const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
@@ -35,7 +35,6 @@ export function aesDecrypt(
 ): string {
   const aesPasswordText = spendingPassword.concat(SECRET).concat(AES_SECRET);
   const aesKey = blake2b(aesPasswordText);
-  // eslint-disable-next-line new-cap
   const aesCtr = new aesjs.ModeOfOperation.ctr(aesKey, new aesjs.Counter(5));
   const decryptedBytes = aesCtr.decrypt(aesjs.utils.hex.toBytes(encryptedHex));
   const decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);

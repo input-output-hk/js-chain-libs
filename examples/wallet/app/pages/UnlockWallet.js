@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import styles from './UnlockWallet.scss';
 import { isValidSpendingPassword } from '../utils/storage';
 import typeof { setKeysWithSpendingPassword as SetKeysWithSpendingPassword } from '../actions/account';
 
@@ -17,7 +18,7 @@ export default ({ setKeysWithSpendingPassword }: Props) => {
     if (isValidSpendingPassword(spendingPassword)) {
       setIsWrongSpendingPassword(false);
       setHiddenSpendingPassword(true);
-      return Promise.all([setKeysWithSpendingPassword(spendingPassword)]);
+      return setKeysWithSpendingPassword(spendingPassword);
     }
     setIsWrongSpendingPassword(true);
     setHiddenSpendingPassword(false);
@@ -28,11 +29,11 @@ export default ({ setKeysWithSpendingPassword }: Props) => {
   const [hiddenSpendingPassword, setHiddenSpendingPassword] = useState(true);
 
   return (
-    <Container>
+    <Container className={styles.container}>
       <Form onSubmit={handleSubmit} className="mt-5">
         <Form.Group>
           <Form.Label>
-            Wellcome! Please insert you password to unlock wallet
+            Welcome! Please insert you password to unlock wallet
           </Form.Label>
           <Form.Control
             type="password"

@@ -9,7 +9,7 @@ import Settings from './pages/Settings';
 import ChooseRestoreOrImport from './containers/ChooseRestoreOrImport';
 import Delegate from './pages/Delegate';
 import Index from './containers/Index';
-import InputKeys from './containers/InputKeys';
+import InputKeys from './pages/InputKeys';
 import UnlockWallet from './containers/UnlockWallet';
 
 export default () => (

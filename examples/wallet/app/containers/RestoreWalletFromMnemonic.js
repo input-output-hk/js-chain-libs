@@ -2,10 +2,10 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import RestoreWalletFromMnemonic from '../components/RestoreWalletFromMnemonic';
-import { setAccount } from '../actions/account';
+import { setAccountFromMnemonic } from '../actions/account';
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ setAccount }, dispatch);
+  return bindActionCreators({ setAccountFromMnemonic }, dispatch);
 }
 
 export default connect(

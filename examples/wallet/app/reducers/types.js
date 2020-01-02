@@ -38,8 +38,8 @@ export type AccountKeys = {
 };
 
 export type SpendingPassword = {
-  walletId: ?string,
-  spendingPassword: ?string
+  walletId: string,
+  spendingPassword: string
 };
 
 export type AccountState = {

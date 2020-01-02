@@ -13,24 +13,11 @@ type Props = {
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
 export default ({ setAccount }: Props) => {
-  const handleSubmitCreateSpending = function handleSubmitCreateSpending(
-    event
-  ) {
+  const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    if (mustCreateSpendingPassword) {
-      if (checkValidSpendingPassword(password, confirmPassword)) {
-        setAccount(newPrivateKey, password);
-      }
-    } else {
-      setAccount(newPrivateKey, '');
+    if (checkValidSpendingPassword(password, confirmPassword)) {
+      setAccount(newPrivateKey, password);
     }
-  };
-
-  const handleCheckCreateSpendingPassword = function handleCheckCreateSpendingPassword(
-    evt
-  ) {
-    setMustCreateSpendingPassword(evt.target.checked);
-    setHiddenSpendingPassword(!evt.target.checked);
   };
 
   const checkValidSpendingPassword = function checkValidSpendingPassword(
@@ -54,10 +41,6 @@ export default ({ setAccount }: Props) => {
 
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [newPrivateKey, setNewPrivateKey] = useState('');
-  const [mustCreateSpendingPassword, setMustCreateSpendingPassword] = useState(
-    true
-  );
-  const [hiddenSpendingPassword, setHiddenSpendingPassword] = useState(false);
 
   const [
     arePasswordAndConfirmationEqual,
@@ -70,7 +53,7 @@ export default ({ setAccount }: Props) => {
 
   return (
     <Container>
-      <Form onSubmit={handleSubmitCreateSpending} className="mt-5">
+      <Form onSubmit={handleSubmit} className="mt-5">
         <Form.Group>
           <Form.Label>Private key:</Form.Label>
           <Form.Control
@@ -87,19 +70,7 @@ export default ({ setAccount }: Props) => {
               ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
             </code>
           </Form.Text>
-          <Form.Group
-            controlId="formCreateSpendingPasswordCheck"
-            className="mt-4"
-          >
-            <Form.Check
-              type="switch"
-              label="Create a password to store your settings securely in an encrypted
-              storage"
-              checked={mustCreateSpendingPassword}
-              onChange={event => handleCheckCreateSpendingPassword(event)}
-            />
-          </Form.Group>
-          <Form.Group hidden={hiddenSpendingPassword}>
+          <Form.Group>
             <Form.Control
               type="password"
               id="password"
