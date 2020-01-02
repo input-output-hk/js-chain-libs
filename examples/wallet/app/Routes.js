@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Switch, Route } from 'react-router';
-import routes from './constants/routes';
+import routes from './constants/routes.json';
 import App from './containers/App';
 import Wallet from './pages/Wallet';
 import Send from './pages/Send';

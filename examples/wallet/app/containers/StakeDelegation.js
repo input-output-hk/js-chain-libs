@@ -22,7 +22,4 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(StakeDelegation);
+export default connect(mapStateToProps, mapDispatchToProps)(StakeDelegation);

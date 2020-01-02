@@ -2,7 +2,7 @@
 import { push } from 'connected-react-router';
 import type { Dispatch, GetState } from '../reducers/types';
 import type { Address } from '../models';
-import routes from '../constants/routes';
+import routes from '../constants/routes.json';
 import {
   updateAccountTransactionsAndState,
   ACCOUNT_STATE_ERROR

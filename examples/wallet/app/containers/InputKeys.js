@@ -8,7 +8,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ setAccount, setAccountFromMnemonic }, dispatch);
 }
 
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(InputKeys);
+export default connect(undefined, mapDispatchToProps)(InputKeys);

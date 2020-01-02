@@ -25,11 +25,15 @@ export default ({ delegate }: Props) => {
   const [delegation, setDelegation] = useState<NewDelegation>({});
   const [selectionCount, setSelectionCount] = useState<number>(0);
 
+  // FIXME: I wont change this to object spreading to comply with the linter rule
+  // without having tests to regress against.
   const poolSelectionHandler: PoolSelectionHandler = (poolId, increment) => {
     const currentDelegation =
       (delegation[poolId] && delegation[poolId].parts) || 0;
     setDelegation(
+      // eslint-disable-next-line prefer-object-spread
       Object.assign({}, delegation, {
+        // eslint-disable-next-line prefer-object-spread
         [poolId]: Object.assign(
           { color: colors[selectionCount % colors.length], parts: 0 },
           delegation[poolId] || {},

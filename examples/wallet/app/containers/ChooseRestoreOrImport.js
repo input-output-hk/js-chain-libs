@@ -8,7 +8,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ push }, dispatch);
 }
 
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(ChooseRestoreOrImport);
+export default connect(undefined, mapDispatchToProps)(ChooseRestoreOrImport);
