@@ -38,6 +38,7 @@ export default function account(
         privateKey: action.privateKey,
         identifier: action.identifier
       };
+
     case SET_ACCOUNT_STATE:
       return {
         ...state,
@@ -45,7 +46,10 @@ export default function account(
         counter: action.counter,
         delegation: action.delegation
       };
+
     case SEND_TRANSACTION: {
+      // TODO: optimistically update the balance.
+      // TODO: perhaps we could not receive the new counter, but increase the one currently in the state instead?
       const newTransaction: Transaction = {
         id: action.id,
         outputs: [{ address: action.destination, amount: action.amount }],
@@ -57,6 +61,7 @@ export default function account(
         transactions: addTransactionToArray(state.transactions, newTransaction)
       };
     }
+
     case SEND_STAKE_DELEGATION: {
       const newTransaction: Transaction = {
         id: action.id,
@@ -70,6 +75,7 @@ export default function account(
         transactions: addTransactionToArray(state.transactions, newTransaction)
       };
     }
+
     case SET_TRANSACTIONS: {
       // transactions from the node always overwrite transactions already in the state
       const mergedTransactionList = {
