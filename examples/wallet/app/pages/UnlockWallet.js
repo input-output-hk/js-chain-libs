@@ -5,23 +5,21 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import styles from './UnlockWallet.scss';
-import { isValidSpendingPassword } from '../utils/storage';
-import typeof { setKeysWithSpendingPassword as SetKeysWithSpendingPassword } from '../actions/account';
+import typeof { setKeysWithUnlockWalletPassword as SetKeysWithSpendingPassword } from '../actions/account';
 
 type Props = {
-  setKeysWithSpendingPassword: SetKeysWithSpendingPassword
+  setKeysWithUnlockWalletPassword: SetKeysWithSpendingPassword
 };
 
-export default ({ setKeysWithSpendingPassword }: Props) => {
+export default ({ setKeysWithUnlockWalletPassword }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    if (isValidSpendingPassword(spendingPassword)) {
-      setIsWrongSpendingPassword(false);
-      setHiddenSpendingPassword(true);
-      return setKeysWithSpendingPassword(spendingPassword);
+    try {
+      return setKeysWithUnlockWalletPassword(spendingPassword);
+    } catch (error) {
+      setIsWrongSpendingPassword(true);
+      setHiddenSpendingPassword(false);
     }
-    setIsWrongSpendingPassword(true);
-    setHiddenSpendingPassword(false);
   };
 
   const [spendingPassword, setSpendingPassword] = useState('');

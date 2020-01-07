@@ -3,22 +3,8 @@ import aesjs from 'aes-js';
 import blakejs from 'blakejs';
 
 const blake2b = data => blakejs.blake2b(data, null, 32);
-const blake2bHex = data => blakejs.blake2bHex(data, null, 32);
 const SECRET = 'wallet_demo#';
 const AES_SECRET = ':aes_secret#';
-
-export function computeBlake2bHexWithSecret(spendingPassword: string): string {
-  const fullSpendingPassword = spendingPassword.concat(SECRET);
-  return blake2bHex(fullSpendingPassword);
-}
-
-export function isBlake2HashHexWithSecretOk(
-  spendingPassword: string,
-  blake2bHashHex: string
-): boolean {
-  const fullSpendingPassword = spendingPassword.concat(SECRET);
-  return blake2bHex(fullSpendingPassword) === blake2bHashHex;
-}
 
 export function aesEncrypt(spendingPassword: string, text: string): string {
   const aesPasswordText = spendingPassword.concat(SECRET).concat(AES_SECRET);

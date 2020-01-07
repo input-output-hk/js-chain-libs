@@ -33,8 +33,7 @@ import {
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
 import {
   saveEncryptedAccountInfo,
-  saveSpendingPassword,
-  readAccountKeysFromDEN
+  readEncryptedAccountInfo
 } from '../utils/storage';
 
 import routes from '../constants/routes.json';
@@ -57,11 +56,11 @@ export function setAccount(
   };
 }
 
-export function setKeysWithSpendingPassword(
+export function setKeysWithUnlockWalletPassword(
   spendingPassword: ?string = ''
 ): Thunk<SetKeysAction> {
-  return function setKeysWithSpendingPasswordThunk(dispatch) {
-    const accountKeys = readAccountKeysFromDEN(spendingPassword);
+  return function setKeysWithUnlockWalletPasswordThunk(dispatch) {
+    const accountKeys = readEncryptedAccountInfo(spendingPassword);
     if (accountKeys) {
       const spendingPasswordKeys = {
         walletId: 'wallet01',
@@ -121,7 +120,6 @@ const initializeKeysAndRedirect = (
     ...keys
   });
 
-  saveSpendingPassword(spendingPassword);
   saveEncryptedAccountInfo(spendingPassword, keys);
 
   return Promise.all([

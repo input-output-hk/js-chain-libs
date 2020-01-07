@@ -2,10 +2,10 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import UnlockWallet from '../pages/UnlockWallet';
-import { setKeysWithSpendingPassword } from '../actions/account';
+import { setKeysWithUnlockWalletPassword } from '../actions/account';
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ setKeysWithSpendingPassword }, dispatch);
+  return bindActionCreators({ setKeysWithUnlockWalletPassword }, dispatch);
 }
 
 export default connect(

@@ -1,30 +1,12 @@
 // @flow
 import type { AccountKeys } from '../reducers/types';
-import {
-  computeBlake2bHexWithSecret,
-  isBlake2HashHexWithSecretOk,
-  aesEncrypt,
-  aesDecrypt
-} from './decrypt';
+import { aesEncrypt, aesDecrypt } from './decrypt';
 
-const WALLET_SPEDING_PASSWORD_KEY = 'wallet.spending.pwd';
 const WALLET_ENCRYPTED_KEYS = 'wallet.encrypted.account.info';
 
-export function saveSpendingPassword(spendingPassword: ?string = ''): void {
-  const spendingHash = computeBlake2bHexWithSecret(spendingPassword);
-  localStorage.setItem(WALLET_SPEDING_PASSWORD_KEY, spendingHash);
-}
-
-export function isValidSpendingPassword(spendingPassword: string): boolean {
-  const savedSpendingHash = localStorage.getItem(WALLET_SPEDING_PASSWORD_KEY);
-  if (!savedSpendingHash)
-    throw new Error('There is not a spending password created');
-  return isBlake2HashHexWithSecretOk(spendingPassword, savedSpendingHash);
-}
-
-export function isSpedingPasswordCreated(): boolean {
-  const savedSpendingHash = localStorage.getItem(WALLET_SPEDING_PASSWORD_KEY);
-  if (savedSpendingHash) return true;
+export function isUnlockWalletPasswordCreated(): boolean {
+  const encryptedAccountInfo = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
+  if (encryptedAccountInfo) return true;
   return false;
 }
 
@@ -39,7 +21,7 @@ export function saveEncryptedAccountInfo(
 }
 
 // eslint-disable-next-line flowtype/space-after-type-colon
-export function readAccountKeysFromDEN(
+export function readEncryptedAccountInfo(
   spendingPassword: ?string
 ): ?AccountKeys {
   const encryptedHex = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
