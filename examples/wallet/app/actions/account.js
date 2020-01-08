@@ -7,7 +7,7 @@ import type {
   Thunk,
   AccountKeys,
   AccountState,
-  SpendingPassword
+  UnlockWalletPassword
 } from '../reducers/types';
 import type {
   Amount,
@@ -39,40 +39,40 @@ import {
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
-export type SetKeysWithSpendingPasswordAction = {
-  type: 'SET_SPENDING_PASSWORD'
-} & SpendingPassword;
+export type SetKeysWithUnlockWalletPasswordAction = {
+  type: 'SET_UNLOCK_WALLET_PASSWORD'
+} & UnlockWalletPassword;
 export const SET_KEYS = 'SET_KEYS';
-export const SET_SPENDING_PASSWORD = 'SET_SPENDING_PASSWORD';
+export const SET_UNLOCK_WALLET_PASSWORD = 'SET_UNLOCK_WALLET_PASSWORD';
 
 export function setAccount(
   privateKey: string,
-  spendingPassword: ?string
+  unlockWalletPassword: ?string
 ): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
     return getAccountFromPrivateKey(privateKey).then(keys =>
-      curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
+      curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
     );
   };
 }
 
 export function setKeysWithUnlockWalletPassword(
-  spendingPassword: ?string = ''
+  unlockWalletPassword: ?string = ''
 ): Thunk<SetKeysAction> {
   return function setKeysWithUnlockWalletPasswordThunk(dispatch) {
-    const accountKeys = readEncryptedAccountInfo(spendingPassword);
+    const accountKeys = readEncryptedAccountInfo(unlockWalletPassword);
     if (accountKeys) {
-      const spendingPasswordKeys = {
+      const unlockWalletPasswordKeys = {
         walletId: 'wallet01',
-        spendingPassword
+        unlockWalletPassword
       };
       dispatch({
-        type: SET_SPENDING_PASSWORD,
-        ...spendingPasswordKeys
+        type: SET_UNLOCK_WALLET_PASSWORD,
+        ...unlockWalletPasswordKeys
       });
 
       return getAccountFromPrivateKey(accountKeys.privateKey).then(keys =>
-        curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
+        curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
       );
     }
     throw new Error('Invalid password');
@@ -113,14 +113,14 @@ export function setAccountFromPrivateKey(
 const initializeKeysAndRedirect = (
   dispatch: Dispatch,
   keys: AccountKeys,
-  spendingPassword: ?string = ''
+  unlockWalletPassword: ?string = ''
 ) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
 
-  saveEncryptedAccountInfo(spendingPassword, keys);
+  saveEncryptedAccountInfo(unlockWalletPassword, keys);
 
   return Promise.all([
     dispatch(updateAccountTransactions()),
@@ -137,13 +137,13 @@ const initializeKeysAndRedirect = (
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword: string,
-  spendingPassword: ?string
+  unlockWalletPassword: ?string
 ): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
       return getAccountFromSeed(seed).then(keys =>
-        curry(initializeKeysAndRedirect)(dispatch, keys, spendingPassword)
+        curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
       );
     };
   }

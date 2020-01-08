@@ -15,16 +15,20 @@ export default ({ setKeysWithUnlockWalletPassword }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     try {
-      return setKeysWithUnlockWalletPassword(spendingPassword);
+      return setKeysWithUnlockWalletPassword(unlockWalletPassword);
     } catch (error) {
-      setIsWrongSpendingPassword(true);
-      setHiddenSpendingPassword(false);
+      setIsWrongUnlockWalletPassword(true);
+      setHiddenUnlockWalletPassword(false);
     }
   };
 
-  const [spendingPassword, setSpendingPassword] = useState('');
-  const [isWrongSpendingPassword, setIsWrongSpendingPassword] = useState(false);
-  const [hiddenSpendingPassword, setHiddenSpendingPassword] = useState(true);
+  const [unlockWalletPassword, setUnlockWalletPassword] = useState('');
+  const [isWrongSpendingPassword, setIsWrongUnlockWalletPassword] = useState(
+    false
+  );
+  const [hiddenSpendingPassword, setHiddenUnlockWalletPassword] = useState(
+    true
+  );
 
   return (
     <Container className={styles.container}>
@@ -35,12 +39,12 @@ export default ({ setKeysWithUnlockWalletPassword }: Props) => {
           </Form.Label>
           <Form.Control
             type="password"
-            id="spendingPassword"
-            name="spendingPassword"
+            id="unlockWalletPassword"
+            name="unlockWalletPassword"
             placeholder="Password"
-            value={spendingPassword}
+            value={unlockWalletPassword}
             isInvalid={isWrongSpendingPassword}
-            onChange={event => setSpendingPassword(event.target.value)}
+            onChange={event => setUnlockWalletPassword(event.target.value)}
           />
           <Form.Label className="text-danger" hidden={hiddenSpendingPassword}>
             <code>Incorrect password</code>

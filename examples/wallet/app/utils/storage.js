@@ -11,23 +11,23 @@ export function isUnlockWalletPasswordCreated(): boolean {
 }
 
 export function saveEncryptedAccountInfo(
-  spendingPassword: ?string,
+  unlockWalletPassword: ?string,
   keys: AccountKeys
 ): void {
   const plainTextAccountInfo = JSON.stringify(keys);
-  const spedingPwd: string = spendingPassword || '';
+  const spedingPwd: string = unlockWalletPassword || '';
   const encryptedTextAccountInfo = aesEncrypt(spedingPwd, plainTextAccountInfo);
   localStorage.setItem(WALLET_ENCRYPTED_KEYS, encryptedTextAccountInfo);
 }
 
 // eslint-disable-next-line flowtype/space-after-type-colon
 export function readEncryptedAccountInfo(
-  spendingPassword: ?string
+  unlockWalletPassword: ?string
 ): ?AccountKeys {
   const encryptedHex = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
   try {
     if (encryptedHex && encryptedHex.length > 0) {
-      const plainText = aesDecrypt(spendingPassword, encryptedHex);
+      const plainText = aesDecrypt(unlockWalletPassword, encryptedHex);
       const accountKeys = JSON.parse(plainText);
       return accountKeys;
     }

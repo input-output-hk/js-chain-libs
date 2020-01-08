@@ -37,9 +37,9 @@ export type AccountKeys = {
   identifier: Identifier
 };
 
-export type SpendingPassword = {
+export type UnlockWalletPassword = {
   walletId: string,
-  spendingPassword: string
+  unlockWalletPassword: string
 };
 
 export type AccountState = {

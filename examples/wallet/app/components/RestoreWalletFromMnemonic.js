@@ -19,7 +19,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
     if (isValidMnemonic(newMnemonicPhrase)) {
-      if (checkValidSpendingPassword(password, confirmPassword)) {
+      if (checkValidUnlockWalletPassword(password, confirmPassword)) {
         return setAccountFromMnemonic(
           newMnemonicPhrase,
           newMnemonicPassword,
@@ -37,7 +37,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
 
   const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
 
-  const checkValidSpendingPassword = function checkValidSpendingPassword(
+  const checkValidUnlockWalletPassword = function checkValidUnlockWalletPassword(
     pass,
     confirmation
   ) {

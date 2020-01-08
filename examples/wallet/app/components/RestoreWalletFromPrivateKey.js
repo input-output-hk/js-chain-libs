@@ -15,12 +15,12 @@ type Props = {
 export default ({ setAccount }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    if (checkValidSpendingPassword(password, confirmPassword)) {
+    if (checkValidUnlockWalletPassword(password, confirmPassword)) {
       setAccount(newPrivateKey, password);
     }
   };
 
-  const checkValidSpendingPassword = function checkValidSpendingPassword(
+  const checkValidUnlockWalletPassword = function checkValidUnlockWalletPassword(
     pass,
     confirmation
   ) {

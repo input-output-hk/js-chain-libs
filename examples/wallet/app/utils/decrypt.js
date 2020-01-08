@@ -6,8 +6,10 @@ const blake2b = data => blakejs.blake2b(data, null, 32);
 const SECRET = 'wallet_demo#';
 const AES_SECRET = ':aes_secret#';
 
-export function aesEncrypt(spendingPassword: string, text: string): string {
-  const aesPasswordText = spendingPassword.concat(SECRET).concat(AES_SECRET);
+export function aesEncrypt(unlockWalletPassword: string, text: string): string {
+  const aesPasswordText = unlockWalletPassword
+    .concat(SECRET)
+    .concat(AES_SECRET);
   const aesKey = blake2b(aesPasswordText);
   const aesCtr = new aesjs.ModeOfOperation.ctr(aesKey, new aesjs.Counter(5));
   const encryptedBytes = aesCtr.encrypt(aesjs.utils.utf8.toBytes(text));
@@ -16,10 +18,12 @@ export function aesEncrypt(spendingPassword: string, text: string): string {
 }
 
 export function aesDecrypt(
-  spendingPassword: string,
+  unlockWalletPassword: string,
   encryptedHex: string
 ): string {
-  const aesPasswordText = spendingPassword.concat(SECRET).concat(AES_SECRET);
+  const aesPasswordText = unlockWalletPassword
+    .concat(SECRET)
+    .concat(AES_SECRET);
   const aesKey = blake2b(aesPasswordText);
   const aesCtr = new aesjs.ModeOfOperation.ctr(aesKey, new aesjs.Counter(5));
   const decryptedBytes = aesCtr.decrypt(aesjs.utils.hex.toBytes(encryptedHex));
