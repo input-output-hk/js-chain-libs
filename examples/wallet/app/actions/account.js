@@ -1,5 +1,6 @@
 // @flow
 import { push } from 'connected-react-router';
+import type { Dispatch } from 'redux';
 import curry from 'lodash/curry';
 import type {
   AppState,
@@ -29,10 +30,14 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
+import { saveAccountInfoInLocalStorage } from '../utils/storage';
+
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
+export const PRIVATE_KEY_ERROR = 'privateKeyError';
+export const ACCOUNT_STATE_ERROR = 'accountStateError';
 
 export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
@@ -42,16 +47,57 @@ export function setAccount(privateKey: string): Thunk<SetKeysAction> {
   };
 }
 
-const initializeKeysAndRedirect = (dispatch, keys: AccountKeys) => {
+export function setAccountFromPrivateKey(
+  privateKey: string
+): Thunk<SetKeysAction> {
+  return function setAccountFromPrivateKeyThunk(dispatch) {
+    getAccountFromPrivateKey(privateKey)
+      .then(loadedPrivateKey => {
+        dispatch({
+          type: SET_KEYS,
+          ...loadedPrivateKey
+        });
+        return dispatch(updateAccountTransactionsAndState());
+      })
+      .catch(error => {
+        console.error(error);
+        throw new Error(PRIVATE_KEY_ERROR);
+      });
+  };
+}
+
+export function updateAccountTransactionsAndState(): Thunk<SetKeysAction> {
+  return function updateAccountTransactionsAndStateThunk(dispatch) {
+    return Promise.all([
+      dispatch(updateAccountTransactions()),
+      dispatch(updateNodeSettings()),
+      dispatch(updateAccountState())
+    ]).then(() => dispatch(push(routes.WALLET)));
+  };
+}
+
+/**
+ * @dev This function is used to obtain the list of transactions, the balance
+ * and the delegation of a given account after obtaining the public, private
+ * and identifier keys.
+ * @param {Dispatch} dispatch
+ * @param {AccountKeys} keys
+ * @param {boolean} saveAccount If true, the keys are stored in the local storage
+ */
+const initializeKeysAndRedirect = (
+  dispatch: Dispatch,
+  keys: AccountKeys,
+  saveAccount?: boolean = true
+) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
-  return Promise.all([
-    dispatch(updateAccountTransactions()),
-    dispatch(updateNodeSettings()),
-    dispatch(updateAccountState())
-  ]).then(() => dispatch(push(routes.WALLET)));
+  if (saveAccount) {
+    saveAccountInfoInLocalStorage(keys);
+  }
+
+  return dispatch(updateAccountTransactionsAndState());
 };
 
 export function setAccountFromMnemonic(
@@ -95,7 +141,7 @@ export function updateAccountState(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching account info');
-          return Promise.reject();
+          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
         })
     );
   };
@@ -127,7 +173,7 @@ export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching transactions');
-          return Promise.reject();
+          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
         })
     );
   };
