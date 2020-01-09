@@ -10,16 +10,22 @@ import type { SendFunds } from '../actions/account';
 import styles from './SendTransaction.scss';
 import type { Balance } from '../models';
 import type { NodeSettings } from '../reducers/types';
-import { isValidAddress } from '../utils/wasmWrapper';
+import { typeof isValidAddress as IsValidAddress } from '../utils/wasmWrapper';
 import feeCalculator from '../utils/feeCalculator';
 
 type Props = {
   sendFunds: SendFunds,
   balance: Balance,
-  nodeSettings: NodeSettings
+  nodeSettings: NodeSettings,
+  isValidAddress: IsValidAddress
 };
 
-export default ({ balance, nodeSettings, sendFunds }: Props) => {
+export default ({
+  balance,
+  nodeSettings,
+  sendFunds,
+  isValidAddress
+}: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     sendFunds(destinationAddress, Number(amount));
@@ -41,6 +47,21 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
     config.get('formDebounceInterval')
   );
 
+  const computeAmountErrorMessage = (): string => {
+    if (typeof amount === 'number') {
+      if (amount <= 0) {
+        return 'Balance must be positive';
+      }
+      if (amount > balance - transactionFee) {
+        if (balance < transactionFee) {
+          return 'Your balance is lower than the transaction fees :(';
+        }
+        return `Insufficient balance. Max: ${balance - transactionFee}`;
+      }
+    }
+    return '';
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group>
@@ -51,9 +72,9 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
           isInvalid={!validAddress && destinationAddress}
           isValid={destinationAddress && validAddress}
           value={destinationAddress}
-          onChange={event => {
-            debouncedAddressValidator(event.target.value);
-            setDestinationAddress(event.target.value);
+          onChange={({ target: { value } }) => {
+            setDestinationAddress(value);
+            debouncedAddressValidator(value);
           }}
         />
         <Form.Control.Feedback type="invalid">
@@ -82,9 +103,7 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
               onChange={({ target: { value } }) => setAmount(Number(value))}
             />
             <Form.Control.Feedback type="invalid">
-              {typeof amount === 'number' && amount <= 0
-                ? 'Balance must be positive'
-                : `insufficient balance. Max: ${balance - transactionFee}`}
+              {computeAmountErrorMessage()}
             </Form.Control.Feedback>
             <Form.Control.Feedback type="valid">
               {`After fee: ${transactionFee + amount}`}

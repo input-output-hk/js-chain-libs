@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SendTransaction component should match exact snapshot 1`] = `
+<form
+  className=""
+  onSubmit={[Function]}
+>
+  <div
+    className="form-group"
+  >
+    <label
+      className="form-label"
+      htmlFor="recipient"
+    >
+      Recipient:
+    </label>
+    <input
+      className="form-control"
+      name="recipient"
+      onChange={[Function]}
+      type="text"
+      value=""
+    />
+    <div
+      className="invalid-feedback"
+    >
+      Please enter a valid address
+    </div>
+  </div>
+  <div
+    className="form-group"
+    htmlFor="amount"
+  >
+    <label
+      className="form-label"
+    >
+      Amount:
+    </label>
+    <div
+      className="row"
+    >
+      <div
+        className="col-10"
+      >
+        <input
+          className="form-control"
+          name="amount"
+          onChange={[Function]}
+          type="number"
+        />
+        <div
+          className="invalid-feedback"
+        >
+          
+        </div>
+        <div
+          className="valid-feedback"
+        >
+          After fee: NaN
+        </div>
+      </div>
+      <div
+        className="align-self-center text-align unitLabel col-2"
+      >
+        LOVELACE
+      </div>
+    </div>
+  </div>
+  <div
+    className="justify-content-between mt-2 flex-sm-row-reverse row"
+  >
+    <button
+      className="btn btn-primary btn-lg"
+      disabled={true}
+      type="submit"
+    >
+      Send
+    </button>
+  </div>
+</form>
+`;
