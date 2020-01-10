@@ -66,11 +66,11 @@ export default ({ setAccount }: Props) => {
           <Form.Text>
             It&apos;s a string like:
             <br />
-            <code>
+            <em className="text-danger">
               ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
-            </code>
+            </em>
           </Form.Text>
-          <Form.Group>
+          <Form.Group className="mt-3">
             <Form.Control
               type="password"
               id="password"
@@ -80,8 +80,10 @@ export default ({ setAccount }: Props) => {
               isInvalid={!isValidPassword}
               onChange={event => setPassword(event.target.value)}
             />
-            <Form.Label className="text-danger" hidden={isValidPassword}>
-              <code>The password must have at least 8 chars.</code>
+            <Form.Label hidden={isValidPassword}>
+              <em className="text-danger">
+                The password must have at least 8 chars.
+              </em>
             </Form.Label>
             <Form.Control
               type="password"
@@ -96,7 +98,9 @@ export default ({ setAccount }: Props) => {
               className="text-danger"
               hidden={arePasswordAndConfirmationEqual}
             >
-              <code>Password and confirmation must be the same.</code>
+              <em className="text-danger">
+                Password and confirmation must be the same.
+              </em>
             </Form.Label>
           </Form.Group>
         </Form.Group>

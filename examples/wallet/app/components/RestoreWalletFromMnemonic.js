@@ -42,17 +42,18 @@ export default ({ setAccountFromMnemonic }: Props) => {
     confirmation
   ) {
     if (!pass && !confirmation) return true;
-    if (pass.length < 8) {
-      setIsValidPassword(false);
-      return false;
-    }
-    setIsValidPassword(true);
-
     if (pass !== confirmation) {
       setArePasswordAndConfirmationEqual(false);
       return false;
     }
     setArePasswordAndConfirmationEqual(true);
+
+    if (!/^[0-9a-zA-Z]{8,}$/.test(password)) {
+      setIsValidPassword(false);
+      return false;
+    }
+
+    setIsValidPassword(true);
     return true;
   };
 
@@ -82,15 +83,17 @@ export default ({ setAccountFromMnemonic }: Props) => {
             onBlur={() => checkIsValidMnemonicPhrase()}
           />
           <Form.Label className="text-danger" hidden={isMnemonicValid}>
-            <code>The phrase can have 12, 15, 18, 21 or 24 valid words.</code>
+            <em className="text-danger">
+              The phrase can have 12, 15, 18, 21 or 24 valid words.
+            </em>
           </Form.Label>
           <Form.Text>
             Example:
             <br />
-            <code>
+            <em className="text-danger">
               decade panther require cruise robust mail gadget advice tonight
               post inner snack
-            </code>
+            </em>
           </Form.Text>
           <Form.Control
             type="password"
@@ -101,8 +104,10 @@ export default ({ setAccountFromMnemonic }: Props) => {
             className="mt-3"
           />
           <Form.Text>
-            This secret password is part of the BIP39 standard to generate safer
-            wallet seeds.
+            <em className="text-danger">
+              This secret password is part of the BIP39 standard to generate
+              safer wallet seeds.
+            </em>
           </Form.Text>
           <Form.Label className="mt-5">Unlock wallet (optional):</Form.Label>
           <Form.Group>
@@ -116,7 +121,9 @@ export default ({ setAccountFromMnemonic }: Props) => {
               onChange={event => setPassword(event.target.value)}
             />
             <Form.Label className="text-danger" hidden={isValidPassword}>
-              <code>The password must have at least 8 chars.</code>
+              <em className="text-danger">
+                The password must have at least 8 chars.
+              </em>
             </Form.Label>
             <Form.Control
               type="password"
@@ -128,14 +135,18 @@ export default ({ setAccountFromMnemonic }: Props) => {
               className="mt-3"
             />
             <Form.Text>
-              This key allows you to unlock your wallet every time you start it
-              and to keep your account data in a more secure way.
+              <em className="text-danger">
+                This key allows you to unlock your wallet every time you start
+                it and to keep your account data in a more secure way.
+              </em>
             </Form.Text>
             <Form.Label
               className="text-danger"
               hidden={arePasswordAndConfirmationEqual}
             >
-              <code>password and confirmation must be the same.</code>
+              <em className="text-danger">
+                password and confirmation must be the same.
+              </em>
             </Form.Label>
           </Form.Group>
         </Form.Group>

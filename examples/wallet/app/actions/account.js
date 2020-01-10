@@ -62,14 +62,6 @@ export function setKeysWithUnlockWalletPassword(
   return function setKeysWithUnlockWalletPasswordThunk(dispatch) {
     const accountKeys = readEncryptedAccountInfo(unlockWalletPassword);
     if (accountKeys) {
-      const unlockWalletPasswordKeys = {
-        unlockWalletPassword
-      };
-      dispatch({
-        type: SET_UNLOCK_WALLET_PASSWORD,
-        ...unlockWalletPasswordKeys
-      });
-
       return getAccountFromPrivateKey(accountKeys.privateKey).then(keys =>
         curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
       );
@@ -94,8 +86,8 @@ export function setAccountFromPrivateKey(
       ])
         .then(() => dispatch(push(routes.WALLET)))
         .catch(error => {
-          console.log(error);
-          dispatch(push(routes.INPUT_KEYS));
+          console.error(error);
+          dispatch(push(routes.WALLET));
         });
     });
   };
