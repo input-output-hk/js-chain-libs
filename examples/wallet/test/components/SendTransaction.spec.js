@@ -1,5 +1,6 @@
 // @flow
 import { stub } from 'sinon';
+import { flatten } from 'lodash';
 import config from 'config';
 import React from 'react';
 import Button from 'react-bootstrap/Button';
@@ -15,7 +16,6 @@ const defaultNodeSettings = {
   block0Hash: 'notimportant',
   fees: { constant: 10, certificate: 10, coefficient: 10 }
 };
-const userBalance = 100;
 const mockedAddress = 'notimportant';
 const getAddressInput = form =>
   form.find(Form.Control).find({ name: 'recipient' });
@@ -62,96 +62,75 @@ describe('SendTransaction component', () => {
   });
 
   describe('Form validations', () => {
-    describe('An empty form cant be submitted, but does not show validation errors', () => {
-      describe('GIVEN a form in its initial state', () => {
-        let component;
-        beforeAll(() => {
-          ({ component } = setup(0, defaultNodeSettings));
-        });
-
-        test('THEN button should start disabled', () => {
-          expect(getSubmitButton(component).prop('disabled')).toBeTruthy();
-        });
-
-        test('AND address should not be valid or invalid', () => {
-          expect(getAddressInput(component).prop('isValid')).toBeFalsy();
-          expect(getAddressInput(component).prop('isInvalid')).toBeFalsy();
-        });
-
-        test('AND amount should not be valid or invalid', () => {
-          expect(getAmountInput(component).prop('isValid')).toBeFalsy();
-          expect(getAmountInput(component).prop('isInvalid')).toBeFalsy();
-        });
-      });
-    });
-
-    describe('button is enabled when amount and recipient are valid', () => {
-      let component;
-      beforeAll(() => {
-        ({ component } = setup(userBalance, defaultNodeSettings));
-      });
-
-      describe('GIVEN an address is entered', () => {
-        beforeAll(async () => {
-          getAddressInput(component).simulate('change', {
-            target: { value: mockedAddress }
-          });
-          // validator is debounced, we have to wait for it.
-          await new Promise(resolve =>
-            setTimeout(resolve, config.get('formDebounceInterval'))
-          );
-        });
-        test('THEN the value changed', () => {
-          expect(getAddressInput(component).prop('value')).toBe(mockedAddress);
-        });
-        test('AND the address is valid', () => {
-          expect(getAddressInput(component).prop('isValid')).toBeTruthy();
-        });
-        test('AND the button not enabled by a valid address and an empty value', () => {
-          expect(getSubmitButton(component).prop('disabled')).toBeTruthy();
-        });
-
-        describe('AND GIVEN an amount is entered', () => {
-          beforeAll(() => {
-            getAmountInput(component).simulate('change', {
-              target: { value: '20' }
+    describe('button validations', () => {
+      const VALID = 'valid';
+      const INVALID = 'invalid';
+      const EMPTY = 'empty';
+      type InputStatus = typeof VALID | typeof INVALID | typeof EMPTY;
+      describe.each(
+        flatten(
+          [EMPTY, VALID, INVALID].map((first, index, array) =>
+            array.map(second => [first, second])
+          )
+        ).map(([amount, address]) => [
+          `button is ${
+            amount === VALID && address === VALID ? '' : 'NOT'
+          } enabled when amount is ${amount} and recipient is ${address}`,
+          {
+            amount,
+            address,
+            buttonDisabled: !(amount === VALID && address === VALID)
+          }
+        ])
+      )(
+        '%s',
+        (
+          title,
+          {
+            amount,
+            address,
+            buttonDisabled
+          }: {
+            amount: InputStatus,
+            address: InputStatus,
+            buttonDisabled: boolean
+          }
+        ) => {
+          describe(`GIVEN a ${address} address`, () => {
+            let component;
+            let isValidAddress;
+            beforeAll(async () => {
+              ({ component, isValidAddress } = setup(100, defaultNodeSettings));
+              if (address !== EMPTY) {
+                isValidAddress.resolves(address === VALID);
+                getAddressInput(component).simulate('change', {
+                  target: { value: mockedAddress }
+                });
+                // validator is debounced, we have to wait for it.
+                await new Promise(resolve =>
+                  setTimeout(resolve, config.get('formDebounceInterval'))
+                );
+              }
+            });
+            describe(`AND GIVEN a ${amount} amount`, () => {
+              beforeAll(() => {
+                if (amount !== EMPTY) {
+                  getAmountInput(component).simulate('change', {
+                    target: { value: amount === VALID ? '20' : '200' }
+                  });
+                }
+              });
+              test(`THEN the submit button is ${
+                buttonDisabled ? 'disabled' : 'enabled'
+              }`, () => {
+                expect(getSubmitButton(component).prop('disabled')).toBe(
+                  buttonDisabled
+                );
+              });
             });
           });
-          test('THEN the value changed', () => {
-            expect(getAmountInput(component).prop('value')).toBe(20);
-          });
-          test('AND the amount is valid', () => {
-            expect(getAmountInput(component).prop('isValid')).toBeTruthy();
-          });
-          test('AND the button is enabled', () => {
-            expect(getSubmitButton(component).prop('disabled')).toBeFalsy();
-          });
-        });
-      });
-    });
-
-    describe('button is not enabled by a valid amount and empty address', () => {
-      let component;
-      beforeAll(() => {
-        ({ component } = setup(userBalance, defaultNodeSettings));
-      });
-
-      describe('GIVEN an amount is entered', () => {
-        beforeAll(() => {
-          getAmountInput(component).simulate('change', {
-            target: { value: '20' }
-          });
-        });
-        test('THEN the value changed', () => {
-          expect(getAmountInput(component).prop('value')).toBe(20);
-        });
-        test('AND the amount is valid', () => {
-          expect(getAmountInput(component).prop('isValid')).toBeTruthy();
-        });
-        test('AND the button is not enabled', () => {
-          expect(getSubmitButton(component).prop('disabled')).toBeTruthy();
-        });
-      });
+        }
+      );
     });
 
     describe('amount validations', () => {
