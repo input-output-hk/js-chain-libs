@@ -1,5 +1,6 @@
 {
   "extends": "erb",
+  "plugins": ["no-only-tests"],
   "settings": {
     "import/resolver": {
       "webpack": {
@@ -11,6 +12,7 @@
     "jest": true
   },
   "rules": {
+    "no-only-tests/no-only-tests": "error",
     "react/require-default-props": "off",
     "func-names": "off",
     "flowtype/generic-spacing": "off",
