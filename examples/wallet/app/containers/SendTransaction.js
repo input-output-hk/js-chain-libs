@@ -5,7 +5,7 @@ import SendTransaction from '../components/SendTransaction';
 import { sendTransaction } from '../actions/account';
 
 function mapStateToProps(state) {
-  return { privateKey: state.account.privateKey };
+  return { balance: state.account.balance, nodeSettings: state.nodeSettings };
 }
 
 function mapDispatchToProps(dispatch) {

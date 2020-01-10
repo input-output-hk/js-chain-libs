@@ -116,6 +116,16 @@ export async function buildSendFundsTransaction(
   });
 }
 
+export const isValidAddress = async (address: string): Promise<boolean> => {
+  const { Address } = await wasmBindings;
+  try {
+    Address.from_string(address);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
 async function buildTransaction(
   secret: string,
   nodeSettings: NodeSettings,

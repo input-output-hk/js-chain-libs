@@ -51,6 +51,7 @@ export type NodeSettings = {
     constant: number
   }
 };
+
 export type StakePools = {
   availablePools: Array<PoolId>
 };
