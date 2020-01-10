@@ -20,6 +20,11 @@ const mockedAddress = 'notimportant';
 const getAddressInput = form =>
   form.find(Form.Control).find({ name: 'recipient' });
 const getAmountInput = form => form.find(Form.Control).find({ name: 'amount' });
+const getAddressFeedback = form =>
+  form
+    .find(Form.Control.Feedback)
+    .find({ type: 'invalid' })
+    .at(0);
 const getAmountNegativeFeedback = form =>
   form
     .find(Form.Control.Feedback)
@@ -30,18 +35,18 @@ const getAmountPositiveFeedback = form =>
 const getSubmitButton = form => form.find(Button);
 
 function setup(balance: number, nodeSettings: NodeSettings) {
-  const sendTransaction = stub();
+  const sendFunds = stub();
   const isValidAddress = stub();
   // by default, the address'll be considered valid
   isValidAddress.resolves(true);
   const component = shallow(
     <SendTransaction
-      {...{ balance, isValidAddress, nodeSettings, sendTransaction }}
+      {...{ balance, isValidAddress, nodeSettings, sendFunds }}
     />
   );
   return {
     component,
-    sendTransaction,
+    sendFunds,
     isValidAddress
   };
 }
@@ -52,7 +57,7 @@ describe('SendTransaction component', () => {
       <SendTransaction
         balance={0}
         nodeSettings={defaultNodeSettings}
-        sendTransaction={stub()}
+        sendFunds={stub()}
         isValidAddress={stub()}
       />
     );
@@ -265,6 +270,87 @@ describe('SendTransaction component', () => {
           });
         }
       );
+    });
+
+    describe('address validations', () => {
+      describe('GIVEN the (mocked) chain libs report an address as invalid', () => {
+        let component;
+        let isValidAddress;
+        beforeAll(() => {
+          ({ component, isValidAddress } = setup(100, defaultNodeSettings));
+          isValidAddress.resolves(false);
+          // validator is debounced, we have to wait for it.
+        });
+        test('AND the address is not valid or invalid', () => {
+          expect(getAddressInput(component).prop('isValid')).toBeFalsy();
+          expect(getAddressInput(component).prop('isInvalid')).toBeFalsy();
+        });
+
+        describe('WHEN address is entered', () => {
+          beforeAll(async () => {
+            getAddressInput(component).simulate('change', {
+              target: { value: mockedAddress }
+            });
+            await new Promise(resolve =>
+              setTimeout(resolve, config.get('formDebounceInterval'))
+            );
+          });
+          test('THEN the value changed', () => {
+            expect(getAddressInput(component).prop('value')).toBe(
+              mockedAddress
+            );
+          });
+          test('AND the address is not valid', () => {
+            expect(getAddressInput(component).prop('isValid')).toBeFalsy();
+          });
+          test('AND the address is invalid', () => {
+            expect(getAddressInput(component).prop('isInvalid')).toBeTruthy();
+          });
+          // FIXME: the children'll always be passed, I have to find a way to check if it's being displayed. isEmptyRender() doesn't work because the feedback is implemented as a forwardRef, the form doesn't know if it has to render.
+          test('AND an error message is displayed', () => {
+            expect(getAddressFeedback(component).prop('children')).toMatch(
+              'Please enter a valid address'
+            );
+          });
+        });
+      });
+
+      describe('GIVEN the (mocked) chain libs report an address as valid', () => {
+        let component;
+        let isValidAddress;
+        beforeAll(() => {
+          ({ component, isValidAddress } = setup(100, defaultNodeSettings));
+          isValidAddress.resolves(true);
+        });
+        test('AND the address is not valid or invalid', () => {
+          expect(getAddressInput(component).prop('isValid')).toBeFalsy();
+          expect(getAddressInput(component).prop('isInvalid')).toBeFalsy();
+        });
+
+        describe('WHEN address is entered', () => {
+          beforeAll(async () => {
+            getAddressInput(component).simulate('change', {
+              target: { value: mockedAddress }
+            });
+            // validator is debounced, we have to wait for it.
+            await new Promise(resolve =>
+              setTimeout(resolve, config.get('formDebounceInterval'))
+            );
+          });
+          test('THEN the value changed', () => {
+            expect(getAddressInput(component).prop('value')).toBe(
+              mockedAddress
+            );
+          });
+          test('AND the address is valid', () => {
+            expect(getAddressInput(component).prop('isValid')).toBeTruthy();
+          });
+          test('AND the address is not invalid', () => {
+            expect(getAddressInput(component).prop('isInvalid')).toBeFalsy();
+          });
+          // TODO: check no error message is displayed
+        });
+      });
     });
   });
 });
