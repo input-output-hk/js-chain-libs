@@ -63,7 +63,6 @@ export function setKeysWithUnlockWalletPassword(
     const accountKeys = readEncryptedAccountInfo(unlockWalletPassword);
     if (accountKeys) {
       const unlockWalletPasswordKeys = {
-        walletId: 'wallet01',
         unlockWalletPassword
       };
       dispatch({

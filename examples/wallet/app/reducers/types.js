@@ -38,7 +38,6 @@ export type AccountKeys = {
 };
 
 export type UnlockWalletPassword = {
-  walletId: string,
   unlockWalletPassword: string
 };
 

@@ -36,7 +36,6 @@ export default function account(
   switch (action.type) {
     case SET_UNLOCK_WALLET_PASSWORD:
       return Object.assign({}, state, {
-        walletId: action.walletId,
         unlockWalletPassword: action.unlockWalletPassword
       });
     case SET_KEYS:
