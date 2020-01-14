@@ -11,18 +11,23 @@ export function isUnlockWalletPasswordCreated(): boolean {
 }
 
 export function saveEncryptedAccountInfo(
-  unlockWalletPassword: ?string,
+  unlockWalletPassword: string,
   keys: AccountKeys
 ): void {
   const plainTextAccountInfo = JSON.stringify(keys);
-  const spedingPwd: string = unlockWalletPassword || '';
-  const encryptedTextAccountInfo = aesEncrypt(spedingPwd, plainTextAccountInfo);
+  if (!unlockWalletPassword || unlockWalletPassword === '') {
+    throw new Error('Invalid unlock password');
+  }
+  const encryptedTextAccountInfo = aesEncrypt(
+    unlockWalletPassword,
+    plainTextAccountInfo
+  );
   localStorage.setItem(WALLET_ENCRYPTED_KEYS, encryptedTextAccountInfo);
 }
 
 // eslint-disable-next-line flowtype/space-after-type-colon
 export function readEncryptedAccountInfo(
-  unlockWalletPassword: ?string
+  unlockWalletPassword: string
 ): ?AccountKeys {
   const encryptedHex = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
   try {

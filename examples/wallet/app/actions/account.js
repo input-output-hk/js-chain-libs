@@ -6,8 +6,7 @@ import type {
   AppState,
   Thunk,
   AccountKeys,
-  AccountState,
-  UnlockWalletPassword
+  AccountState
 } from '../reducers/types';
 import type {
   Amount,
@@ -39,15 +38,11 @@ import {
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
-export type SetKeysWithUnlockWalletPasswordAction = {
-  type: 'SET_UNLOCK_WALLET_PASSWORD'
-} & UnlockWalletPassword;
 export const SET_KEYS = 'SET_KEYS';
-export const SET_UNLOCK_WALLET_PASSWORD = 'SET_UNLOCK_WALLET_PASSWORD';
 
 export function setAccount(
   privateKey: string,
-  unlockWalletPassword: ?string
+  unlockWalletPassword: string
 ): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
     return getAccountFromPrivateKey(privateKey).then(keys =>
@@ -57,7 +52,7 @@ export function setAccount(
 }
 
 export function setKeysWithUnlockWalletPassword(
-  unlockWalletPassword: ?string = ''
+  unlockWalletPassword: string = ''
 ): Thunk<SetKeysAction> {
   return function setKeysWithUnlockWalletPasswordThunk(dispatch) {
     const accountKeys = readEncryptedAccountInfo(unlockWalletPassword);
@@ -104,7 +99,7 @@ export function setAccountFromPrivateKey(
 const initializeKeysAndRedirect = (
   dispatch: Dispatch,
   keys: AccountKeys,
-  unlockWalletPassword: ?string = ''
+  unlockWalletPassword: string = ''
 ) => {
   dispatch({
     type: SET_KEYS,
@@ -128,7 +123,7 @@ const initializeKeysAndRedirect = (
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
   mnemonicPassword: string,
-  unlockWalletPassword: ?string
+  unlockWalletPassword: string
 ): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);

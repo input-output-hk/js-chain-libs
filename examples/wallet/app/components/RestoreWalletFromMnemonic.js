@@ -109,7 +109,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
               safer wallet seeds.
             </em>
           </Form.Text>
-          <Form.Label className="mt-5">Unlock wallet (optional):</Form.Label>
+          <Form.Label className="mt-5">Unlock wallet:</Form.Label>
           <Form.Group>
             <Form.Control
               type="password"
