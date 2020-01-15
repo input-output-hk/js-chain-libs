@@ -69,7 +69,7 @@ export default ({
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group>
+      <Form.Group className={styles.fieldWithFeedback}>
         <Form.Label htmlFor="recipient">Recipient:</Form.Label>
         <Form.Control
           type="text"
@@ -87,7 +87,7 @@ export default ({
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Form.Group htmlFor="amount">
+      <Form.Group htmlFor="amount" className={styles.fieldWithFeedback}>
         <Form.Label>Amount:</Form.Label>
         <Row>
           <Col xs="10">
@@ -114,10 +114,7 @@ export default ({
               {`After fee: ${transactionFee + amount}`}
             </Form.Control.Feedback>
           </Col>
-          <Col
-            xs="2"
-            className={`align-self-center text-align ${styles.unitLabel}`}
-          >
+          <Col xs="2" className={`align-self-start mt-2 ${styles.unitLabel}`}>
             {config.get('coinName')}
           </Col>
         </Row>
