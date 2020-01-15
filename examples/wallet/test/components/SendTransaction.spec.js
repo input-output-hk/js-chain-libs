@@ -39,6 +39,8 @@ function setup(balance: number, nodeSettings: NodeSettings) {
   const isValidAddress = stub();
   // by default, the address'll be considered valid
   isValidAddress.resolves(true);
+  // by default, the transaction is built and broadcasted correctly
+  sendFunds.resolves();
   const component = shallow(
     <SendTransaction
       {...{ balance, isValidAddress, nodeSettings, sendFunds }}
@@ -67,12 +69,13 @@ describe('SendTransaction component', () => {
   });
 
   describe('Form submission', () => {
-    describe('GIVEN a valid form', () => {
+    // context: we're clearing the amount field in order to give the user some feedback
+    describe('GIVEN a valid form AND a successful sendFunds action', () => {
       // enzyme's shallow render doesn't do proper event bubbling, so
       // we test the submission of the form separetely from the button activation
       let component;
       let sendFunds;
-      beforeAll(async () => {
+      beforeAll(() => {
         ({ component, sendFunds } = setup(100, defaultNodeSettings));
         getAddressInput(component).simulate('change', {
           target: { value: mockedAddress }
@@ -80,10 +83,11 @@ describe('SendTransaction component', () => {
         getAmountInput(component).simulate('change', {
           target: { value: '20' }
         });
-        await new Promise(resolve =>
+        return new Promise(resolve =>
           setTimeout(resolve, config.get('formDebounceInterval'))
         );
       });
+
       describe('WHEN submitting it', () => {
         beforeAll(() => {
           component.simulate('submit', { preventDefault: () => {} });
@@ -93,6 +97,48 @@ describe('SendTransaction component', () => {
           expect(
             sendFunds.firstCall.calledWith(mockedAddress, 20)
           ).toBeTruthy();
+        });
+        test('AND the amount input is cleared', () => {
+          expect(getAmountInput(component).prop('value')).toBeFalsy();
+        });
+        test('AND the submit button is disabled', () => {
+          expect(getSubmitButton(component).prop('disabled')).toBeTruthy();
+        });
+      });
+    });
+
+    describe('GIVEN a valid form AND a failing sendFunds action', () => {
+      let component;
+      let sendFunds;
+      beforeAll(() => {
+        ({ component, sendFunds } = setup(100, defaultNodeSettings));
+        getAddressInput(component).simulate('change', {
+          target: { value: mockedAddress }
+        });
+        sendFunds.rejects();
+        getAmountInput(component).simulate('change', {
+          target: { value: '20' }
+        });
+        return new Promise(resolve =>
+          setTimeout(resolve, config.get('formDebounceInterval'))
+        );
+      });
+
+      describe('WHEN submitting it', () => {
+        beforeAll(() => {
+          component.simulate('submit', { preventDefault: () => {} });
+        });
+        test('THEN the sendFunds action was called', () => {
+          expect(sendFunds.callCount).toBe(1);
+          expect(
+            sendFunds.firstCall.calledWith(mockedAddress, 20)
+          ).toBeTruthy();
+        });
+        test('AND the amount input not affected', () => {
+          expect(getAmountInput(component).prop('value')).toBe(20);
+        });
+        test('AND the submit button is enabled', () => {
+          expect(getSubmitButton(component).prop('disabled')).toBeFalsy();
         });
       });
     });

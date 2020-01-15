@@ -47,6 +47,7 @@ exports[`SendTransaction component should match exact snapshot 1`] = `
           name="amount"
           onChange={[Function]}
           type="number"
+          value=""
         />
         <div
           className="invalid-feedback"
@@ -56,7 +57,7 @@ exports[`SendTransaction component should match exact snapshot 1`] = `
         <div
           className="valid-feedback"
         >
-          After fee: NaN
+          After fee: 30
         </div>
       </div>
       <div
