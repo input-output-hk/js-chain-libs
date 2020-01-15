@@ -1,6 +1,7 @@
 // @flow
 import sortBy from 'lodash/sortBy';
 import {
+  SET_VALID_UNLOCK_WALLET_PASSWORD,
   SET_KEYS,
   SET_ACCOUNT_STATE,
   SEND_TRANSACTION,
@@ -31,6 +32,11 @@ export default function account(
     return { transactions: [] };
   }
   switch (action.type) {
+    case SET_VALID_UNLOCK_WALLET_PASSWORD:
+      return Object.assign({}, state, {
+        unlockWalletPassword: action.unlockWalletPassword,
+        isValidUnlockPassword: action.isValidUnlockPassword
+      });
     case SET_KEYS:
       return {
         ...state,

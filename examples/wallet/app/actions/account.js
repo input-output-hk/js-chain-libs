@@ -39,6 +39,8 @@ import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
+export const SET_VALID_UNLOCK_WALLET_PASSWORD =
+  'SET_VALID_UNLOCK_WALLET_PASSWORD';
 
 export function setAccount(
   privateKey: string,

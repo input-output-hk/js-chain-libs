@@ -6,12 +6,19 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import typeof { setAccountFromMnemonic as SetAccountFromMnemonic } from '../actions/account';
 import { isValidMnemonic } from '../utils/mnemonic';
+import CreateUnlockWalletPassword from '../containers/CreateUnlockWalletPassword';
 
 type Props = {
-  setAccountFromMnemonic: SetAccountFromMnemonic
+  setAccountFromMnemonic: SetAccountFromMnemonic,
+  unlockWalletPassword: string,
+  isValidUnlockPassword: boolean
 };
 
-export default ({ setAccountFromMnemonic }: Props) => {
+export default ({
+  setAccountFromMnemonic,
+  unlockWalletPassword,
+  isValidUnlockPassword
+}: Props) => {
   const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
     setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
   };
@@ -19,16 +26,16 @@ export default ({ setAccountFromMnemonic }: Props) => {
   const handleSubmitMnemonic = function handleSubmitMnemonic(event) {
     event.preventDefault();
     if (isValidMnemonic(newMnemonicPhrase)) {
-      if (checkValidUnlockWalletPassword(password, confirmPassword)) {
+      // TODO: ADD IF SENTENCE TO CHECK IF PASSWORD AND CONFIRM IS OK
+      if (isValidUnlockPassword) {
         return setAccountFromMnemonic(
           newMnemonicPhrase,
           newMnemonicPassword,
-          password
+          unlockWalletPassword
         );
       }
-    } else {
-      setIsMnemonicValid(false);
     }
+    setIsMnemonicValid(false);
   };
 
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
@@ -36,35 +43,6 @@ export default ({ setAccountFromMnemonic }: Props) => {
   const [newMnemonicPhrase, setNewMnemonicPhrase] = useState('');
 
   const [newMnemonicPassword, setNewMnemonicPassword] = useState('');
-
-  const checkValidUnlockWalletPassword = function checkValidUnlockWalletPassword(
-    pass,
-    confirmation
-  ) {
-    if (!pass && !confirmation) return true;
-    if (pass !== confirmation) {
-      setArePasswordAndConfirmationEqual(false);
-      return false;
-    }
-    setArePasswordAndConfirmationEqual(true);
-
-    if (!/^[0-9a-zA-Z]{8,}$/.test(password)) {
-      setIsValidPassword(false);
-      return false;
-    }
-
-    setIsValidPassword(true);
-    return true;
-  };
-
-  const [
-    arePasswordAndConfirmationEqual,
-    setArePasswordAndConfirmationEqual
-  ] = useState(true);
-
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isValidPassword, setIsValidPassword] = useState(true);
 
   return (
     <Container>
@@ -109,46 +87,7 @@ export default ({ setAccountFromMnemonic }: Props) => {
               safer wallet seeds.
             </em>
           </Form.Text>
-          <Form.Label className="mt-5">Unlock wallet:</Form.Label>
-          <Form.Group>
-            <Form.Control
-              type="password"
-              id="password"
-              name="password"
-              placeholder="New password (min 8 chars)"
-              value={password}
-              isInvalid={!isValidPassword}
-              onChange={event => setPassword(event.target.value)}
-            />
-            <Form.Label className="text-danger" hidden={isValidPassword}>
-              <em className="text-danger">
-                The password must have at least 8 chars.
-              </em>
-            </Form.Label>
-            <Form.Control
-              type="password"
-              name="confirmPassword"
-              id="confirmPassword"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={event => setConfirmPassword(event.target.value)}
-              className="mt-3"
-            />
-            <Form.Text>
-              <em className="text-danger">
-                This key allows you to unlock your wallet every time you start
-                it and to keep your account data in a more secure way.
-              </em>
-            </Form.Text>
-            <Form.Label
-              className="text-danger"
-              hidden={arePasswordAndConfirmationEqual}
-            >
-              <em className="text-danger">
-                password and confirmation must be the same.
-              </em>
-            </Form.Label>
-          </Form.Group>
+          <CreateUnlockWalletPassword />
         </Form.Group>
         <Row className="justify-content-between">
           <Button variant="secondary" type="button">
