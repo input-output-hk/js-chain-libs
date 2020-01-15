@@ -5,12 +5,12 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import PieChart from 'react-minimal-pie-chart';
 import type { NewDelegation, PoolId, Color } from '../models';
-import typeof { sendStakeDelegation as SendStakeDelegation } from '../actions/account';
+import type { Delegate } from '../actions/account';
 import StakePoolList from '../containers/StakePoolList';
 import styles from './StakeDelegation.scss';
 
 type Props = {
-  sendStakeDelegation: SendStakeDelegation
+  delegate: Delegate
 };
 
 export type PoolSelectionHandler = (poolId: PoolId, increment: number) => void;
@@ -21,7 +21,7 @@ type PieChartEntry = {
   color: Color
 };
 
-export default ({ sendStakeDelegation }: Props) => {
+export default ({ delegate }: Props) => {
   const [delegation, setDelegation] = useState<NewDelegation>({});
   const [selectionCount, setSelectionCount] = useState<number>(0);
 
@@ -46,7 +46,7 @@ export default ({ sendStakeDelegation }: Props) => {
 
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    sendStakeDelegation(delegation);
+    delegate(delegation);
   };
   const pieChartData: Array<PieChartEntry> = Object.keys(delegation)
     .map(pool => ({

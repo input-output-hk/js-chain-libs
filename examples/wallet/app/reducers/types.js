@@ -18,8 +18,8 @@ export type Action = {
 
 export type Store = ReduxStore<AppState, Action>;
 export type GetState = () => AppState;
-export type Dispatch = ReduxDispatch<Action> & Thunk<Action>;
-export type Thunk<A> = ((Dispatch, ?GetState) => Promise<void> | void) => A;
+export type Dispatch = ReduxDispatch<Action> & Thunk;
+export type Thunk = (Dispatch, GetState) => any;
 
 export type AppState = {
   account: Account,

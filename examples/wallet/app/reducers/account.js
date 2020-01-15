@@ -9,7 +9,7 @@ import {
 } from '../actions/account';
 import type {
   SetKeysAction,
-  SendTransactionAction,
+  SendFundsAction,
   SetAccountStateAction,
   SetTransactionsAction,
   SendStakeDelegation
@@ -23,7 +23,7 @@ export default function account(
   action:
     | SetKeysAction
     | SetAccountStateAction
-    | SendTransactionAction
+    | SendFundsAction
     | SendStakeDelegation
     | SetTransactionsAction
 ): Account {
