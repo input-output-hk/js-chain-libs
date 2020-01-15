@@ -28,11 +28,16 @@ export default ({
 }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    sendFunds(destinationAddress, Number(amount));
+    sendFunds(destinationAddress, Number(amount))
+      .then(() => {
+        console.log('success!');
+        return setAmount('');
+      })
+      .catch(error => console.error('couldnt send funds: ', error));
   };
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [validAddress, setValidAddress] = useState<boolean>(false);
-  const [amount, setAmount] = useState<?number>();
+  const [amount, setAmount] = useState<number | ''>('');
   const isValidAmount = (value, currentBalance) =>
     transactionFee + value <= currentBalance &&
     typeof value === 'number' &&
