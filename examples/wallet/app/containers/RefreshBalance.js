@@ -12,7 +12,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ updateAccountState }, dispatch);
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RefreshBalance);
+export default connect(mapStateToProps, mapDispatchToProps)(RefreshBalance);

@@ -14,7 +14,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ push }, dispatch);
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SidebarLayout);
+export default connect(mapStateToProps, mapDispatchToProps)(SidebarLayout);

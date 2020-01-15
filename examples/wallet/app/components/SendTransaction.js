@@ -29,7 +29,8 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
   const [amount, setAmount] = useState<?number>();
   const isValidAmount = (value, currentBalance) =>
     transactionFee + value <= currentBalance &&
-    (typeof value === 'number' && value > 0);
+    typeof value === 'number' &&
+    value > 0;
   const transactionFee = feeCalculator(nodeSettings).sendFundsFee();
   // This is asyncronous and might be resource intensive, so it's better to debounce it.
   const debouncedAddressValidator = debounce(

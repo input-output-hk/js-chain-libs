@@ -8,7 +8,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ redirectToFirstAppPage }, dispatch);
 }
 
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(Index);
+export default connect(undefined, mapDispatchToProps)(Index);

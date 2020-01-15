@@ -14,6 +14,7 @@
     "react/require-default-props": "off",
     "func-names": "off",
     "flowtype/generic-spacing": "off",
+    "react/jsx-props-no-spreading": "off",
     "no-multi-str": "off"
   }
 }
