@@ -66,6 +66,38 @@ describe('SendTransaction component', () => {
     expect(tree).toMatchSnapshot();
   });
 
+  describe('Form submission', () => {
+    describe('GIVEN a valid form', () => {
+      // enzyme's shallow render doesn't do proper event bubbling, so
+      // we test the submission of the form separetely from the button activation
+      let component;
+      let sendFunds;
+      beforeAll(async () => {
+        ({ component, sendFunds } = setup(100, defaultNodeSettings));
+        getAddressInput(component).simulate('change', {
+          target: { value: mockedAddress }
+        });
+        getAmountInput(component).simulate('change', {
+          target: { value: '20' }
+        });
+        await new Promise(resolve =>
+          setTimeout(resolve, config.get('formDebounceInterval'))
+        );
+      });
+      describe('WHEN submitting it', () => {
+        beforeAll(() => {
+          component.simulate('submit', { preventDefault: () => {} });
+        });
+        test('THEN the sendFunds action is called', () => {
+          expect(sendFunds.callCount).toBe(1);
+          expect(
+            sendFunds.firstCall.calledWith(mockedAddress, 20)
+          ).toBeTruthy();
+        });
+      });
+    });
+  });
+
   describe('Form validations', () => {
     describe('button validations', () => {
       const VALID = 'valid';
