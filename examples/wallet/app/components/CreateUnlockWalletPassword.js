@@ -60,17 +60,16 @@ export default ({ setValidUnlockWalletPassword }) => {
           onChange={event => setPassword(event.target.value)}
           onBlur={() => checkValidUnlockWalletPassword(password)}
         />
-        <Form.Label className="text-danger" hidden={isValidPassword}>
-          <em className="text-danger">
-            The password must have at least 8 chars.
-          </em>
-        </Form.Label>
+        <Form.Control.Feedback type="invalid">
+          The password must have at least 8 chars.
+        </Form.Control.Feedback>
         <Form.Control
           type="password"
           name="confirmPassword"
           id="confirmPassword"
           placeholder="Confirm password"
           value={confirmPassword}
+          isInvalid={!arePasswordAndConfirmationEqual}
           onChange={event => setConfirmPassword(event.target.value)}
           onBlur={() =>
             checkValidUnlockWalletConfirmation(password, confirmPassword)
@@ -78,19 +77,12 @@ export default ({ setValidUnlockWalletPassword }) => {
           className="mt-3"
         />
         <Form.Text>
-          <em className="text-danger">
-            This key allows you to unlock your wallet every time you start it
-            and to keep your account data in a more secure way.
-          </em>
+          This key allows you to unlock your wallet every time you start it and
+          to keep your account data in a more secure way.
         </Form.Text>
-        <Form.Label
-          className="text-danger"
-          hidden={arePasswordAndConfirmationEqual}
-        >
-          <em className="text-danger">
-            password and confirmation must be the same.
-          </em>
-        </Form.Label>
+        <Form.Control.Feedback type="invalid">
+          password and confirmation must be the same.
+        </Form.Control.Feedback>
       </Form.Group>
     </Form.Group>
   );
