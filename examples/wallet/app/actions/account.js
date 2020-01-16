@@ -81,11 +81,8 @@ export function setAccountFromPrivateKey(
         dispatch(updateNodeSettings()),
         dispatch(updateAccountState())
       ])
-        .then(() => dispatch(push(routes.WALLET)))
-        .catch(error => {
-          console.error(error);
-          dispatch(push(routes.WALLET));
-        });
+        .catch(console.error)
+        .then(() => dispatch(push(routes.WALLET)));
     });
   };
 }
@@ -115,11 +112,8 @@ const initializeKeysAndRedirect = (
     dispatch(updateNodeSettings()),
     dispatch(updateAccountState())
   ])
-    .then(() => dispatch(push(routes.WALLET)))
-    .catch(error => {
-      console.log(error);
-      dispatch(push(routes.WALLET));
-    });
+    .catch(console.error)
+    .then(() => dispatch(push(routes.WALLET)));
 };
 
 export function setAccountFromMnemonic(
