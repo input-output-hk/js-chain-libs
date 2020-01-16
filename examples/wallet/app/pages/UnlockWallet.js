@@ -18,16 +18,12 @@ export default ({ setKeysWithUnlockWalletPassword }: Props) => {
       return setKeysWithUnlockWalletPassword(unlockWalletPassword);
     } catch (error) {
       setIsWrongUnlockWalletPassword(true);
-      setHiddenUnlockWalletPassword(false);
     }
   };
 
   const [unlockWalletPassword, setUnlockWalletPassword] = useState('');
   const [isWrongSpendingPassword, setIsWrongUnlockWalletPassword] = useState(
     false
-  );
-  const [hiddenSpendingPassword, setHiddenUnlockWalletPassword] = useState(
-    true
   );
 
   return (
@@ -46,7 +42,7 @@ export default ({ setKeysWithUnlockWalletPassword }: Props) => {
             isInvalid={isWrongSpendingPassword}
             onChange={event => setUnlockWalletPassword(event.target.value)}
           />
-          <Form.Label className="text-danger" hidden={hiddenSpendingPassword}>
+          <Form.Label className="text-danger" hidden={!isWrongSpendingPassword}>
             <code>Incorrect password</code>
           </Form.Label>
         </Form.Group>
