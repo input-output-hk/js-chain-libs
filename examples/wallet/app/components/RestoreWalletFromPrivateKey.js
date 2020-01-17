@@ -6,6 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import typeof { setAccount as SetAccount } from '../actions/account';
 import CreateUnlockWalletPassword from '../containers/CreateUnlockWalletPassword';
+import { getAccountFromPrivateKey } from '../utils/wasmWrapper';
 
 type Props = {
   setAccount: SetAccount,
@@ -30,6 +31,15 @@ export default ({
     }
   };
 
+  const checkValidPrivateKey = function checkValidPrivateKey() {
+    getAccountFromPrivateKey(newPrivateKey)
+      .then(() => setPrivateKeyErrorMessage(''))
+      .catch(error => {
+        console.error(error);
+        setPrivateKeyErrorMessage('Invalid private key');
+      });
+  };
+
   const [newPrivateKey, setNewPrivateKey] = useState('');
   const [privateKeyErrorMessage, setPrivateKeyErrorMessage] = useState('');
 
@@ -45,6 +55,7 @@ export default ({
             value={newPrivateKey}
             isInvalid={privateKeyErrorMessage}
             onChange={event => setNewPrivateKey(event.target.value)}
+            onBlur={() => checkValidPrivateKey()}
           />
           <Form.Control.Feedback type="invalid">
             {privateKeyErrorMessage}
