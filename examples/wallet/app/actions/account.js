@@ -39,8 +39,6 @@ import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
-export const SET_VALID_UNLOCK_WALLET_PASSWORD =
-  'SET_VALID_UNLOCK_WALLET_PASSWORD';
 
 export function setAccount(
   privateKey: string,
@@ -64,26 +62,6 @@ export function setKeysWithUnlockWalletPassword(
       );
     }
     throw new Error('Invalid password');
-  };
-}
-
-export function setAccountFromPrivateKey(
-  privateKey: string
-): Thunk<SetKeysAction> {
-  return function setAccountFromPrivateKeyThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey).then(loadedPrivateKey => {
-      dispatch({
-        type: SET_KEYS,
-        ...loadedPrivateKey
-      });
-      return Promise.all([
-        dispatch(updateAccountTransactions()),
-        dispatch(updateNodeSettings()),
-        dispatch(updateAccountState())
-      ])
-        .catch(console.error)
-        .then(() => dispatch(push(routes.WALLET)));
-    });
   };
 }
 

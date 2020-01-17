@@ -9,16 +9,10 @@ import { isValidMnemonic } from '../utils/mnemonic';
 import CreateUnlockWalletPassword from '../containers/CreateUnlockWalletPassword';
 
 type Props = {
-  setAccountFromMnemonic: SetAccountFromMnemonic,
-  unlockWalletPassword: string,
-  isValidUnlockPassword: boolean
+  setAccountFromMnemonic: SetAccountFromMnemonic
 };
 
-export default ({
-  setAccountFromMnemonic,
-  unlockWalletPassword,
-  isValidUnlockPassword
-}: Props) => {
+export default ({ setAccountFromMnemonic }: Props) => {
   const checkIsValidMnemonicPhrase = function checkIsValidMnemonicPhrase() {
     setIsMnemonicValid(isValidMnemonic(newMnemonicPhrase));
   };
@@ -37,6 +31,17 @@ export default ({
     }
     setIsMnemonicValid(false);
   };
+
+  const setValidCreateUnlockWalletPassword = function setValidCreateUnlockWalletPassword(
+    unlockPwd: string,
+    isValid: boolean
+  ): void {
+    setUnlockWalletPassword(unlockPwd);
+    setIsValidUnlockPassword(isValid);
+  };
+
+  const [unlockWalletPassword, setUnlockWalletPassword] = useState('');
+  const [isValidUnlockPassword, setIsValidUnlockPassword] = useState(false);
 
   const [isMnemonicValid, setIsMnemonicValid] = useState(true);
 
@@ -66,10 +71,8 @@ export default ({
           <Form.Text>
             Example:
             <br />
-            <span>
-              decade panther require cruise robust mail gadget advice tonight
-              post inner snack
-            </span>
+            decade panther require cruise robust mail gadget advice tonight post
+            inner snack
           </Form.Text>
           <Form.Control
             type="password"
@@ -80,12 +83,14 @@ export default ({
             className="mt-3"
           />
           <Form.Text>
-            <span>
-              This secret password is part of the BIP39 standard to generate
-              safer wallet seeds.
-            </span>
+            This secret password is part of the BIP39 standard to generate safer
+            wallet seeds.
           </Form.Text>
-          <CreateUnlockWalletPassword />
+          <CreateUnlockWalletPassword
+            setValidCreateUnlockWalletPassword={
+              setValidCreateUnlockWalletPassword
+            }
+          />
         </Form.Group>
         <Row className="justify-content-between">
           <Button variant="secondary" type="button">

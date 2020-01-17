@@ -15,7 +15,7 @@ export function saveEncryptedAccountInfo(
   keys: AccountKeys
 ): void {
   const plainTextAccountInfo = JSON.stringify(keys);
-  if (!unlockWalletPassword || unlockWalletPassword === '') {
+  if (!unlockWalletPassword) {
     throw new Error('Invalid unlock password');
   }
   const encryptedTextAccountInfo = aesEncrypt(

@@ -1,9 +1,14 @@
 // @flow
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
+import PropTypes from 'prop-types';
 
-// eslint-disable-next-line react/prop-types
-export default ({ setValidUnlockWalletPassword }) => {
+CreateUnlockWalletPassword.propTypes = {
+  setValidCreateUnlockWalletPassword: PropTypes.func
+};
+export default function CreateUnlockWalletPassword({
+  setValidCreateUnlockWalletPassword
+}) {
   const checkValidUnlockWalletPassword = function checkValidUnlockWalletPassword(
     pass
   ) {
@@ -33,7 +38,10 @@ export default ({ setValidUnlockWalletPassword }) => {
       isValidUnlockPassword = false;
     }
 
-    setValidUnlockWalletPassword(unlockWalletPassword, isValidUnlockPassword);
+    setValidCreateUnlockWalletPassword(
+      unlockWalletPassword,
+      isValidUnlockPassword
+    );
     return isValidUnlockPassword;
   };
 
@@ -77,10 +85,8 @@ export default ({ setValidUnlockWalletPassword }) => {
           className="mt-3"
         />
         <Form.Text>
-          <span>
-            This key allows you to unlock your wallet every time you start it
-            and to keep your account data in a more secure way.
-          </span>
+          This key allows you to unlock your wallet every time you start it and
+          to keep your account data in a more secure way.
         </Form.Text>
         <Form.Control.Feedback type="invalid">
           password and confirmation must be the same.
@@ -88,4 +94,4 @@ export default ({ setValidUnlockWalletPassword }) => {
       </Form.Group>
     </Form.Group>
   );
-};
+}

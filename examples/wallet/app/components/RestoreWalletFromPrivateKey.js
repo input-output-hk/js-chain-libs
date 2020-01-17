@@ -9,18 +9,12 @@ import CreateUnlockWalletPassword from '../containers/CreateUnlockWalletPassword
 import { getAccountFromPrivateKey } from '../utils/wasmWrapper';
 
 type Props = {
-  setAccount: SetAccount,
-  unlockWalletPassword: string,
-  isValidUnlockPassword: boolean
+  setAccount: SetAccount
 };
 
 // FIXME: this has no error handling, neither while parsing the address
 // nor when fetching the balance.
-export default ({
-  setAccount,
-  unlockWalletPassword,
-  isValidUnlockPassword
-}: Props) => {
+export default ({ setAccount }: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     if (isValidUnlockPassword) {
@@ -39,6 +33,17 @@ export default ({
         setPrivateKeyErrorMessage('Invalid private key');
       });
   };
+
+  const setValidCreateUnlockWalletPassword = function setValidCreateUnlockWalletPassword(
+    unlockPwd: string,
+    isValid: boolean
+  ): void {
+    setUnlockWalletPassword(unlockPwd);
+    setIsValidUnlockPassword(isValid);
+  };
+
+  const [unlockWalletPassword, setUnlockWalletPassword] = useState('');
+  const [isValidUnlockPassword, setIsValidUnlockPassword] = useState(false);
 
   const [newPrivateKey, setNewPrivateKey] = useState('');
   const [privateKeyErrorMessage, setPrivateKeyErrorMessage] = useState('');
@@ -63,11 +68,13 @@ export default ({
           <Form.Text>
             It&apos;s a string like:
             <br />
-            <span>
-              ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
-            </span>
+            ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
           </Form.Text>
-          <CreateUnlockWalletPassword />
+          <CreateUnlockWalletPassword
+            setValidCreateUnlockWalletPassword={
+              setValidCreateUnlockWalletPassword
+            }
+          />
         </Form.Group>
         <Row className="justify-content-center">
           <Button variant="primary" type="submit">
