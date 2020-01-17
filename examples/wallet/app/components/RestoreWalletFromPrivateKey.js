@@ -23,11 +23,15 @@ export default ({
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
     if (isValidUnlockPassword) {
-      setAccount(newPrivateKey, unlockWalletPassword);
+      return setAccount(newPrivateKey, unlockWalletPassword).catch(error => {
+        console.error(error);
+        setPrivateKeyErrorMessage('Invalid private key');
+      });
     }
   };
 
   const [newPrivateKey, setNewPrivateKey] = useState('');
+  const [privateKeyErrorMessage, setPrivateKeyErrorMessage] = useState('');
 
   return (
     <Container>
@@ -39,14 +43,18 @@ export default ({
             type="text"
             name="privateKey"
             value={newPrivateKey}
+            isInvalid={privateKeyErrorMessage}
             onChange={event => setNewPrivateKey(event.target.value)}
           />
+          <Form.Control.Feedback type="invalid">
+            {privateKeyErrorMessage}
+          </Form.Control.Feedback>
           <Form.Text>
             It&apos;s a string like:
             <br />
-            <em className="text-danger">
+            <span>
               ed25519e_sk15psr45hyqnpwcl8xd4lv0m32prenhh8kcltgte2305h5jgynndxect9274j0am0qmmd0snjuadnm6xkgssnkn2njvkg8et8qg0vevsgnwvmpl
-            </em>
+            </span>
           </Form.Text>
           <CreateUnlockWalletPassword />
         </Form.Group>

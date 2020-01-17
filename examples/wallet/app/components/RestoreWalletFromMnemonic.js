@@ -60,18 +60,16 @@ export default ({
             onChange={event => setNewMnemonicPhrase(event.target.value)}
             onBlur={() => checkIsValidMnemonicPhrase()}
           />
-          <Form.Label className="text-danger" hidden={isMnemonicValid}>
-            <em className="text-danger">
-              The phrase can have 12, 15, 18, 21 or 24 valid words.
-            </em>
-          </Form.Label>
+          <Form.Control.Feedback type="invalid">
+            The phrase can have 12, 15, 18, 21 or 24 valid words.
+          </Form.Control.Feedback>
           <Form.Text>
             Example:
             <br />
-            <em className="text-danger">
+            <span>
               decade panther require cruise robust mail gadget advice tonight
               post inner snack
-            </em>
+            </span>
           </Form.Text>
           <Form.Control
             type="password"
@@ -82,10 +80,10 @@ export default ({
             className="mt-3"
           />
           <Form.Text>
-            <em className="text-danger">
+            <span>
               This secret password is part of the BIP39 standard to generate
               safer wallet seeds.
-            </em>
+            </span>
           </Form.Text>
           <CreateUnlockWalletPassword />
         </Form.Group>

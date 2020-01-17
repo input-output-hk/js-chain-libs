@@ -42,9 +42,9 @@ export default ({ setKeysWithUnlockWalletPassword }: Props) => {
             isInvalid={isWrongSpendingPassword}
             onChange={event => setUnlockWalletPassword(event.target.value)}
           />
-          <Form.Label className="text-danger" hidden={!isWrongSpendingPassword}>
-            <code>Incorrect password</code>
-          </Form.Label>
+          <Form.Control.Feedback type="invalid">
+            Incorrect password
+          </Form.Control.Feedback>
         </Form.Group>
         <Row className="justify-content-center">
           <Button variant="primary" type="submit">

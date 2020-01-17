@@ -77,8 +77,10 @@ export default ({ setValidUnlockWalletPassword }) => {
           className="mt-3"
         />
         <Form.Text>
-          This key allows you to unlock your wallet every time you start it and
-          to keep your account data in a more secure way.
+          <span>
+            This key allows you to unlock your wallet every time you start it
+            and to keep your account data in a more secure way.
+          </span>
         </Form.Text>
         <Form.Control.Feedback type="invalid">
           password and confirmation must be the same.
