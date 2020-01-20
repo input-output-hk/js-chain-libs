@@ -6,7 +6,7 @@ exports[`SendTransaction component should match exact snapshot 1`] = `
   onSubmit={[Function]}
 >
   <div
-    className="form-group"
+    className="fieldWithFeedback form-group"
   >
     <label
       className="form-label"
@@ -26,13 +26,9 @@ exports[`SendTransaction component should match exact snapshot 1`] = `
     >
       Please enter a valid address
     </div>
-    <div>
-       
-      <br />
-    </div>
   </div>
   <div
-    className="form-group"
+    className="fieldWithFeedback form-group"
     htmlFor="amount"
   >
     <label
@@ -62,10 +58,6 @@ exports[`SendTransaction component should match exact snapshot 1`] = `
           className="valid-feedback"
         >
           After fee: 30
-        </div>
-        <div>
-           
-          <br />
         </div>
       </div>
       <div
