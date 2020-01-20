@@ -34,11 +34,12 @@ export default function nodeConnectionBuilder({
   injectedAxios,
   injectedGrpcClient
 }: {
-  injectedAxios?: typeof axios,
-  injectedGrpcClient?: typeof grpcClient
+  injectedAxios?: any,
+  injectedGrpcClient?: any
 } = {}) {
-  const axiosInstance = injectedAxios || axios;
-  const grpcClientInstance = injectedGrpcClient || grpcClient;
+  const axiosInstance = ((injectedAxios: any): typeof axios) || axios;
+  const grpcClientInstance =
+    (injectedGrpcClient: typeof grpcClient) || grpcClient;
   const getAccountState = function getAccountState(
     identifier: Identifier
   ): Promise<AccountState> {
