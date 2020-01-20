@@ -24,15 +24,15 @@ import {
   typeof buildSendFundsTransaction as BuildSendFundsTransaction,
   typeof buildDelegateTransaction as BuildDelegateTransaction
 } from '../utils/wasmWrapper';
-import {
-  getAccountState,
-  typeof broadcastTransaction as BroadcastTransaction,
-  getTransactions
+import nodeConnectionBuilder, {
+  type BroadcastTransaction
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
 import { saveAccountInfoInLocalStorage } from '../utils/storage';
 
 import routes from '../constants/routes.json';
+
+const { getAccountState, getTransactions } = nodeConnectionBuilder();
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';

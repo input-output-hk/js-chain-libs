@@ -1,7 +1,9 @@
 // @flow
 import type { Dispatch } from 'redux';
 import type { Pool } from '../models';
-import { getStakePools } from '../utils/nodeConnection';
+import nodeConnectionBuilder from '../utils/nodeConnection';
+
+const { getStakePools } = nodeConnectionBuilder();
 
 export type SetStakePoolsAction = {
   type: 'STAKEPOOL_INFO_UPDATED',

@@ -7,7 +7,9 @@ import {
   buildSendFundsTransaction,
   isValidAddress
 } from '../utils/wasmWrapper';
-import { broadcastTransaction } from '../utils/nodeConnection';
+import nodeConnectionBuilder from '../utils/nodeConnection';
+
+const { broadcastTransaction } = nodeConnectionBuilder();
 
 function mapStateToProps(state) {
   return { balance: state.account.balance, nodeSettings: state.nodeSettings };

@@ -4,7 +4,9 @@ import { connect } from 'react-redux';
 import StakeDelegation from '../components/StakeDelegation';
 import { buildDelegationAction } from '../actions/account';
 import { buildDelegateTransaction } from '../utils/wasmWrapper';
-import { broadcastTransaction } from '../utils/nodeConnection';
+import nodeConnectionBuilder from '../utils/nodeConnection';
+
+const { broadcastTransaction } = nodeConnectionBuilder();
 
 function mapStateToProps(state) {
   return { privateKey: state.account.privateKey };
