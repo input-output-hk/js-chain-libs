@@ -8,7 +8,7 @@ import { HandshakeRequest, HandshakeResponse } from '../generated/node_pb';
 import type {
   Address,
   Identifier,
-  PoolId,
+  Pool,
   Transaction,
   Balance,
   Delegation,
@@ -120,11 +120,22 @@ export function getNodeSettings(): Promise<NodeSettings> {
     }));
 }
 
-export function getStakePools(): Promise<Array<PoolId>> {
-  return axios.get(`${BASE_REST_URL}/stake_pools`).then(({ data }) => data);
+export function getStakePools(): Promise<Array<Pool>> {
+  return axios
+    .post(`${NODE_URL}:${REST_PORT}/explorer/graphql`, {
+      operationName: 'getStakepoolDetails',
+      query: graphQlGetStakepoolDetails
+    })
+    .then(({ data: { data: { allStakePools: { edges } } } }) =>
+      edges.map(({ node: { id, registration: { owners, operators } } }) => ({
+        id,
+        owners,
+        operators
+      }))
+    );
 }
 
-export function broadcastTransaction(tx: Uint8Array): Promise<void> {
+export function broadcastTransaction(tx: Uint8Array): Promise<mixed> {
   return axios.post(`${BASE_REST_URL}/message`, tx, {
     headers: {
       'content-type': 'application/octet-stream'
@@ -174,6 +185,21 @@ const graphQlGetTransactionsQuery =
               id\
             }\
           }\
+        }\
+      }\
+    }\
+  }\
+}';
+
+const graphQlGetStakepoolDetails =
+  'query getStakepoolDetails {\
+  allStakePools{\
+    edges{\
+      node{\
+        id\
+        registration{\
+          operators\
+          owners\
         }\
       }\
     }\

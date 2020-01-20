@@ -8,7 +8,7 @@ import type {
   PrivateKey,
   Delegation,
   Identifier,
-  PoolId,
+  Pool,
   Transaction
 } from '../models';
 
@@ -53,5 +53,5 @@ export type NodeSettings = {
 };
 
 export type StakePools = {
-  availablePools: Array<PoolId>
+  availablePools: Array<Pool>
 };
