@@ -15,7 +15,7 @@
   },
   "rules": {
     "func-names": "error",
-    "new-cap": "off",
+    "new-cap": ["off", { "capIsNewExceptionPattern": "^Aesjs\.." }],
     "arrow-parens": "off",
     "consistent-return": "off",
     "comma-dangle": "off",

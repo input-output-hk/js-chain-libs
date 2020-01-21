@@ -1,18 +1,43 @@
 // @flow
 import type { AccountKeys } from '../reducers/types';
-import type { Address, Identifier, PrivateKey } from '../models';
+import { aesEncrypt, aesDecrypt } from './decrypt';
 
-export function saveAccountInfoInLocalStorage(keys: AccountKeys): void {
-  Object.keys(keys).forEach(key => localStorage.setItem(key, keys[key]));
+const WALLET_ENCRYPTED_KEYS = 'wallet.encrypted.account.info';
+
+export function isUnlockWalletPasswordCreated(): boolean {
+  const encryptedAccountInfo = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
+  if (encryptedAccountInfo) return true;
+  return false;
 }
 
-export function readAccountKeysFromLocalStorage(): ?AccountKeys {
-  if (localStorage.getItem('privateKey')) {
-    return {
-      address: (localStorage.getItem('address'): Address),
-      identifier: (localStorage.getItem('identifier'): Identifier),
-      privateKey: (localStorage.getItem('privateKey'): PrivateKey)
-    };
+export function saveEncryptedAccountInfo(
+  unlockWalletPassword: string,
+  keys: AccountKeys
+): void {
+  const plainTextAccountInfo = JSON.stringify(keys);
+  if (!unlockWalletPassword) {
+    throw new Error('Invalid unlock password');
+  }
+  const encryptedTextAccountInfo = aesEncrypt(
+    unlockWalletPassword,
+    plainTextAccountInfo
+  );
+  localStorage.setItem(WALLET_ENCRYPTED_KEYS, encryptedTextAccountInfo);
+}
+
+// eslint-disable-next-line flowtype/space-after-type-colon
+export function readEncryptedAccountInfo(
+  unlockWalletPassword: string
+): ?AccountKeys {
+  const encryptedHex = localStorage.getItem(WALLET_ENCRYPTED_KEYS);
+  try {
+    if (encryptedHex && encryptedHex.length > 0) {
+      const plainText = aesDecrypt(unlockWalletPassword, encryptedHex);
+      const accountKeys = JSON.parse(plainText);
+      return accountKeys;
+    }
+  } catch (e) {
+    console.error('There was an error unlocking wallet', e.toString());
   }
   return undefined;
 }

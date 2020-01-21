@@ -30,47 +30,38 @@ import {
   getTransactions
 } from '../utils/nodeConnection';
 import { isValidMnemonic, createSeedFromMnemonic } from '../utils/mnemonic';
-import { saveAccountInfoInLocalStorage } from '../utils/storage';
+import {
+  saveEncryptedAccountInfo,
+  readEncryptedAccountInfo
+} from '../utils/storage';
 
 import routes from '../constants/routes.json';
 
 export type SetKeysAction = { type: 'SET_KEYS' } & AccountKeys;
 export const SET_KEYS = 'SET_KEYS';
-export const PRIVATE_KEY_ERROR = 'privateKeyError';
-export const ACCOUNT_STATE_ERROR = 'accountStateError';
 
-export function setAccount(privateKey: string): Thunk {
+export function setAccount(
+  privateKey: string,
+  unlockWalletPassword: string
+): Thunk<SetKeysAction> {
   return function setAccountThunk(dispatch) {
-    return getAccountFromPrivateKey(privateKey).then(
-      curry(initializeKeysAndRedirect)(dispatch)
+    return getAccountFromPrivateKey(privateKey).then(keys =>
+      curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
     );
   };
 }
 
-export function setAccountFromPrivateKey(privateKey: string): Thunk {
-  return function setAccountFromPrivateKeyThunk(dispatch) {
-    getAccountFromPrivateKey(privateKey)
-      .then(loadedPrivateKey => {
-        dispatch({
-          type: SET_KEYS,
-          ...loadedPrivateKey
-        });
-        return dispatch(updateAccountTransactionsAndState());
-      })
-      .catch(error => {
-        console.error(error);
-        throw new Error(PRIVATE_KEY_ERROR);
-      });
-  };
-}
-
-export function updateAccountTransactionsAndState(): Thunk {
-  return function updateAccountTransactionsAndStateThunk(dispatch) {
-    return Promise.all([
-      dispatch(updateAccountTransactions()),
-      dispatch(updateNodeSettings()),
-      dispatch(updateAccountState())
-    ]).then(() => dispatch(push(routes.WALLET)));
+export function setKeysWithUnlockWalletPassword(
+  unlockWalletPassword: string = ''
+): Thunk<SetKeysAction> {
+  return function setKeysWithUnlockWalletPasswordThunk(dispatch) {
+    const accountKeys = readEncryptedAccountInfo(unlockWalletPassword);
+    if (accountKeys) {
+      return getAccountFromPrivateKey(accountKeys.privateKey).then(keys =>
+        curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
+      );
+    }
+    throw new Error('Invalid password');
   };
 }
 
@@ -83,30 +74,36 @@ export function updateAccountTransactionsAndState(): Thunk {
  * @param {boolean} saveAccount If true, the keys are stored in the local storage
  */
 const initializeKeysAndRedirect = (
-  dispatch: Dispatch<SetKeysAction>,
+  dispatch: Dispatch,
   keys: AccountKeys,
-  saveAccount?: boolean = true
+  unlockWalletPassword: string = ''
 ) => {
   dispatch({
     type: SET_KEYS,
     ...keys
   });
-  if (saveAccount) {
-    saveAccountInfoInLocalStorage(keys);
-  }
 
-  return dispatch(updateAccountTransactionsAndState());
+  saveEncryptedAccountInfo(unlockWalletPassword, keys);
+
+  return Promise.all([
+    dispatch(updateAccountTransactions()),
+    dispatch(updateNodeSettings()),
+    dispatch(updateAccountState())
+  ])
+    .catch(console.error)
+    .then(() => dispatch(push(routes.WALLET)));
 };
 
 export function setAccountFromMnemonic(
   mnemonicPhrase: string,
-  mnemonicPassword?: string
-) {
+  mnemonicPassword: string,
+  unlockWalletPassword: string
+): Thunk<SetKeysAction> {
   if (isValidMnemonic(mnemonicPhrase)) {
     const seed = createSeedFromMnemonic(mnemonicPhrase, mnemonicPassword);
     return function setAccountThunk(dispatch) {
-      return getAccountFromSeed(seed).then(
-        curry(initializeKeysAndRedirect)(dispatch)
+      return getAccountFromSeed(seed).then(keys =>
+        curry(initializeKeysAndRedirect)(dispatch, keys, unlockWalletPassword)
       );
     };
   }
@@ -119,7 +116,7 @@ export type SetAccountStateAction = {
 } & AccountState;
 export const SET_ACCOUNT_STATE = 'SET_ACCOUNT_STATE';
 
-export function updateAccountState(): Thunk {
+export function updateAccountState(): Thunk<SetAccountStateAction> {
   return function updateAccountStateThunk(dispatch, getState) {
     const { identifier }: { identifier: Identifier } = getState().account;
     if (!identifier) {
@@ -139,7 +136,7 @@ export function updateAccountState(): Thunk {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching account info');
-          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
+          return Promise.reject();
         })
     );
   };
@@ -151,7 +148,7 @@ export type SetTransactionsAction = {
 };
 export const SET_TRANSACTIONS = 'SET_TRANSACTIONS';
 
-export function updateAccountTransactions(): Thunk {
+export function updateAccountTransactions(): Thunk<SetAccountStateAction> {
   return function updateAccountTransactionsThunk(dispatch, getState) {
     const { address }: { address: Address } = getState().account;
     if (!address) {
@@ -171,7 +168,7 @@ export function updateAccountTransactions(): Thunk {
         // TODO: display a notification or something
         .catch(() => {
           console.error('there was an error fetching transactions');
-          return Promise.reject(new Error(ACCOUNT_STATE_ERROR));
+          return Promise.reject();
         })
     );
   };
