@@ -5,13 +5,13 @@ import Row from 'react-bootstrap/Row';
 import styles from './ListingRow.scss';
 
 type Props = {
-  key: string | number,
+  itemKey: string | number,
   className?: string,
   children: Node
 };
 
-export default ({ key, className, children }: Props) => (
-  <Row key={key} className={`${className || ''} ${styles.row}`}>
+export default ({ itemKey, className, children }: Props) => (
+  <Row key={itemKey} className={`${className || ''} ${styles.row}`}>
     {children}
   </Row>
 );

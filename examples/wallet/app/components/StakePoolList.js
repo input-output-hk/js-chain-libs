@@ -36,7 +36,7 @@ export default ({
           const currentDelegationPercentage =
             currentDelegation && percentageFromParts(currentDelegation, poolId);
           return (
-            <ListingRow key={poolId}>
+            <ListingRow itemKey={poolId}>
               <Col style={rowStyles} className={styles.poolId} xs={4}>
                 {poolId}
               </Col>
