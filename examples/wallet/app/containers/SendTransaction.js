@@ -3,7 +3,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import SendTransaction from '../components/SendTransaction';
 import { buildSendFundsAction } from '../actions/account';
-import { buildSendFundsTransaction } from '../utils/wasmWrapper';
+import {
+  buildSendFundsTransaction,
+  isValidAddress
+} from '../utils/wasmWrapper';
 import { broadcastTransaction } from '../utils/nodeConnection';
 
 function mapStateToProps(state) {
@@ -22,4 +25,13 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SendTransaction);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    isValidAddress
+  })
+)(SendTransaction);

@@ -10,23 +10,34 @@ import type { SendFunds } from '../actions/account';
 import styles from './SendTransaction.scss';
 import type { Balance } from '../models';
 import type { NodeSettings } from '../reducers/types';
-import { isValidAddress } from '../utils/wasmWrapper';
+import { typeof isValidAddress as IsValidAddress } from '../utils/wasmWrapper';
 import feeCalculator from '../utils/feeCalculator';
 
 type Props = {
   sendFunds: SendFunds,
   balance: Balance,
-  nodeSettings: NodeSettings
+  nodeSettings: NodeSettings,
+  isValidAddress: IsValidAddress
 };
 
-export default ({ balance, nodeSettings, sendFunds }: Props) => {
+export default ({
+  balance,
+  nodeSettings,
+  sendFunds,
+  isValidAddress
+}: Props) => {
   const handleSubmit = function handleSubmit(event) {
     event.preventDefault();
-    sendFunds(destinationAddress, Number(amount));
+    sendFunds(destinationAddress, Number(amount))
+      .then(() => {
+        console.log('success!');
+        return setAmount('');
+      })
+      .catch(error => console.error('couldnt send funds: ', error));
   };
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [validAddress, setValidAddress] = useState<boolean>(false);
-  const [amount, setAmount] = useState<?number>();
+  const [amount, setAmount] = useState<number | ''>('');
   const isValidAmount = (value, currentBalance) =>
     transactionFee + value <= currentBalance &&
     typeof value === 'number' &&
@@ -41,9 +52,24 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
     config.get('formDebounceInterval')
   );
 
+  const computeAmountErrorMessage = (): string => {
+    if (typeof amount === 'number') {
+      if (amount <= 0) {
+        return 'Balance must be positive';
+      }
+      if (amount > balance - transactionFee) {
+        if (balance < transactionFee) {
+          return 'Your balance is lower than the transaction fees :(';
+        }
+        return `Insufficient balance. Max: ${balance - transactionFee}`;
+      }
+    }
+    return '';
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group>
+      <Form.Group className={styles.fieldWithFeedback}>
         <Form.Label htmlFor="recipient">Recipient:</Form.Label>
         <Form.Control
           type="text"
@@ -51,9 +77,9 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
           isInvalid={!validAddress && destinationAddress}
           isValid={destinationAddress && validAddress}
           value={destinationAddress}
-          onChange={event => {
-            debouncedAddressValidator(event.target.value);
-            setDestinationAddress(event.target.value);
+          onChange={({ target: { value } }) => {
+            setDestinationAddress(value);
+            debouncedAddressValidator(value);
           }}
         />
         <Form.Control.Feedback type="invalid">
@@ -61,7 +87,7 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Form.Group htmlFor="amount">
+      <Form.Group htmlFor="amount" className={styles.fieldWithFeedback}>
         <Form.Label>Amount:</Form.Label>
         <Row>
           <Col xs="10">
@@ -82,18 +108,13 @@ export default ({ balance, nodeSettings, sendFunds }: Props) => {
               onChange={({ target: { value } }) => setAmount(Number(value))}
             />
             <Form.Control.Feedback type="invalid">
-              {typeof amount === 'number' && amount <= 0
-                ? 'Balance must be positive'
-                : `insufficient balance. Max: ${balance - transactionFee}`}
+              {computeAmountErrorMessage()}
             </Form.Control.Feedback>
             <Form.Control.Feedback type="valid">
               {`After fee: ${transactionFee + amount}`}
             </Form.Control.Feedback>
           </Col>
-          <Col
-            xs="2"
-            className={`align-self-center text-align ${styles.unitLabel}`}
-          >
+          <Col xs="2" className={`align-self-start mt-2 ${styles.unitLabel}`}>
             {config.get('coinName')}
           </Col>
         </Row>
