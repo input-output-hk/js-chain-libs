@@ -5,6 +5,7 @@ import routes from './constants/routes.json';
 import App from './containers/App';
 import Wallet from './pages/Wallet';
 import Send from './pages/Send';
+import OwnStakepools from './pages/OwnStakepools';
 import Settings from './pages/Settings';
 import ChooseRestoreOrImport from './containers/ChooseRestoreOrImport';
 import Delegate from './pages/Delegate';
@@ -14,6 +15,7 @@ import InputKeys from './containers/InputKeys';
 export default () => (
   <App>
     <Switch>
+      <Route path={routes.OWN_STAKEPOOLS} component={OwnStakepools} />
       <Route path={routes.WALLET} component={Wallet} />
       <Route path={routes.SEND} component={Send} />
       <Route path={routes.STAKING} component={Delegate} />
