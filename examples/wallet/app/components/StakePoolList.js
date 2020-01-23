@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import ListingColumn from './Listing/ListingColumn';
 import ListingTable from './Listing/ListingTable';
 import type { NewDelegation, PoolId, Delegation } from '../models';
 import type { PoolSelectionHandler } from './StakeDelegation';
@@ -37,16 +37,16 @@ export default ({
             currentDelegation && percentageFromParts(currentDelegation, poolId);
           return (
             <ListingRow itemKey={poolId}>
-              <Col as="td" style={rowStyles} className={styles.poolId} xs={4}>
+              <ListingColumn style={rowStyles} className={styles.poolId} xs={4}>
                 {poolId}
-              </Col>
-              <Col as="td" style={rowStyles} xs={2}>
+              </ListingColumn>
+              <ListingColumn style={rowStyles} xs={2}>
                 {newDelegationPercentage}%
-              </Col>
-              <Col as="td" xs={2}>
+              </ListingColumn>
+              <ListingColumn xs={2}>
                 {currentDelegationPercentage}%
-              </Col>
-              <Col as="td" xs={3}>
+              </ListingColumn>
+              <ListingColumn xs={3}>
                 <Row className="justify-content-between">
                   <Button
                     type="button"
@@ -65,7 +65,7 @@ export default ({
                     Add delegation
                   </Button>
                 </Row>
-              </Col>
+              </ListingColumn>
             </ListingRow>
           );
         })}
