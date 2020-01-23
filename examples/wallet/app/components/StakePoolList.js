@@ -3,11 +3,11 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Container from 'react-bootstrap/Container';
+import ListingTable from './Listing/ListingTable';
 import type { NewDelegation, PoolId, Delegation } from '../models';
 import type { PoolSelectionHandler } from './StakeDelegation';
 import { percentageFromParts } from '../utils/proportionsHelper';
-import ListingRow from './ListingRow';
+import ListingRow from './Listing/ListingRow';
 import styles from './StakePoolList.scss';
 
 type Props = {
@@ -24,7 +24,7 @@ export default ({
   newDelegation
 }: Props) => {
   return (
-    <Container>
+    <ListingTable>
       {stakePools &&
         stakePools.map((poolId: PoolId) => {
           const activeDelegation = newDelegation[poolId];
@@ -37,14 +37,16 @@ export default ({
             currentDelegation && percentageFromParts(currentDelegation, poolId);
           return (
             <ListingRow itemKey={poolId}>
-              <Col style={rowStyles} className={styles.poolId} xs={4}>
+              <Col as="td" style={rowStyles} className={styles.poolId} xs={4}>
                 {poolId}
               </Col>
-              <Col style={rowStyles} xs={2}>
+              <Col as="td" style={rowStyles} xs={2}>
                 {newDelegationPercentage}%
               </Col>
-              <Col xs={2}>{currentDelegationPercentage}%</Col>
-              <Col xs={3}>
+              <Col as="td" xs={2}>
+                {currentDelegationPercentage}%
+              </Col>
+              <Col as="td" xs={3}>
                 <Row className="justify-content-between">
                   <Button
                     type="button"
@@ -67,6 +69,6 @@ export default ({
             </ListingRow>
           );
         })}
-    </Container>
+    </ListingTable>
   );
 };

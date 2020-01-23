@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default ({ itemKey, className, children }: Props) => (
-  <Row key={itemKey} className={`${className || ''} ${styles.row}`}>
+  <Row as="tr" key={itemKey} className={`${className || ''} ${styles.row}`}>
     {children}
   </Row>
 );

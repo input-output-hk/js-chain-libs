@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
 import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
 import curry from 'lodash/curry';
 import ClickableBox from 'clickable-box';
 import config from 'config';
 // FIXME: this is obviously not portable to a webapp
 import { shell } from 'electron';
+import ListingTable from './Listing/ListingTable';
 import type {
   Transaction,
   Address,
@@ -14,7 +14,7 @@ import type {
   TransactionOutput
 } from '../models';
 import styles from './TransactionListing.scss';
-import ListingRow from './ListingRow';
+import ListingRow from './Listing/ListingRow';
 
 type Props = {
   transactions: Array<Transaction>,
@@ -23,9 +23,9 @@ type Props = {
 
 export default ({ transactions, myAddress }: Props) => {
   return (
-    <Container>
+    <ListingTable>
       {transactions.map(curry(transactionToRow)(myAddress))}
-    </Container>
+    </ListingTable>
   );
 };
 
