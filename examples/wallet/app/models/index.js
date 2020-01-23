@@ -21,6 +21,11 @@ export type Certificate = {
   type: CertificateType,
   pools: Array<PoolId>
 };
+export type Pool = {
+  id: PoolId,
+  owners: Array<PublicKey>,
+  operators: Array<PublicKey>
+};
 
 export type Transaction = {
   id: TransactionHash,

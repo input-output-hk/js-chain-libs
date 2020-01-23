@@ -1,23 +1,25 @@
 // @flow
 import type { Dispatch } from 'redux';
-import type { PoolId } from '../models';
-import { getStakePools } from '../utils/nodeConnection';
+import type { Pool } from '../models';
+import nodeConnectionBuilder from '../utils/nodeConnection';
+
+const { getStakePools } = nodeConnectionBuilder();
 
 export type SetStakePoolsAction = {
-  type: 'SET_STAKEPOOLS',
-  stakePools: Array<PoolId>
+  type: 'STAKEPOOL_INFO_UPDATED',
+  stakePools: Array<Pool>
 };
-export const SET_STAKEPOOLS = 'SET_STAKEPOOLS';
+export const STAKEPOOL_INFO_UPDATED = 'STAKEPOOL_INFO_UPDATED';
 
 export function setStakePools(): (
   dispatch: Dispatch<SetStakePoolsAction>
-) => Promise<SetStakePoolsAction> {
+) => Promise<mixed> {
   return function setStakePoolsThunk(dispatch) {
     return (
       getStakePools()
-        .then((stakePools: Array<PoolId>) =>
+        .then((stakePools: Array<Pool>) =>
           dispatch({
-            type: SET_STAKEPOOLS,
+            type: STAKEPOOL_INFO_UPDATED,
             stakePools
           })
         )

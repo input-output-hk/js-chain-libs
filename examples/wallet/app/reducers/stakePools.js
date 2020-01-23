@@ -1,5 +1,5 @@
 // @flow
-import { SET_STAKEPOOLS } from '../actions/stakePools';
+import { STAKEPOOL_INFO_UPDATED } from '../actions/stakePools';
 import type { StakePools } from './types';
 import type { SetStakePoolsAction } from '../actions/stakePools';
 
@@ -11,7 +11,7 @@ export default function stakePools(
     return { availablePools: [] };
   }
   switch (action.type) {
-    case SET_STAKEPOOLS:
+    case STAKEPOOL_INFO_UPDATED:
       return Object.assign(state, { availablePools: action.stakePools });
     default:
       return state;

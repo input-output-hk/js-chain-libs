@@ -10,6 +10,7 @@ import walletIcon from '../assets/images/wallet-ic.inline.svg';
 import sendIcon from '../assets/images/send-ic.inline.svg';
 import settingsIcon from '../assets/images/settings-ic.inline.svg';
 import delegationIcon from '../assets/images/delegation-ic.inline.svg';
+import stakePoolListIcon from '../assets/images/list-ic.inline.svg';
 import routes from '../constants/routes.json';
 
 type Props = {
@@ -51,6 +52,12 @@ const SidebarContent = (props: SidebarContentProps) => {
           route={routes.STAKING}
           icon={delegationIcon}
           text="delegate"
+          {...props}
+        />
+        <ResponsiveSidebarItem
+          route={routes.OWN_STAKEPOOLS}
+          icon={stakePoolListIcon}
+          text="pools"
           {...props}
         />
       </div>
