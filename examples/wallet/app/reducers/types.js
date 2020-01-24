@@ -6,6 +6,7 @@ import type {
   Balance,
   Counter,
   PrivateKey,
+  PublicKey,
   Delegation,
   Identifier,
   Pool,
@@ -34,6 +35,7 @@ export type Account = AccountKeys &
 export type AccountKeys = {
   address: Address,
   privateKey: PrivateKey,
+  publicKey: PublicKey,
   identifier: Identifier
 };
 
