@@ -52,7 +52,7 @@ async function getAccountDataFromPrivateKey(
     .to_string(config.get('addressPrefix'));
   return {
     address,
-    publicKey,
+    publicKey: publicKey.to_bech32(),
     privateKey: secret,
     identifier: identifier.to_hex()
   };
