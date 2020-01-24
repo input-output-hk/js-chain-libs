@@ -3,6 +3,8 @@
   "WALLET": "/wallet",
   "CHOOSE_RESTORE_OR_IMPORT": "/choose_restore_or_import",
   "INPUT_KEYS": "/input_keys",
+  "CREATE_WALLET_KEYS": "/create_wallet_keys",
+  "REVEAL_MNEMONIC_PHRASE": "/reveal_mnemonic_phrase",
   "SEND": "/send",
   "STAKING": "/staking",
   "SETTINGS": "/settings",
