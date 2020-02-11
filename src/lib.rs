@@ -356,6 +356,12 @@ impl From<tx::Input> for Input {
     }
 }
 
+#[wasm_bindgen]
+pub enum InputKind {
+    Account,
+    Utxo,
+}
+
 /// Generalized input which have a specific input value, and
 /// either contains an account reference or a TransactionSignDataHash+index
 ///
@@ -371,11 +377,10 @@ impl Input {
         Input(tx::Input::from_account(identifier.0, v.0))
     }
 
-    /// Get the kind of Input, this can be either "Account" or "Utxo"
-    pub fn get_type(&self) -> String {
+    pub fn get_type(&self) -> InputKind {
         match self.0.get_type() {
-            tx::InputType::Account => "Account".to_string(),
-            tx::InputType::Utxo => "Utxo".to_string(),
+            tx::InputType::Account => InputKind::Account,
+            tx::InputType::Utxo => InputKind::Utxo,
         }
     }
 
@@ -411,6 +416,18 @@ impl Input {
             tx::InputEnum::AccountInput(account, _) => Ok(AccountIdentifier(account)),
             _ => Err(JsValue::from_str("Input is not from account")),
         }
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.0.bytes().to_vec()
+    }
+
+    pub fn from_bytes(bytes: Uint8Array) -> Result<Input, JsValue> {
+        let mut slice: Box<[u8]> = vec![0; bytes.length() as usize].into_boxed_slice();
+        bytes.copy_to(&mut *slice);
+        tx::Input::deserialize(&*slice)
+            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+            .map(Input)
     }
 }
 
