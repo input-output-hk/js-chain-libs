@@ -256,7 +256,7 @@
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.10.1",
     "webpack-merge": "4.2.2",
-    "yarn": "1.21.1"
+    "yarn": "1.22.0"
   },
   "dependencies": {
     "@forevolve/bootstrap-dark": "1.0.0-alpha.863",
