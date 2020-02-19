@@ -285,8 +285,8 @@ pub struct AccountBindingSignature(tx::AccountBindingSignature);
 impl AccountBindingSignature {
     pub fn new_single(private_key: &PrivateKey, auth_data: &TransactionBindingAuthData) -> Self {
         Self(tx::AccountBindingSignature::new_single(
-            &private_key.0,
             &tx::TransactionBindingAuthData(auth_data.0.as_slice()),
+            |sd| private_key.0.sign_slice(&sd.0),
         ))
     }
 }
