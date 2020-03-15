@@ -57,16 +57,14 @@ impl PrivateKey {
         self.0.to_public().into()
     }
 
-    // todo remove Result
-    pub fn generate_ed25519() -> Result<PrivateKey, JsValue> {
+    pub fn generate_ed25519() -> PrivateKey {
         let key = crypto::SecretKey::<crypto::Ed25519>::generate(OsRng);
-        Ok(PrivateKey(key::EitherEd25519SecretKey::Normal(key)))
+        PrivateKey(key::EitherEd25519SecretKey::Normal(key))
     }
 
-    // todo remove Result
-    pub fn generate_ed25519extended() -> Result<PrivateKey, JsValue> {
+    pub fn generate_ed25519extended() -> PrivateKey {
         let key = crypto::SecretKey::<crypto::Ed25519Extended>::generate(OsRng);
-        Ok(PrivateKey(key::EitherEd25519SecretKey::Extended(key)))
+        PrivateKey(key::EitherEd25519SecretKey::Extended(key))
     }
 
     pub fn to_bech32(&self) -> String {
