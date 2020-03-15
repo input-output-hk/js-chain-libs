@@ -14,7 +14,7 @@ use chain_impl_mockchain as chain;
 use crypto::bech32::Bech32 as _;
 use hex;
 use js_sys::Uint8Array;
-use rand_os::OsRng;
+use rand_core::OsRng;
 use std::convert::TryFrom;
 use std::ops::{Add, Sub};
 use std::str::FromStr;
@@ -57,20 +57,14 @@ impl PrivateKey {
         self.0.to_public().into()
     }
 
-    pub fn generate_ed25519() -> Result<PrivateKey, JsValue> {
-        OsRng::new()
-            .map(crypto::SecretKey::<crypto::Ed25519>::generate)
-            .map(key::EitherEd25519SecretKey::Normal)
-            .map(PrivateKey)
-            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    pub fn generate_ed25519() -> PrivateKey {
+        let key = crypto::SecretKey::<crypto::Ed25519>::generate(OsRng);
+        PrivateKey(key::EitherEd25519SecretKey::Normal(key))
     }
 
-    pub fn generate_ed25519extended() -> Result<PrivateKey, JsValue> {
-        OsRng::new()
-            .map(crypto::SecretKey::<crypto::Ed25519Extended>::generate)
-            .map(key::EitherEd25519SecretKey::Extended)
-            .map(PrivateKey)
-            .map_err(|e| JsValue::from_str(&format!("{}", e)))
+    pub fn generate_ed25519extended() -> PrivateKey {
+        let key = crypto::SecretKey::<crypto::Ed25519Extended>::generate(OsRng);
+        PrivateKey(key::EitherEd25519SecretKey::Extended(key))
     }
 
     pub fn to_bech32(&self) -> String {
@@ -1021,7 +1015,7 @@ impl Witness {
         Witness(tx::Witness::new_utxo(
             &genesis_hash.0,
             &transaction_id.0,
-            &secret_key.0,
+            |tsd| secret_key.0.sign(tsd),
         ))
     }
 
@@ -1037,7 +1031,7 @@ impl Witness {
             &genesis_hash.0,
             &transaction_id.0,
             &account_spending_counter.0,
-            &secret_key.0,
+            |tsd| secret_key.0.sign(tsd),
         ))
     }
 
