@@ -25,6 +25,9 @@ macro_rules! map_payloads {
             $crate::transaction::TaggedTransaction::PoolRegistration($with) => $body,
             $crate::transaction::TaggedTransaction::PoolUpdate($with) => $body,
             $crate::transaction::TaggedTransaction::PoolRetirement($with) => $body,
+            $crate::transaction::TaggedTransaction::VotePlan($with) => $body,
+            $crate::transaction::TaggedTransaction::VoteCast($with) => $body,
+            $crate::transaction::TaggedTransaction::VoteTally($with) => $body,
         }
     };
 }
@@ -37,6 +40,9 @@ pub enum TaggedTransaction {
     PoolRegistration(tx::Transaction<certificate::PoolRegistration>),
     PoolRetirement(tx::Transaction<certificate::PoolRetirement>),
     PoolUpdate(tx::Transaction<certificate::PoolUpdate>),
+    VotePlan(tx::Transaction<certificate::VotePlan>),
+    VoteCast(tx::Transaction<certificate::VoteCast>),
+    VoteTally(tx::Transaction<certificate::VoteTally>),
 }
 
 impl TaggedTransaction {
