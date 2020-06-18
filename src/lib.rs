@@ -20,6 +20,8 @@ use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
+pub use utils::set_panic_hook;
+
 pub use transaction::*;
 
 /// ED25519 signing key, either normal or extended
