@@ -808,7 +808,7 @@ impl PoolRegistration {
             rewards: chain::rewards::TaxType::zero(),
             // TODO: Hardcoded parameter
             reward_account: None,
-            keys: chain::leadership::genesis::GenesisPraosLeader {
+            keys: chain_impl_mockchain::key::GenesisPraosLeader {
                 kes_public_key: kes_public_key.0,
                 vrf_public_key: vrf_public_key.0,
             },
@@ -977,7 +977,7 @@ impl Fee {
         use fee::FeeAlgorithm;
         let v = map_payloads!(tx.0, tx, {
             fee_algorithm.calculate(
-                tx.as_slice().payload().to_certificate_slice(),
+                tx.as_slice().payload().into_certificate_slice(),
                 tx.nb_inputs(),
                 tx.nb_outputs(),
             )
@@ -1032,7 +1032,7 @@ impl Witness {
         Witness(tx::Witness::new_account(
             &genesis_hash.0,
             &transaction_id.0,
-            &account_spending_counter.0,
+            account_spending_counter.0,
             |sd| secret_key.0.sign(sd),
         ))
     }

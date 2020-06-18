@@ -10,6 +10,9 @@ macro_rules! transition_from_to {
             $from::PoolRegistration($with) => $to::PoolRegistration($body),
             $from::PoolUpdate($with) => $to::PoolUpdate($body),
             $from::PoolRetirement($with) => $to::PoolRetirement($body),
+            $from::VotePlan($with) => $to::VotePlan($body),
+            $from::VoteCast($with) => $to::VoteCast($body),
+            $from::VoteTally($with) => $to::VoteTally($body),
         }
     };
 }
@@ -23,6 +26,9 @@ macro_rules! for_all_payloads {
             $from::PoolRegistration($with) => $body,
             $from::PoolUpdate($with) => $body,
             $from::PoolRetirement($with) => $body,
+            $from::VotePlan($with) => $body,
+            $from::VoteCast($with) => $body,
+            $from::VoteTally($with) => $body,
         }
     };
 }
@@ -49,6 +55,9 @@ enum TaggedTransactionBuilderSetIOs {
     PoolRegistration(tx::TxBuilderState<tx::SetIOs<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetIOs<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetIOs<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetIOs<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetIOs<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetIOs<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -61,6 +70,9 @@ enum TaggedTransactionBuilderSetWitness {
     PoolRegistration(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetWitnesses<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetWitnesses<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetWitnesses<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -73,6 +85,9 @@ enum TaggedTransactionBuilderSetAuthData {
     PoolRegistration(tx::TxBuilderState<tx::SetAuthData<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetAuthData<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetAuthData<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetAuthData<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetAuthData<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetAuthData<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -98,6 +113,15 @@ impl TransactionBuilder {
             }
             certificate::Certificate::OwnerStakeDelegation(p) => {
                 TaggedTransactionBuilderSetIOs::OwnerStakeDelegation(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VotePlan(p) => {
+                TaggedTransactionBuilderSetIOs::VotePlan(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VoteCast(p) => {
+                TaggedTransactionBuilderSetIOs::VoteCast(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VoteTally(p) => {
+                TaggedTransactionBuilderSetIOs::VoteTally(self.0.set_payload(&p))
             }
         })
     }

@@ -22,6 +22,9 @@ macro_rules! map_payload {
                     C::PoolRegistration($with) => $body,
                     C::PoolUpdate($with) => $body,
                     C::PoolRetirement($with) => $body,
+                    C::VotePlan($with) => $body,
+                    C::VoteCast($with) => $body,
+                    C::VoteTally($with) => $body,
                 }
             }
         }
