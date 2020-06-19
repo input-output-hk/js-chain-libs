@@ -278,7 +278,7 @@
     "google-protobuf": "3.11.2",
     "grpc-web": "1.0.7",
     "history": "4.10.1",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "js-chain-libs": "0.3.0",
     "lodash": "4.17.15",
     "qrcode.react": "1.0.0",
