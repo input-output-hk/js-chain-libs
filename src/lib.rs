@@ -20,6 +20,8 @@ use std::ops::{Add, Sub};
 use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 
+pub use utils::set_panic_hook;
+
 pub use transaction::*;
 
 /// ED25519 signing key, either normal or extended
@@ -808,7 +810,7 @@ impl PoolRegistration {
             rewards: chain::rewards::TaxType::zero(),
             // TODO: Hardcoded parameter
             reward_account: None,
-            keys: chain::leadership::genesis::GenesisPraosLeader {
+            keys: chain_impl_mockchain::key::GenesisPraosLeader {
                 kes_public_key: kes_public_key.0,
                 vrf_public_key: vrf_public_key.0,
             },
@@ -977,7 +979,7 @@ impl Fee {
         use fee::FeeAlgorithm;
         let v = map_payloads!(tx.0, tx, {
             fee_algorithm.calculate(
-                tx.as_slice().payload().to_certificate_slice(),
+                tx.as_slice().payload().into_certificate_slice(),
                 tx.nb_inputs(),
                 tx.nb_outputs(),
             )
@@ -1032,7 +1034,7 @@ impl Witness {
         Witness(tx::Witness::new_account(
             &genesis_hash.0,
             &transaction_id.0,
-            &account_spending_counter.0,
+            account_spending_counter.0,
             |sd| secret_key.0.sign(sd),
         ))
     }
@@ -1101,6 +1103,9 @@ impl Fragment {
             T::PoolUpdate(auth_tx) => F::PoolUpdate(auth_tx),
             T::StakeDelegation(auth_tx) => F::StakeDelegation(auth_tx),
             T::OwnerStakeDelegation(auth_tx) => F::OwnerStakeDelegation(auth_tx),
+            T::VotePlan(auth_tx) => F::VotePlan(auth_tx),
+            T::VoteCast(auth_tx) => F::VoteCast(auth_tx),
+            T::VoteTally(auth_tx) => F::VoteTally(auth_tx),
         }
         .into()
     }
@@ -1116,6 +1121,9 @@ impl Fragment {
             F::PoolRegistration(auth) => Ok(T::PoolRegistration(auth)),
             F::PoolRetirement(auth) => Ok(T::PoolRetirement(auth)),
             F::PoolUpdate(auth) => Ok(T::PoolUpdate(auth)),
+            F::VotePlan(auth) => Ok(T::VotePlan(auth)),
+            F::VoteCast(auth) => Ok(T::VoteCast(auth)),
+            F::VoteTally(auth) => Ok(T::VoteTally(auth)),
             _ => Err(JsValue::from_str("Invalid fragment type")),
         }
         .map(Transaction)
@@ -1201,6 +1209,27 @@ impl Fragment {
     pub fn is_update_vote(&self) -> bool {
         match self.0 {
             chain::fragment::Fragment::UpdateVote(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_vote_cast(&self) -> bool {
+        match self.0 {
+            chain::fragment::Fragment::VoteCast(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_vote_plan(&self) -> bool {
+        match self.0 {
+            chain::fragment::Fragment::VotePlan(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_vote_tally(&self) -> bool {
+        match self.0 {
+            chain::fragment::Fragment::VoteTally(_) => true,
             _ => false,
         }
     }

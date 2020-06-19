@@ -10,6 +10,9 @@ macro_rules! transition_from_to {
             $from::PoolRegistration($with) => $to::PoolRegistration($body),
             $from::PoolUpdate($with) => $to::PoolUpdate($body),
             $from::PoolRetirement($with) => $to::PoolRetirement($body),
+            $from::VotePlan($with) => $to::VotePlan($body),
+            $from::VoteCast($with) => $to::VoteCast($body),
+            $from::VoteTally($with) => $to::VoteTally($body),
         }
     };
 }
@@ -23,6 +26,9 @@ macro_rules! for_all_payloads {
             $from::PoolRegistration($with) => $body,
             $from::PoolUpdate($with) => $body,
             $from::PoolRetirement($with) => $body,
+            $from::VotePlan($with) => $body,
+            $from::VoteCast($with) => $body,
+            $from::VoteTally($with) => $body,
         }
     };
 }
@@ -49,6 +55,9 @@ enum TaggedTransactionBuilderSetIOs {
     PoolRegistration(tx::TxBuilderState<tx::SetIOs<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetIOs<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetIOs<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetIOs<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetIOs<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetIOs<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -61,6 +70,9 @@ enum TaggedTransactionBuilderSetWitness {
     PoolRegistration(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetWitnesses<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetWitnesses<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetWitnesses<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetWitnesses<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -73,6 +85,9 @@ enum TaggedTransactionBuilderSetAuthData {
     PoolRegistration(tx::TxBuilderState<tx::SetAuthData<certificate::PoolRegistration>>),
     PoolRetirement(tx::TxBuilderState<tx::SetAuthData<certificate::PoolRetirement>>),
     PoolUpdate(tx::TxBuilderState<tx::SetAuthData<certificate::PoolUpdate>>),
+    VotePlan(tx::TxBuilderState<tx::SetAuthData<certificate::VotePlan>>),
+    VoteCast(tx::TxBuilderState<tx::SetAuthData<certificate::VoteCast>>),
+    VoteTally(tx::TxBuilderState<tx::SetAuthData<certificate::VoteTally>>),
 }
 
 #[wasm_bindgen]
@@ -98,6 +113,15 @@ impl TransactionBuilder {
             }
             certificate::Certificate::OwnerStakeDelegation(p) => {
                 TaggedTransactionBuilderSetIOs::OwnerStakeDelegation(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VotePlan(p) => {
+                TaggedTransactionBuilderSetIOs::VotePlan(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VoteCast(p) => {
+                TaggedTransactionBuilderSetIOs::VoteCast(self.0.set_payload(&p))
+            }
+            certificate::Certificate::VoteTally(p) => {
+                TaggedTransactionBuilderSetIOs::VoteTally(self.0.set_payload(&p))
             }
         })
     }
@@ -204,6 +228,24 @@ impl TransactionBuilderSetAuthData {
                 }
                 _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
             },
+            P::VotePlan(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::VotePlan(builder) => {
+                    T::VotePlan(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::VoteCast(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::VoteCast(builder) => {
+                    T::VoteCast(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
+            P::VoteTally(a) => match self.0 {
+                TaggedTransactionBuilderSetAuthData::VoteTally(builder) => {
+                    T::VoteTally(builder.set_payload_auth(&a))
+                }
+                _ => return Err(JsValue::from_str(&"Invalid auth type".to_owned())),
+            },
         };
         Ok(Transaction(tx))
     }
@@ -222,6 +264,9 @@ pub enum TaggedPayloadAuthData {
     PoolRegistration(<certificate::PoolRegistration as tx::Payload>::Auth),
     PoolRetirement(<certificate::PoolRetirement as tx::Payload>::Auth),
     PoolUpdate(<certificate::PoolUpdate as tx::Payload>::Auth),
+    VotePlan(<certificate::VotePlan as tx::Payload>::Auth),
+    VoteCast(<certificate::VoteCast as tx::Payload>::Auth),
+    VoteTally(<certificate::VoteTally as tx::Payload>::Auth),
 }
 
 #[wasm_bindgen]
@@ -248,6 +293,18 @@ impl PayloadAuthData {
 
     pub fn for_pool_update(auth_data: PoolUpdateAuthData) -> PayloadAuthData {
         Self(TaggedPayloadAuthData::PoolUpdate(auth_data.0))
+    }
+
+    pub fn for_vote_plan(auth_data: VotePlanAuthData) -> PayloadAuthData {
+        Self(TaggedPayloadAuthData::VotePlan(auth_data.0))
+    }
+
+    pub fn for_vote_cast() -> PayloadAuthData {
+        Self(TaggedPayloadAuthData::VoteCast(()))
+    }
+
+    pub fn for_vote_tally(auth_data: VoteTallyAuthData) -> PayloadAuthData {
+        Self(TaggedPayloadAuthData::VoteTally(auth_data.0))
     }
 }
 
@@ -360,5 +417,68 @@ impl PoolUpdateAuthData {
                     certificate::PoolOwnersSigned { signatures },
                 ))
             })
+    }
+}
+
+#[wasm_bindgen]
+pub struct CommitteeId(chain_impl_mockchain::vote::CommitteeId);
+
+impl CommitteeId {
+    /// returns the identifier encoded in hexadecimal string
+    pub fn to_hex(&self) -> String {
+        self.0.to_hex()
+    }
+
+    /// read the identifier from the hexadecimal string
+    pub fn from_hex(s: &str) -> Result<Self, JsValue> {
+        chain_impl_mockchain::vote::CommitteeId::from_hex(s)
+            .map(CommitteeId)
+            .map_err(|err| JsValue::from_str(&format!("Invalid commiteeid {}", err)))
+    }
+}
+
+#[wasm_bindgen]
+pub struct VotePlanAuthData(<certificate::VotePlan as tx::Payload>::Auth);
+
+#[wasm_bindgen]
+impl VotePlanAuthData {
+    pub fn new(
+        committee: CommitteeId,
+        signature: AccountBindingSignature,
+    ) -> Result<VotePlanAuthData, JsValue> {
+        match signature.0 {
+            tx::AccountBindingSignature::Single(signature) => {
+                Ok(Self(certificate::VotePlanProof {
+                    id: committee.0,
+                    signature,
+                }))
+            }
+            tx::AccountBindingSignature::Multi(_) => {
+                Err(JsValue::from_str("Expected single account signature"))
+            }
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub struct VoteTallyAuthData(<certificate::VoteTally as tx::Payload>::Auth);
+
+#[wasm_bindgen]
+impl VoteTallyAuthData {
+    pub fn new(
+        committee: CommitteeId,
+        signature: AccountBindingSignature,
+    ) -> Result<VoteTallyAuthData, JsValue> {
+        match signature.0 {
+            tx::AccountBindingSignature::Single(signature) => {
+                Ok(Self(certificate::TallyProof::Public {
+                    id: committee.0,
+                    signature,
+                }))
+            }
+            tx::AccountBindingSignature::Multi(_) => {
+                Err(JsValue::from_str("Expected single account signature"))
+            }
+        }
     }
 }
