@@ -1,12 +1,11 @@
 // @flow
 import React from 'react';
-import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
 import curry from 'lodash/curry';
 import ClickableBox from 'clickable-box';
 import config from 'config';
 // FIXME: this is obviously not portable to a webapp
 import { shell } from 'electron';
+import ListingTable from './Listing/ListingTable';
 import type {
   Transaction,
   Address,
@@ -14,7 +13,8 @@ import type {
   TransactionOutput
 } from '../models';
 import styles from './TransactionListing.scss';
-import ListingRow from './ListingRow';
+import ListingRow from './Listing/ListingRow';
+import ListingColumn from './Listing/ListingColumn';
 
 type Props = {
   transactions: Array<Transaction>,
@@ -23,9 +23,9 @@ type Props = {
 
 export default ({ transactions, myAddress }: Props) => {
   return (
-    <Container>
+    <ListingTable>
       {transactions.map(curry(transactionToRow)(myAddress))}
-    </Container>
+    </ListingTable>
   );
 };
 
@@ -55,11 +55,11 @@ const transactionToRow = (
     return null;
   }
   return (
-    <ListingRow key={id} className={styles.row}>
-      <Col className={styles.transactionType} xs={2}>
+    <ListingRow itemKey={id} className={styles.row}>
+      <ListingColumn className={styles.transactionType} xs={2}>
         {transactionType}
-      </Col>
-      <Col xs={2} className={styles.txHash}>
+      </ListingColumn>
+      <ListingColumn xs={2} className={styles.txHash}>
         <ClickableBox
           onClick={() =>
             shell.openExternal(
@@ -71,16 +71,16 @@ const transactionToRow = (
         >
           {id}
         </ClickableBox>
-      </Col>
+      </ListingColumn>
       {/* TODO show date */}
-      <Col xs={1}>04/20/2020</Col>
-      <Col className={styles.amount} xs={2}>
+      <ListingColumn xs={1}>04/20/2020</ListingColumn>
+      <ListingColumn className={styles.amount} xs={2}>
         {inputSum > outputSum ? inputSum : outputSum}
-      </Col>
+      </ListingColumn>
       {/* TODO show confirmations */}
-      <Col className={styles.transactionStatus} xs={2}>
+      <ListingColumn className={styles.transactionStatus} xs={2}>
         pending
-      </Col>
+      </ListingColumn>
       {/* TODO add a dropdown with details (inpt sum, output sum, ) */}
     </ListingRow>
   );
